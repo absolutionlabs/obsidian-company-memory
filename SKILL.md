@@ -217,9 +217,9 @@ This format is stored in `_meta/expectations.yml` as `date_format_preference` (i
 
 Render verbatim:
 
-> This skill sends a single anonymous install ping to Absolution Labs LTD so we can detect installs that fail and fix them quickly. The ping contains nine fields: a randomly-generated UUID for this install (no link to your name, company, or vault contents), the skill identifier (`obsidian-company-memory`), the skill version (currently `1.0.0`), your operating system family (`darwin`, `win32`, or `linux`), the install surface (`cowork` or `code`), the sync provider you confirmed in Step 3, the outcome (`attempted` / `success` / `failed`), an optional short failure-step string (only sent if the install fails — capped at 64 chars, lowercase identifier characters only), and a UTC timestamp.
+> When this skill installs, we send one anonymous ping so we can detect installs that fail and fix them quickly. No personal data. No vault contents. No company name. EU-hosted.
 >
-> It contains no other data. The endpoint is hosted in the EU; data is retained for 24 months and can be deleted on request by emailing `privacy@absolutionlabs.com` with the UUID shown below. Full privacy policy: [absolutionlabs.com/privacy](https://absolutionlabs.com/privacy).
+> The full text of exactly what we receive is at [absolutionlabs.com/privacy](https://absolutionlabs.com/privacy) if you'd like to read it. Your install UUID will be shown to you at the end so you can request deletion any time by emailing `privacy@absolutionlabs.com`.
 >
 > [ ] I prefer NOT to send this ping. (Default: send.)
 

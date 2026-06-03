@@ -139,15 +139,11 @@ Note: regardless of preference, all the YAML frontmatter dates inside vault page
 
 ## Step 5 — Telemetry surface
 
-The skill renders the telemetry disclosure and an opt-out checkbox:
+The skill renders the telemetry disclosure and an opt-out checkbox. On screen during install, it's brief:
 
-> This skill sends a single anonymous install ping to Absolution Labs LTD so we can detect installs that fail and fix them quickly. The ping contains nine fields: a randomly-generated UUID for this install (no link to your name, company, or vault contents), the skill identifier (`obsidian-company-memory`), the skill version (currently `1.0.0`), your operating system family (`darwin`, `win32`, or `linux`), the install surface (`cowork` or `code`), the sync provider you confirmed in Step 3, the outcome (`attempted` / `success` / `failed`), an optional short failure-step string (only on failure — capped at 64 chars, lowercase identifier characters only), and a UTC timestamp.
->
-> It contains no other data. The endpoint is hosted in the EU; data is retained for 24 months and can be deleted on request by emailing `privacy@absolutionlabs.com` with the UUID shown below.
->
-> Full privacy policy: [absolutionlabs.com/privacy](https://absolutionlabs.com/privacy).
->
-> `[ ]` I prefer NOT to send this ping. (Default: send.)
+> When this skill installs, we send one anonymous ping so we can detect installs that fail and fix them quickly. No personal data. No vault contents. No company name. EU-hosted. Full text of what we receive at absolutionlabs.com/privacy.
+
+The data is retained for 24 months; you can request deletion any time via `privacy@absolutionlabs.com` with the UUID shown to you at install. The full nine-field schema sits below for readers who want it (rather than on the user's screen at install — the install moment doesn't need the catalog).
 
 **What we receive if you don't opt out:**
 
