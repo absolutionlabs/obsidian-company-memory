@@ -46,7 +46,7 @@ A scaffolded vault with five things bolted in by design:
 4. **An audit trail.** `log.md` records every Ingest, Query, and close-obsidian-project event with a date and a one-liner. Future you reads it to understand why your past self made certain calls.
 5. **An operating-principles starter.** `concepts/claude-operating-principles.md` ships with 5 principles tailored to AI-assisted work; you extend over time as your team learns what to repeat and what to stop.
 
-Plus: a procedural skill that scaffolds it in ~5 minutes, a 5-step round-trip test that verifies the system works end-to-end, an idempotency contract that refuses partial scaffolds, a compliance gate at install time, no telemetry (the skill does not phone home), and two companion skills (`open-obsidian-project` for starting projects, `close-obsidian-project` for ending sessions cleanly) that auto-install alongside the main install skill.
+Plus: a procedural skill that scaffolds it in ~5 minutes, a 5-step round-trip test that verifies the system works end-to-end, an idempotency contract that refuses partial scaffolds, a compliance gate at install time, no telemetry (the skill does not phone home), and two companion skills (`open-obsidian-project` for starting projects, `close-obsidian-project` for ending sessions cleanly) shipped as separate zips on the same GitHub Release for parallel install.
 
 ---
 

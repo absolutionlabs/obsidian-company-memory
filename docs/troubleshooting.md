@@ -8,24 +8,26 @@ If nothing here describes what you're seeing: email `info@absolutionlabs.com` wi
 
 ## Pre-install — before the skill starts
 
-### "I pasted the install URL into Cowork and nothing happened."
+### "I don't see an 'Install from URL' field in Cowork."
 
-The most common cause: Cowork's plugin install field rejected the URL silently because it didn't match the expected pattern (HTTPS + Absolution Labs domain).
+There isn't one. Cowork installs skills via **Skills → Upload skill** (drag-drop a zip / `.skill` / `.md` file) or via its marketplace. There is no third-party URL-paste path. v1.2.0 of this bundle's docs incorrectly described a URL-paste flow that doesn't exist; v1.2.1 corrected it.
 
-Check:
-- You copied the URL from the current install page on [absolutionlabs.com](https://absolutionlabs.com) and it's pasted with no trailing slash or extra characters.
-- You're signed in to Cowork.
-- You're on a Cowork plan that allows third-party plugin installs (the free tier may not).
+What to do:
+- Download all three zips (main install + two companions) from the [latest GitHub Release](https://github.com/absolutionlabs/obsidian-company-memory/releases/latest).
+- In Cowork: **Skills → Upload skill → drag-drop each zip**, one at a time.
 
-If all three are fine: try clearing the input field and pasting again. Some browsers strip URL characters during paste-and-replace.
+### "Claude Code can't install — there's no `/plugin marketplace add` path for this repo."
 
-### "Claude Code says the install script isn't trusted."
+Correct, not in v1.2.1. The repo is missing the `.claude-plugin/marketplace.json` file Code needs to add the repo as a plugin marketplace. v1.3.0 will ship it; until then, install by cloning the repo and copying the three skill folders into `~/.claude/skills/` manually:
 
-The Code install uses `curl … | sh`. Some hardened terminal environments block piped-shell installs by default.
+```bash
+git clone https://github.com/absolutionlabs/obsidian-company-memory.git ~/tmp/obsidian-company-memory
+cp -r ~/tmp/obsidian-company-memory ~/.claude/skills/
+cp -r ~/tmp/obsidian-company-memory/companion-skills/open-obsidian-project ~/.claude/skills/
+cp -r ~/tmp/obsidian-company-memory/companion-skills/close-obsidian-project ~/.claude/skills/
+```
 
-Options:
-- Download the install script from [absolutionlabs.com](https://absolutionlabs.com) first, inspect it (it should be ~30 lines doing a `git clone` and a `mv`), then run it locally.
-- Manual install: clone the source repo into `~/.claude/skills/obsidian-company-memory` (the repo URL is on the install page) and restart Claude Code.
+Then restart Code.
 
 ### "The compliance checkboxes won't let me proceed."
 
@@ -203,14 +205,21 @@ The vault is plain markdown. There is no proprietary database, no schema migrati
 
 The skill bundle is ~25 files; if even one is missing, the pre-flight integrity check refuses. These are the common reasons the download doesn't land cleanly.
 
-### "The Cowork plugin URL paste did nothing visible."
+### "The Cowork zip upload was rejected."
 
-Cowork's plugin install field accepts the URL silently and shows no progress indicator for the first 2-5 seconds while it resolves. If you paste-and-immediately-click-away, you may miss the success state.
+Cowork's Upload-skill dialog validates the zip before installing. The common rejection messages:
 
-What to check:
-- Wait 5-10 seconds after pasting before assuming it failed.
-- Open Cowork's plugin list (Settings → Plugins) — the new plugin appears there once install completes, even if no toast notification fires.
-- If the plugin doesn't appear in the list after 30 seconds: the URL was probably rejected. See "URL paste did nothing" in the Pre-install section above.
+- *"Zip file contains path with invalid characters"* — the zip uses backslash (`\`) path separators inside its entries instead of forward slashes (`/`). Windows PowerShell's `Compress-Archive` produces backslashed zips; the official Absolution Labs zips are built with Python's `zipfile` which always writes forward slashes. **Fix:** download the zip directly from the [GitHub Release](https://github.com/absolutionlabs/obsidian-company-memory/releases/latest) rather than building your own. If you must build your own, use `scripts/build_cowork_zips.py` from the repo (not PowerShell).
+- *"SKILL.md not found"* — the zip is missing `SKILL.md` at its root, or the `SKILL.md` is nested inside a folder. Re-download from the GitHub Release; if you're zipping your own, the file must be at the root, not under `obsidian-company-memory/SKILL.md`.
+- *"Skill name conflicts with existing skill"* — you already have a skill with the same `name:` in your installed list. Uninstall the older version first.
+
+What to check otherwise:
+- Wait 5-10 seconds after the upload — the install state can lag a couple of seconds.
+- Open Cowork's skills list (**Skills**) — the new skill appears there once install completes.
+
+### "I uploaded the v1.2.1 zip but Cowork still shows v1.2.0 in the skill description."
+
+Cowork doesn't overwrite an existing skill on re-upload; uploading the same-named zip into a slot that already has it may either no-op or stack a duplicate. Cleanest sequence: uninstall the old version first, then upload the v1.2.1 zip.
 
 ### "The Claude Code install ran but `claude` doesn't see the skill."
 

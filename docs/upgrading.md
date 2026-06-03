@@ -29,25 +29,25 @@ The reason for this separation: your edits to `SCHEMA.md`, `CONTEXT.md`, your op
 
 ## Version pinning
 
-The install page on [absolutionlabs.com](https://absolutionlabs.com) gives you two install paths for each surface (Cowork, Code):
+Two paths into a given version:
 
-- A URL for the **current latest version** — convenient, but means whatever ships next could land on you without warning.
-- A URL for a **specific version** (e.g. `v1.0.0`, `v1.1.0`) — reproducible, rollback-safe.
+- **Latest** — `https://github.com/absolutionlabs/obsidian-company-memory/releases/latest` — always resolves to the current version, whatever it is. Convenient, but means whatever ships next could land on you without warning.
+- **Version-pinned** — `https://github.com/absolutionlabs/obsidian-company-memory/releases/tag/vX.Y.Z` — reproducible, rollback-safe.
 
-**Use the specific-version URL in production.** Pinning to `v1.0.0` (or whichever version you tested against) means:
+**Use the version-pinned URL in production.** Pinning to `v1.2.1` (or whichever version you tested against) means:
 
 - Your install is reproducible.
-- If we release `v1.1.0` and you don't like it, you keep `v1.0.0` until you choose to move.
-- If `v1.1.0` introduces a regression, you can stay on `v1.0.0` until it's fixed.
+- If we release `v1.2.2` and you don't like it, you keep `v1.2.1` until you choose to move.
+- If `v1.2.2` introduces a regression, you can stay on `v1.2.1` until it's fixed.
 
-Old versions never disappear. The install page keeps every previous version selectable indefinitely; see § Version retention below.
+Old versions never disappear. GitHub Releases keep every previous tag selectable indefinitely; see § Version retention below.
 
 ### How to know which version you have
 
 Two places:
 
 1. **Your installed skill artifact:**
-   - Cowork: Settings → Plugins → Obsidian Company Memory → shown next to the name.
+   - Cowork: Skills → find Obsidian Company Memory in the list → version shown next to the name (or inside the skill description).
    - Code: `cat ~/.claude/skills/obsidian-company-memory/SKILL.md | head -10` — the `version:` field in the frontmatter.
 
 2. **Inside any vault you scaffolded:** `cat <vault>/_meta/scaffold-version.txt` — the line `version: 1.0.0` (per SKILL.md Step 6.7) records which version of the skill scaffolded that vault. This stamp does NOT auto-update when you upgrade the skill — it's a permanent record of what was installed and when.
@@ -58,18 +58,25 @@ Two places:
 
 ### Cowork
 
-1. Settings → Plugins → Obsidian Company Memory → uninstall.
-2. Visit the install page on [absolutionlabs.com](https://absolutionlabs.com), pick the version you want, copy the install URL.
-3. Paste into Cowork's plugin-install field.
+1. Skills → find Obsidian Company Memory in the list → uninstall. Repeat for the two companion skills if you're upgrading those too.
+2. Visit the [latest GitHub Release](https://github.com/absolutionlabs/obsidian-company-memory/releases/latest) (or a version-pinned tag — `/releases/tag/vX.Y.Z`).
+3. Download the three zips (`obsidian-company-memory-vX.Y.Z.zip` + two companions).
+4. Cowork: Skills → Upload skill → drag-drop each. Suggested order: companions first, main last.
 
-The plugin is replaced in place. No vault changes occur as part of this.
+No vault changes occur as part of this — only the skill artifacts change.
 
 ### Claude Code
 
 ```sh
 rm -rf ~/.claude/skills/obsidian-company-memory
-# Then paste the one-line install command for the version you want
-# from absolutionlabs.com — the page shows the current command.
+rm -rf ~/.claude/skills/open-obsidian-project
+rm -rf ~/.claude/skills/close-obsidian-project
+
+git clone https://github.com/absolutionlabs/obsidian-company-memory.git ~/tmp/obsidian-company-memory
+# (or `git -C ~/tmp/obsidian-company-memory checkout vX.Y.Z` for a specific tag)
+cp -r ~/tmp/obsidian-company-memory ~/.claude/skills/
+cp -r ~/tmp/obsidian-company-memory/companion-skills/open-obsidian-project ~/.claude/skills/
+cp -r ~/tmp/obsidian-company-memory/companion-skills/close-obsidian-project ~/.claude/skills/
 ```
 
 Restart Code (or its harness) to pick up the new skill version.
@@ -86,7 +93,7 @@ The skill won't do this for you. Doing it by hand is straightforward if you unde
 
 ### Workflow
 
-1. **Read the release notes** for every version between yours and the target. The install page on [absolutionlabs.com](https://absolutionlabs.com) links to per-version notes; the most recent version is at the top.
+1. **Read the release notes** for every version between yours and the target. Per-version notes live on the [GitHub Releases page](https://github.com/absolutionlabs/obsidian-company-memory/releases); the most recent version is at the top.
 
 2. **Decide what you want.** Most users want one or two specific changes (a new lint rule, an updated operating principle, a `.obsidian/` config fix). You rarely want everything.
 
@@ -122,11 +129,11 @@ The skill won't do this for you. Doing it by hand is straightforward if you unde
 
 ### Rolling back the installed skill
 
-Code: `rm -rf ~/.claude/skills/obsidian-company-memory`, then paste the one-line install for the older version from the install page on [absolutionlabs.com](https://absolutionlabs.com).
+Code: `rm -rf ~/.claude/skills/obsidian-company-memory`, then `git clone … -b vX.Y.Z` the older tag from the [GitHub Releases page](https://github.com/absolutionlabs/obsidian-company-memory/releases) and copy in per § Claude Code above (with the older tag's zips or the older commit's files).
 
-Cowork: uninstall the current version, install from the version-pinned URL for the older version (same install page).
+Cowork: uninstall the current version, download the older version's three zips from `https://github.com/absolutionlabs/obsidian-company-memory/releases/tag/vX.Y.Z`, upload via Skills → Upload skill.
 
-You can always revert to any past version we've published, because every version stays selectable on the install page forever.
+You can always revert to any past version we've published, because every tag stays selectable on GitHub Releases forever.
 
 ### Rolling back changes to a vault
 
@@ -142,7 +149,7 @@ The vault has no proprietary database, no migrations to undo, no schema upgrades
 
 ## Version retention
 
-Every published version of this skill remains selectable from the install page on [absolutionlabs.com](https://absolutionlabs.com) indefinitely. We do not retire old versions.
+Every published version of this skill remains selectable from the [GitHub Releases page](https://github.com/absolutionlabs/obsidian-company-memory/releases) indefinitely. We do not retire old versions.
 
 What you should know:
 
@@ -151,7 +158,7 @@ What you should know:
 - **The compatibility matrix in [COMPATIBILITY.md](../COMPATIBILITY.md) is updated for the current version only.** Older versions' compatibility is whatever was true at their release date.
 
 If we ever need to withdraw a published version (e.g. a critical security issue we can't patch backwards), we'll:
-- Replace the version's entry on the install page with a clear "this version was withdrawn because [reason]; please install [recommended replacement]" notice.
+- Mark the GitHub Release as withdrawn with a clear "this version was withdrawn because [reason]; please install [recommended replacement]" notice in the release notes.
 - Email everyone we have a contact for (which is: nobody — we don't collect any contact information at install, by design).
 - Post the withdrawal on the Absolution Labs site.
 
@@ -176,8 +183,9 @@ No release will silently change your installed version. You upgrade when you cho
 
 We don't push notifications. The install doesn't phone home for version checks. You discover new releases the same way you'd discover anything else from Absolution Labs:
 
+- Watch the [GitHub repository](https://github.com/absolutionlabs/obsidian-company-memory) (the "Watch → Releases only" option emails you when a new release is tagged).
+- Check the [GitHub Releases page](https://github.com/absolutionlabs/obsidian-company-memory/releases) periodically — current version is at the top.
 - Subscribe to the Absolution Labs newsletter at [absolutionlabs.com](https://absolutionlabs.com).
-- Check the install page on [absolutionlabs.com](https://absolutionlabs.com) periodically — current version is shown.
 - Email `info@absolutionlabs.com` to ask if there's a newer version than the one you're running.
 
 This is intentional. Auto-update is convenient but also a path through which someone could ship a broken or compromised version into your environment without you noticing. The skill installs once and stays put until you choose otherwise.

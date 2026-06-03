@@ -4,6 +4,8 @@ Before any public release, run the install against each of the 7 personas below.
 
 The matrix maps 1:1 to the 6 assumptions + the pre-mortem failure shape captured in our internal project brief. The bundle survives this matrix or it doesn't ship.
 
+> **v1.2.1 updates to pass criteria across every persona.** (a) Install procedure now reads: *Download three zips from the latest GitHub Release → Cowork → Skills → Upload skill → drag-drop each. Then say "Set up my Obsidian company memory."* (Persona-specific paths for Code / MDM / Codex still differ.) (b) Compliance gate is **2 checkboxes**, not 3 (v1.2.1 cut box 3 — "Absolution Labs has no access" — because confirmations should be about user commitments, not our behaviour; a one-line passive privacy statement appears above the gate instead). (c) **Telemetry pass criteria are deleted** — v1.2.0 removed the install ping; v1.2.1 retains that decision. References below to "telemetry surface explains 9 fields", "telemetry HTTPS POST succeeds", "final UUID shown to user", or "telemetry ping arrives in Supabase install_events" do NOT apply to v1.2.1+ runs. Strike them when running the matrix.
+
 ---
 
 ## How to run a persona

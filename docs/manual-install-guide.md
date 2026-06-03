@@ -200,7 +200,7 @@ Rule 2 — `companion-skills/open-obsidian-project/SKILL.md` and `companion-skil
 
 > **Substitute NOTHING. Copy verbatim.**
 >
-> The companion skills auto-install as sibling skills in your AI tool (Section 7f). They read the vault's `_meta/scaffold-version.txt` and `CONTEXT.md` at runtime to know which company / vault path they're operating against. No scaffold-time substitution required. (In v1.0.0 the equivalent files lived in `templates/_meta/skill-prompts/` and required scaffold-time substitution; v1.2.0 moved them to `companion-skills/` and removed the substitution requirement.)
+> The companion skills install as sibling skills in your AI tool via separate zips on the same GitHub Release (Section 7f). They read the vault's `_meta/scaffold-version.txt` and `CONTEXT.md` at runtime to know which company / vault path they're operating against. No scaffold-time substitution required. (In v1.0.0 the equivalent files lived in `templates/_meta/skill-prompts/` and required scaffold-time substitution; v1.2.0 moved them to `companion-skills/` and removed the substitution requirement; v1.2.1 confirmed that programmatic auto-install isn't possible on Cowork — each companion is its own zip the user uploads.)
 
 Rule 3 — `templates/CLAUDE.md.template` and `templates/AGENTS.md.template`:
 
@@ -364,7 +364,7 @@ These files become USER-COPY templates inside the vault. When you (or your AI) c
 
 ### 7f. Companion-skill install (no substitution required — copy verbatim)
 
-In v1.0.0 the bundle wrote three skill-prompt files into the vault at `_meta/skill-prompts/` and you (the user) manually installed them as custom skills in your AI tool. **In v1.2.0+ the companion skills auto-install alongside the main skill** as sibling skill folders in your AI tool's skill directory, with namespaced names that don't collide with other skills you might have.
+In v1.0.0 the bundle wrote three skill-prompt files into the vault at `_meta/skill-prompts/` and you (the user) manually installed them as custom skills in your AI tool. **In v1.2.1+ the companion skills ship as their own zips on the GitHub Release** — they install in parallel with the main skill rather than being auto-installed by it. (Earlier v1.1.0 / v1.2.0 versions of this document described an auto-install path on Code; that path still works on Code if you're cloning the repo, but Cowork can't programmatically install other skills on the user's behalf — the user uploads each companion zip via the same Upload-skill UI as the main skill.) Names are still namespaced (`open-obsidian-project`, `close-obsidian-project`) so they don't collide with other skills you might have.
 
 For the manual install path, you copy the two companion-skill folders out of the bundle to the appropriate skill-install location for your AI tool:
 

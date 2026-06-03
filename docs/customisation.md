@@ -6,6 +6,8 @@ The skill is MIT-licensed. You can take it as your own starting point with no pe
 
 This guide assumes you're comfortable editing markdown and JSON.
 
+> **v1.2.1 update — `plugin.json` references are deprecated.** Sections below describe edits to `plugin.json`, the Cowork plugin manifest, and the `MANIFESTS.md` mirror contract. v1.2.1 retired all three — the canonical manifest is now the YAML frontmatter at the top of `SKILL.md`, and Cowork installs via zip upload (see `scripts/build_cowork_zips.py`), not via `plugin.json` URL paste. **When forking: edit `SKILL.md` frontmatter and ignore the `plugin.json` files.** The deprecated files are preserved in the repo with `_deprecated` headers but not read at install time.
+
 ---
 
 ## What's editable, and how the bundle is structured
