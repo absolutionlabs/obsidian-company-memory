@@ -310,7 +310,7 @@ What to check on disk to confirm everything is there:
 ├── _meta/expectations.yml
 ├── _meta/scaffold-version.txt
 ├── _meta/templates/{entity,concept,query}.md
-├── _meta/skill-prompts/{README,new-project-setup,close-session}.md
+├── _meta/skill-prompts/{README,open-obsidian-project,close-obsidian-project}.md
 └── .obsidian/{app,appearance,core-plugins,community-plugins,hotkeys}.json
 ```
 

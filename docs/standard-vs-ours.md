@@ -43,10 +43,10 @@ A scaffolded vault with five things bolted in by design:
 1. **A schema.** `SCHEMA.md` at the vault root names the three operations (Ingest / Query / Lint), defines the page format (YAML frontmatter, wikilinks), and lays out file conventions. Every AI session reads it first.
 2. **A company context.** `CONTEXT.md` tells the AI what your company does, who its customers are, what its constraints are. The first thing it reads after SCHEMA.
 3. **An index.** `index.md` is the lookup table. Every page on disk appears here. AI consults it to find what exists before deciding to write something new.
-4. **An audit trail.** `log.md` records every Ingest, Query, and close-session event with a date and a one-liner. Future you reads it to understand why your past self made certain calls.
+4. **An audit trail.** `log.md` records every Ingest, Query, and close-obsidian-project event with a date and a one-liner. Future you reads it to understand why your past self made certain calls.
 5. **An operating-principles starter.** `concepts/claude-operating-principles.md` ships with 5 principles tailored to AI-assisted work; you extend over time as your team learns what to repeat and what to stop.
 
-Plus: a procedural skill that scaffolds it in ~5 minutes, a 5-step round-trip test that verifies the system works end-to-end, an idempotency contract that refuses partial scaffolds, a compliance gate at install time, opt-out telemetry for failure detection, and ready-to-install prompt files for two custom skills (`new-project-setup` for starting projects, `close-session` for ending sessions cleanly).
+Plus: a procedural skill that scaffolds it in ~5 minutes, a 5-step round-trip test that verifies the system works end-to-end, an idempotency contract that refuses partial scaffolds, a compliance gate at install time, opt-out telemetry for failure detection, and ready-to-install prompt files for two custom skills (`open-obsidian-project` for starting projects, `close-obsidian-project` for ending sessions cleanly).
 
 ---
 
@@ -119,7 +119,7 @@ Plus: a procedural skill that scaffolds it in ~5 minutes, a 5-step round-trip te
 | You can't tell what's stale | Lint check #3 (stale content) flags pages > 30 days old |
 | Wikilinks point at pages that don't exist | Lint check #4 (data gaps) catches this every run |
 | Two pages disagree | Lint check #1 (contradictions) flags conflicting claims |
-| You can't audit what changed | log.md is the audit trail; one line per close-session |
+| You can't audit what changed | log.md is the audit trail; one line per close-obsidian-project |
 | You don't know if your install worked | Round-trip test verifies end-to-end; 5-step user confirmation |
 | You install something that overwrites your work | Refuse-on-non-empty + worktree-refusal + skill-bundle integrity check |
 | You can't tell compliance whether data leaves your machine | The vault never reaches our infra; opt-out telemetry has 9 anonymous fields disclosed at install |

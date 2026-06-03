@@ -82,7 +82,7 @@ How the vault stays healthy. Run on demand: ask the AI to "run a lint on the vau
 
 ## 5. Close procedure
 
-Every session ends with the `close-session` skill (the user installs this from `_meta/skill-prompts/close-session.md` at vault setup time). The protocol the skill executes:
+Every session ends with the `close-obsidian-project` skill (auto-installed alongside the main vault-setup skill at install time). The protocol the skill executes:
 
 1. Update the project brief if one exists.
 2. Verify at least one Ingest ran this session. If not, the session must record why (in `log.md`) before closing.

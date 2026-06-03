@@ -1,6 +1,6 @@
 # Manual install guide
 
-A by-hand installation procedure for **Obsidian Company Memory v1.0.0** without using the Cowork plugin or the Claude Code skill. Produces a vault byte-identical to the skill-installed one.
+A by-hand installation procedure for **Obsidian Company Memory v1.1.0** without using the Cowork plugin or the Claude Code skill. Produces a vault byte-identical to the skill-installed one, plus the two companion skills (`open-obsidian-project`, `close-obsidian-project`) installed alongside.
 
 **Estimated time:** 45–60 minutes if you follow along carefully. The skill path is ~25 minutes; manual is slower because you do the substitutions and file copies yourself.
 
@@ -171,7 +171,7 @@ If the result is empty, the folder is good. If anything appears, **STOP**. Move 
 
 ## Section 5 — Substitution variables
 
-This is the section that bites people. The skill ships 5 placeholders that get replaced with your values during install. **Two of these have non-obvious "do not substitute in these files" rules.** Get them wrong and the vault works but the lint or downstream skills fail in confusing ways.
+This is the section that bites people. The skill ships 5 placeholders that get replaced with your values during install. **One of these has a non-obvious "do not substitute in these files" rule** (Rule 1 below). Get it wrong and the vault works but the lint flags every page as stale immediately.
 
 ### The five placeholders
 
@@ -180,10 +180,10 @@ This is the section that bites people. The skill ships 5 placeholders that get r
 | `{{COMPANY_NAME}}` | Your company name as it should appear in headings, page titles, prose. | 1–80 characters. Letters, digits, spaces, hyphens, ampersands, apostrophes, periods, and corporate suffixes (LTD, Ltd, Limited, Inc, Co). NO angle brackets, braces, pipes, backslashes, backticks, or control characters. |
 | `{{TODAY}}` | Today's date in ISO format. | `YYYY-MM-DD` in UTC. Example: `2026-06-03`. |
 | `{{VAULT_ABSOLUTE_PATH}}` | The full path to your vault folder. | Absolute path, e.g. `/Users/jane/Dropbox/AcmeCorp` (macOS) or `C:\Users\jane\Dropbox\AcmeCorp` (Windows). |
-| `{{PROJECT_NAME}}` | **Leave as literal** in `CLAUDE.md.template` and `AGENTS.md.template`. Substituted later by your `new-project-setup` skill. | Do not pick a value at scaffold time. |
+| `{{PROJECT_NAME}}` | **Leave as literal** in `CLAUDE.md.template` and `AGENTS.md.template`. Substituted later by your `open-obsidian-project` skill. | Do not pick a value at scaffold time. |
 | `{{PROJECT_DESCRIPTION}}` | Same — leave as literal. | Do not pick a value at scaffold time. |
 
-### The four substitution-scope carve-outs (READ CAREFULLY)
+### The three substitution-scope carve-outs (READ CAREFULLY)
 
 Rule 1 — `templates/_meta/templates/*.md` (the per-page templates):
 
@@ -191,23 +191,17 @@ Rule 1 — `templates/_meta/templates/*.md` (the per-page templates):
 >
 > These files are USER-COPY templates. You'll clone them in Obsidian months from now to make new pages. Baking the install date into them defeats the lint's stale-page detection. Leave `{{TODAY}}` as a literal placeholder.
 
-Rule 2 — `templates/_meta/skill-prompts/new-project-setup.md` and `close-session.md`:
-
-> **Substitute `{{COMPANY_NAME}}` and `{{VAULT_ABSOLUTE_PATH}}` only. DO NOT substitute `{{TODAY}}`, `{{PROJECT_NAME}}`, or `{{PROJECT_DESCRIPTION}}`.**
->
-> These get consumed by your custom skills at per-project use time, not at scaffold time. The placeholders the user-built skill expects must remain placeholders.
-
-Rule 3 — `templates/_meta/skill-prompts/README.md`:
-
-> **Substitute all three: `{{COMPANY_NAME}}`, `{{VAULT_ABSOLUTE_PATH}}`, `{{TODAY}}`.**
->
-> This README is a one-time-at-scaffold artefact, not a downstream-consumed template. The exception to the rule-2 carve-out.
-
-Rule 4 — `templates/CLAUDE.md.template` and `templates/AGENTS.md.template`:
+Rule 2 — `companion-skills/open-obsidian-project/SKILL.md` and `companion-skills/close-obsidian-project/SKILL.md`:
 
 > **Substitute NOTHING. Copy verbatim.**
 >
-> All five placeholders stay literal. The user's `new-project-setup` skill substitutes these at first project invocation, using THAT project's date, not the vault scaffold date.
+> The companion skills auto-install as sibling skills in your AI tool (Section 7f). They read the vault's `_meta/scaffold-version.txt` and `CONTEXT.md` at runtime to know which company / vault path they're operating against. No scaffold-time substitution required. (In v1.0.0 the equivalent files lived in `templates/_meta/skill-prompts/` and required scaffold-time substitution; v1.1.0 moved them to `companion-skills/` and removed the substitution requirement.)
+
+Rule 3 — `templates/CLAUDE.md.template` and `templates/AGENTS.md.template`:
+
+> **Substitute NOTHING. Copy verbatim.**
+>
+> All five placeholders stay literal. The user's `open-obsidian-project` skill substitutes these at first project invocation, using THAT project's date, not the vault scaffold date.
 
 ### Substitution recipes by OS
 
@@ -269,14 +263,14 @@ From inside `$VAULT`:
 
 ```bash
 cd "$VAULT"
-mkdir -p entities concepts comparisons queries raw raw/articles raw/transcripts raw/assets lint-reports _meta _meta/templates _meta/skill-prompts .obsidian
+mkdir -p entities concepts comparisons queries raw raw/articles raw/transcripts raw/assets lint-reports _meta _meta/templates .obsidian
 ```
 
 **Windows PowerShell:**
 
 ```powershell
 Set-Location $VAULT
-"entities","concepts","comparisons","queries","raw","raw/articles","raw/transcripts","raw/assets","lint-reports","_meta","_meta/templates","_meta/skill-prompts",".obsidian" | ForEach-Object { New-Item -ItemType Directory -Path $_ -Force | Out-Null }
+"entities","concepts","comparisons","queries","raw","raw/articles","raw/transcripts","raw/assets","lint-reports","_meta","_meta/templates",".obsidian" | ForEach-Object { New-Item -ItemType Directory -Path $_ -Force | Out-Null }
 ```
 
 Verify:
@@ -363,15 +357,38 @@ Pick the value matching your `DATE_FORMAT` choice from Section 5. (DD/MM/YYYY fo
 
 These files become USER-COPY templates inside the vault. When you (or your AI) clone them to make a new entity page in 3 months' time, `{{TODAY}}` should resolve to THAT day, not today. Leave it untouched.
 
-### 7f. Skill-prompts (carve-out Rule 2 + Rule 3)
+### 7f. Companion-skill install (no substitution required — copy verbatim)
 
-| Source | Destination | Substitutions |
+In v1.0.0 the bundle wrote three skill-prompt files into the vault at `_meta/skill-prompts/` and you (the user) manually installed them as custom skills in your AI tool. **In v1.1.0+ the companion skills auto-install alongside the main skill** as sibling skill folders in your AI tool's skill directory, with namespaced names that don't collide with other skills you might have.
+
+For the manual install path, you copy the two companion-skill folders out of the bundle to the appropriate skill-install location for your AI tool:
+
+| Source | Destination (Claude Code) | Substitutions |
 |---|---|---|
-| `$BUNDLE/templates/_meta/skill-prompts/README.md` | `$VAULT/_meta/skill-prompts/README.md` | **All three:** `{{COMPANY_NAME}}`, `{{VAULT_ABSOLUTE_PATH}}`, `{{TODAY}}` (Rule 3 — this README is one-time-at-scaffold). |
-| `$BUNDLE/templates/_meta/skill-prompts/new-project-setup.md` | `$VAULT/_meta/skill-prompts/new-project-setup.md` | **`{{COMPANY_NAME}}` and `{{VAULT_ABSOLUTE_PATH}}` only** (Rule 2). Leave `{{TODAY}}`, `{{PROJECT_NAME}}`, `{{PROJECT_DESCRIPTION}}` as literal placeholders. |
-| `$BUNDLE/templates/_meta/skill-prompts/close-session.md` | `$VAULT/_meta/skill-prompts/close-session.md` | **`{{COMPANY_NAME}}` and `{{VAULT_ABSOLUTE_PATH}}` only** (Rule 2). Leave `{{TODAY}}` as a literal placeholder. |
+| `$BUNDLE/companion-skills/open-obsidian-project/` (whole folder) | `~/.claude/skills/open-obsidian-project/` | **None. Copy verbatim.** |
+| `$BUNDLE/companion-skills/close-obsidian-project/` (whole folder) | `~/.claude/skills/close-obsidian-project/` | **None. Copy verbatim.** |
 
-These files become the prompts you'll install as custom skills in your AI tool (Section 10). The placeholders left literal are the ones those skills consume at use time.
+**macOS / Linux:**
+
+```bash
+cp -r "$BUNDLE/companion-skills/open-obsidian-project" ~/.claude/skills/
+cp -r "$BUNDLE/companion-skills/close-obsidian-project" ~/.claude/skills/
+# Restart Claude Code so it picks up the new skills.
+```
+
+**Windows PowerShell:**
+
+```powershell
+Copy-Item -Recurse "$BUNDLE\companion-skills\open-obsidian-project" "$env:USERPROFILE\.claude\skills\"
+Copy-Item -Recurse "$BUNDLE\companion-skills\close-obsidian-project" "$env:USERPROFILE\.claude\skills\"
+# Restart Claude Code.
+```
+
+**Collision check before copying:** if `~/.claude/skills/open-obsidian-project/` or `~/.claude/skills/close-obsidian-project/` already exists from a previous install, the `cp` will refuse or merge depending on flags. Best practice: `rm -rf` the target only if you intend to overwrite, otherwise rename your existing copy first.
+
+The companion skills require no placeholder substitution — they read the vault's `_meta/scaffold-version.txt` and `CONTEXT.md` at runtime to know which company / vault path they're operating against. Copy verbatim.
+
+**For Cowork / Codex / opencode**, see [companion-skills/README.md](../companion-skills/README.md) in the bundle for the surface-specific install path. The bundle path is the same; only how you register the SKILL.md with your AI tool differs.
 
 ### 7g. Project-stub templates (carve-out Rule 4 — substitute NOTHING)
 
@@ -380,7 +397,7 @@ These files become the prompts you'll install as custom skills in your AI tool (
 | `$BUNDLE/templates/CLAUDE.md.template` | `$VAULT/CLAUDE.md.template` | **None. Copy verbatim with all placeholders literal.** |
 | `$BUNDLE/templates/AGENTS.md.template` | `$VAULT/AGENTS.md.template` | **None. Copy verbatim with all placeholders literal.** |
 
-These `.template` files sit at the vault root with the `.template` suffix preserved. They are NOT instantiated; your `new-project-setup` skill instantiates them at first project creation. The five placeholders inside (`{{PROJECT_NAME}}`, `{{PROJECT_DESCRIPTION}}`, `{{COMPANY_NAME}}`, `{{VAULT_ABSOLUTE_PATH}}`, `{{TODAY}}`) all get substituted later, with the project's values and date, not the vault scaffold's.
+These `.template` files sit at the vault root with the `.template` suffix preserved. They are NOT instantiated; your `open-obsidian-project` skill instantiates them at first project creation. The five placeholders inside (`{{PROJECT_NAME}}`, `{{PROJECT_DESCRIPTION}}`, `{{COMPANY_NAME}}`, `{{VAULT_ABSOLUTE_PATH}}`, `{{TODAY}}`) all get substituted later, with the project's values and date, not the vault scaffold's.
 
 ### 7h. Write `_meta/scaffold-version.txt` (no template — build fresh)
 
@@ -388,7 +405,7 @@ Create a new file at `$VAULT/_meta/scaffold-version.txt` containing exactly:
 
 ```
 skill: obsidian-company-memory
-version: 1.0.0
+version: 1.1.0
 scaffolded: 2026-06-03
 date_format_preference: DD/MM/YYYY
 sync_provider: dropbox
@@ -480,7 +497,7 @@ the wikilink, the round-trip works.
 ## Next
 
 Read [[HOW-TO-USE-THIS]] for the ongoing-use guide. When you are ready to
-start your first real project, run the `new-project-setup` skill (it ships
+start your first real project, run the `open-obsidian-project` skill (it ships
 separately in your AI tool's skill list).
 ```
 
@@ -589,25 +606,27 @@ Expected response: HTTP 201 with empty body. Anything else (400, 429, network er
 
 ---
 
-## Section 10 — Install the two custom skills in your AI tool
+## Section 10 — Confirm the companion skills installed correctly
 
-The bundle ships ready-to-install prompts for two custom skills the user creates inside their AI tool. They are at `$VAULT/_meta/skill-prompts/`.
+This step was already done as part of Section 7f (the companion-skill copy). What's left is verification: confirm both companion skills are visible to your AI tool and respond to invocation.
 
-This is the most important step after the round-trip. Without these two skills, your AI sessions will start cold (no SCHEMA-reading discipline) and end abruptly (no audit trail in `log.md`).
+### Read [`companion-skills/README.md`](../companion-skills/README.md)
 
-### Read `_meta/skill-prompts/README.md`
+It walks the surface-by-surface install procedure for Cowork, Claude Code, Codex, and opencode. ~3 minutes to read. Useful reference if Section 7f's copy didn't land cleanly on your surface.
 
-It walks the surface-by-surface install procedure for Cowork, Claude Code, Codex, and opencode. ~3 minutes to read.
+### Verify `open-obsidian-project` is installed
 
-### Install `new-project-setup`
+Ask your AI: *"List my available skills."* `open-obsidian-project` should appear. If you're on Code, also confirm `~/.claude/skills/open-obsidian-project/SKILL.md` exists on disk.
 
-Per the README's instructions for your specific AI tool. The prompt body is `$VAULT/_meta/skill-prompts/new-project-setup.md`. After install, your AI can scaffold new projects inside the vault with one command.
+If it doesn't appear: re-run the copy step from Section 7f for that skill, restart your AI tool, and retry.
 
-### Install `close-session`
+### Verify `close-obsidian-project` is installed
 
-Same — `$VAULT/_meta/skill-prompts/close-session.md`. After install, every session can end with `/close-session` (or your tool's equivalent), which updates the brief, verifies Ingest, appends `log.md`, and produces a continuation prompt.
+Same check. `close-obsidian-project` should appear in the skills list. If not, re-run the copy step.
 
-You can install these now or at your first real session — both work. Recommendation: install both now while you're still in setup mode.
+If both appear and respond, you're done.
+
+Both companion skills use the `-obsidian-project` namespace suffix so they coexist with any other "open project" or "close" skills you already have. If you already had a skill with the exact name `open-obsidian-project` or `close-obsidian-project`, the copy step in Section 7f would have collided — pick a different name for one or the other and re-run.
 
 ---
 
@@ -626,11 +645,10 @@ Before declaring the manual install complete, confirm:
 [ ] CLAUDE.md.template at vault root still contains literal {{...}} placeholders (NOT substituted).
 [ ] AGENTS.md.template at vault root still contains literal {{...}} placeholders (NOT substituted).
 [ ] _meta/templates/{entity,concept,query}.md each contain a literal {{TODAY}} (NOT substituted).
-[ ] _meta/skill-prompts/new-project-setup.md contains literal {{TODAY}}, {{PROJECT_NAME}}, {{PROJECT_DESCRIPTION}} placeholders (NOT substituted).
-[ ] _meta/skill-prompts/close-session.md contains literal {{TODAY}} placeholder (NOT substituted).
 [ ] CONTEXT.md heading shows your company name, not a literal {{COMPANY_NAME}}.
-[ ] No file anywhere shows a literal {{VAULT_ABSOLUTE_PATH}} except the four files listed above.
-[ ] Two custom skills are installed in your AI tool (or scheduled to be at first session).
+[ ] No file in the vault shows a literal {{VAULT_ABSOLUTE_PATH}} except the two .template files at the vault root.
+[ ] open-obsidian-project companion skill is installed in your AI tool (verified by "list my skills" returning it).
+[ ] close-obsidian-project companion skill is installed in your AI tool (same check).
 ```
 
 If every box is ticked, you're done.
@@ -643,12 +661,12 @@ These are the failure modes most likely to bite a manual installer. Each links t
 
 ### Mistake 1 — Forgot the carve-outs and substituted everything
 
-You ran the batch sed/PowerShell substitution from Section 5 without reverting the four carve-outs. Your `_meta/templates/*.md` files now have today's date baked in instead of `{{TODAY}}`, and your `CLAUDE.md.template` / `AGENTS.md.template` files are partially substituted.
+You ran the batch sed/PowerShell substitution from Section 5 without reverting the carve-outs. Your `_meta/templates/*.md` files now have today's date baked in instead of `{{TODAY}}`, and your `CLAUDE.md.template` / `AGENTS.md.template` files are partially substituted.
 
 Recovery:
 1. For `_meta/templates/{entity,concept,query}.md`: open each, find your literal `TODAY` date, replace it with `{{TODAY}}`. Save.
 2. For `CLAUDE.md.template` and `AGENTS.md.template` at the vault root: easiest fix is to re-copy from `$BUNDLE/templates/` verbatim — they have no substitutions at all, so just overwrite.
-3. For `_meta/skill-prompts/new-project-setup.md` and `close-session.md`: open each, find any literal substitutions of `{{TODAY}}`, `{{PROJECT_NAME}}`, `{{PROJECT_DESCRIPTION}}` (if you batched-replaced them), put the literal placeholders back.
+3. For the companion skills at `~/.claude/skills/open-obsidian-project/SKILL.md` and `~/.claude/skills/close-obsidian-project/SKILL.md`: these are copied verbatim from `$BUNDLE/companion-skills/`; if a batch substitution accidentally hit them, re-copy from the bundle.
 
 ### Mistake 2 — Heading shows `{{COMPANY_NAME}}` literally in Obsidian
 

@@ -1,6 +1,6 @@
 # Compatibility Matrix
 
-Tested combinations for **Obsidian Company Memory v1.0.0**. Last updated: 2026-06-02.
+Tested combinations for **Obsidian Company Memory v1.1.0**. Last updated: 2026-06-03.
 
 This skill is intentionally lightweight — markdown + YAML + JSON files only, no shipped binaries, no platform-specific code paths. Compatibility risk is therefore concentrated in two places: the agent CLI (Cowork / Claude Code / Codex / opencode) and the cloud sync provider's behaviour around the `.obsidian/` folder.
 

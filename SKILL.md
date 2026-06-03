@@ -1,7 +1,7 @@
 ---
 name: obsidian-company-memory
-description: Scaffold an Obsidian-based company-memory vault — single-company, three-layer architecture, AI-session-ready in about 25 minutes. Walks the user through a compliance gate, a 2-question intake, an idempotent vault scaffold, and a round-trip test that proves the system works end-to-end. Single source, dual install paths (Cowork plugin + Claude Code user-global skill). Triggers when the user says "set up Obsidian", "install company memory", "scaffold a vault", "set up the Absolution Labs vault", "I want a company memory system", or pastes the install URL. Hands off to `new-project-setup` for the first project; does NOT scaffold projects itself. Ships from Absolution Labs LTD.
-version: 1.0.0
+description: Scaffold an Obsidian-based company-memory vault — single-company, three-layer architecture, AI-session-ready in about 25 minutes. Walks the user through a compliance gate, a 2-question intake, an idempotent vault scaffold, a round-trip test that proves the system works end-to-end, and auto-installation of two companion skills (open-obsidian-project, close-obsidian-project) so the lifecycle is wired by the time the install finishes. Single source, dual install paths (Cowork plugin + Claude Code user-global skill). Triggers when the user says "set up Obsidian", "install company memory", "scaffold a vault", "set up the Absolution Labs vault", "I want a company memory system", or pastes the install URL. Hands off to `open-obsidian-project` for the first project; does NOT scaffold projects itself. Ships from Absolution Labs LTD.
+version: 1.1.0
 license: MIT
 publisher: Absolution Labs LTD
 support: info@absolutionlabs.com
@@ -66,6 +66,7 @@ Confirm the skill bundle contains the expected files:
 SKILL.md                                       (this file)
 README.md
 LICENSE
+DISCLAIMERS.md
 COMPATIBILITY.md
 templates/SCHEMA.md
 templates/CONTEXT.md
@@ -84,6 +85,9 @@ templates/.obsidian/core-plugins.json
 templates/.obsidian/hotkeys.json
 templates/CLAUDE.md.template
 templates/AGENTS.md.template
+companion-skills/README.md
+companion-skills/open-obsidian-project/SKILL.md
+companion-skills/close-obsidian-project/SKILL.md
 ```
 
 If anything is missing, the bundle is corrupt — STOP and tell the user to re-install from the canonical URL. Do not improvise replacement content.
@@ -244,14 +248,14 @@ Substitution variables (build once before any write):
 | `{{COMPANY_NAME}}` | from Step 3 Question 1 |
 | `{{TODAY}}` | ISO date in UTC, format `YYYY-MM-DD` |
 | `{{VAULT_ABSOLUTE_PATH}}` | the resolved absolute path of the target directory |
-| `{{PROJECT_NAME}}` | NOT substituted at this stage (left as literal `{{PROJECT_NAME}}` in `CLAUDE.md.template` and `AGENTS.md.template` — `new-project-setup` substitutes per-project at first invocation) |
+| `{{PROJECT_NAME}}` | NOT substituted at this stage (left as literal `{{PROJECT_NAME}}` in `CLAUDE.md.template` and `AGENTS.md.template` — `open-obsidian-project` substitutes per-project at first invocation) |
 | `{{PROJECT_DESCRIPTION}}` | same — left as literal |
 
 **Substitution scope exceptions** (read carefully; bugs from missing these have shipped in past sessions):
 
 - **In `templates/_meta/templates/*.md` (the per-page templates `entity.md`, `concept.md`, `query.md`):** substitute `{{COMPANY_NAME}}` but DO NOT substitute `{{TODAY}}`. These files are USER-COPY templates the user clones in Obsidian months from now to create new pages — baking the scaffold date into them defeats the lint's stale-page detection. The `{{TODAY}}` placeholder is left in place for the user's Obsidian Templates plugin (or the AI at page-creation time) to fill in.
-- **In `templates/_meta/skill-prompts/new-project-setup.md` and `close-session.md`:** substitute `{{COMPANY_NAME}}` and `{{VAULT_ABSOLUTE_PATH}}` only. DO NOT substitute `{{TODAY}}`, `{{PROJECT_NAME}}`, or `{{PROJECT_DESCRIPTION}}` — those are consumed by the user's `new-project-setup` skill at per-project use time, not at vault scaffold time. The skill-prompts `README.md` is the exception within the exception: it gets `{{TODAY}}` substituted because the README is a one-time-at-scaffold artifact.
-- **In `CLAUDE.md.template` and `AGENTS.md.template` at the vault root:** do NOT substitute anything; preserve `{{PROJECT_NAME}}`, `{{PROJECT_DESCRIPTION}}`, `{{COMPANY_NAME}}`, `{{VAULT_ABSOLUTE_PATH}}`, `{{TODAY}}` all as literal. The user's `new-project-setup` skill substitutes these at first project invocation, with the project-creation date — NOT the vault-scaffold date.
+- **In `companion-skills/open-obsidian-project/SKILL.md` and `companion-skills/close-obsidian-project/SKILL.md`:** substitute NOTHING. These are top-level installable skills (not vault scaffolding); they read the vault's `_meta/scaffold-version.txt` and `CONTEXT.md` at runtime to know which company / vault path they're operating against. Copy them verbatim to the user's AI tool per Substep 6.6. (In v1.0.0 the equivalent files lived in `templates/_meta/skill-prompts/` and required substitution; the auto-install pivot in v1.1.0 moved them to `companion-skills/` and removed the substitution requirement.)
+- **In `CLAUDE.md.template` and `AGENTS.md.template` at the vault root:** do NOT substitute anything; preserve `{{PROJECT_NAME}}`, `{{PROJECT_DESCRIPTION}}`, `{{COMPANY_NAME}}`, `{{VAULT_ABSOLUTE_PATH}}`, `{{TODAY}}` all as literal. The user's `open-obsidian-project` skill substitutes these at first project invocation, with the project-creation date — NOT the vault-scaffold date.
 - **In `_meta/scaffold-version.txt` (Substep 6.8):** the file is built fresh from the runtime values, not from a template. `{{TODAY}}` in the example block below means "the resolved value at scaffold time," not "leave the literal text."
 
 The substitution table above is otherwise applied universally; the four exceptions above are the only carve-outs.
@@ -272,9 +276,10 @@ raw/assets/
 lint-reports/
 _meta/
 _meta/templates/
-_meta/skill-prompts/
 .obsidian/
 ```
+
+`_meta/skill-prompts/` is NOT created in v1.1.0+ — companion skills auto-install to the user's AI tool instead of being written to the vault as prompts. See Substep 6.6.
 
 **Substep 6.2 — Write `.obsidian/` config files.**
 
@@ -307,24 +312,42 @@ For each, read the template, substitute `{{COMPANY_NAME}}` and `{{TODAY}}`, writ
 - `_meta/expectations.yml` → from template; append a `date_format_preference: <detected>` line for downstream tools that want it.
 - `_meta/templates/entity.md`, `concept.md`, `query.md` → from `templates/_meta/templates/`. Substitute `{{COMPANY_NAME}}` but DO NOT substitute `{{TODAY}}` (these are user-copy templates per the substitution-scope exception above; leaving `{{TODAY}}` as a placeholder is correct).
 
-**Substep 6.6 — Write the skill prompts (the user installs these as custom skills in their AI tool).**
+**Substep 6.6 — Auto-install the two companion skills.**
 
-The bundle does NOT install a `new-project-setup` or `close-session` skill into the user's AI tool — those are user-built, because Cowork / Claude Code / Codex / opencode all install custom skills differently and the user's workflow matters more than ours. Instead the bundle ships ready-to-install prompts the user copies into their tool. Write these three files from `templates/_meta/skill-prompts/`:
+In v1.0.0 the bundle shipped skill prompts the user manually installed. In v1.1.0+ the two companion skills (`open-obsidian-project`, `close-obsidian-project`) auto-install alongside the vault scaffold so the lifecycle is wired by the time the install finishes. **Naming uses the `-obsidian-project` suffix so the skills can coexist with any other "open project" or "close" skill the user already has for non-Obsidian work** (this was a beta-tester finding 2026-06-03; pre-rename, the older `close-session` name collided with an existing skill on the tester's laptop).
 
-- `_meta/skill-prompts/README.md` → substitute `{{COMPANY_NAME}}`, `{{VAULT_ABSOLUTE_PATH}}`, and `{{TODAY}}` (the README is timestamped at scaffold; the prompts inside are not).
-- `_meta/skill-prompts/new-project-setup.md` → substitute `{{COMPANY_NAME}}` and `{{VAULT_ABSOLUTE_PATH}}` only. DO NOT substitute `{{TODAY}}`, `{{PROJECT_NAME}}`, `{{PROJECT_DESCRIPTION}}` — those are consumed by the skill at per-project use time, not at vault scaffold time.
-- `_meta/skill-prompts/close-session.md` → same substitution rules: `{{COMPANY_NAME}}` and `{{VAULT_ABSOLUTE_PATH}}` only. Leave `{{TODAY}}` literal.
+The companion skill SKILL.md files ship inside the bundle at `companion-skills/open-obsidian-project/SKILL.md` and `companion-skills/close-obsidian-project/SKILL.md`. **The companion skill bodies require no substitution** — they read the vault's `_meta/scaffold-version.txt` and `CONTEXT.md` at runtime to know which company / vault path they're operating against. Copy them verbatim.
 
-Step 9.2's final message will tell the user where these files live and that they're the next thing to install.
+**Surface-specific install paths:**
+
+- **Claude Code.** Copy `companion-skills/open-obsidian-project/` and `companion-skills/close-obsidian-project/` from the bundle to `~/.claude/skills/` as sibling folders to `obsidian-company-memory/`. For each:
+  1. Check whether `~/.claude/skills/<skill-name>/` already exists.
+  2. If it does NOT exist: copy the folder. Confirm `SKILL.md` parses cleanly.
+  3. If it DOES exist: refuse the auto-install for that specific skill and tell the user:
+     > A skill named `<skill-name>` already exists at `~/.claude/skills/<skill-name>/`. The auto-install will not overwrite it. To use the companion skill the bundle ships, rename or move your existing one and re-run the install — or skip the companion skill and continue using your existing one.
+  4. Proceed to the other companion skill regardless of whether one succeeded.
+
+- **Cowork.** Cowork's plugin system installs one plugin per URL paste. The bundle's `plugin.json` declares the two companion skills as sub-skills of the main plugin (`plugin.json.companion_skills` array — see plugin.json for exact shape). If Cowork honors the multi-skill declaration, both companion skills auto-install when the user pastes the bundle's install URL. If Cowork does NOT honor the multi-skill declaration (we are validating this in private beta), the user must paste the companion-skill URLs separately:
+  - `https://raw.githubusercontent.com/absolutionlabs/obsidian-company-memory/main/companion-skills/open-obsidian-project/SKILL.md` (or the equivalent `plugin.json`, once added)
+  - `https://raw.githubusercontent.com/absolutionlabs/obsidian-company-memory/main/companion-skills/close-obsidian-project/SKILL.md`
+
+  Surface the URLs in Step 9.2's final message regardless of whether multi-skill auto-install worked — they're useful for reinstalls, migrations, and second-laptop setups.
+
+- **Codex / opencode / other AGENTS.md-aware tools.** These tools don't have a separate skill mechanism. Tell the user:
+  > Your AI tool reads `AGENTS.md` at session start, not separate skill files. Two options for using the companion skills:
+  > 1. Append the body of each companion `SKILL.md` (at `companion-skills/open-obsidian-project/SKILL.md` and `companion-skills/close-obsidian-project/SKILL.md` inside the bundle) to your home `~/.codex/AGENTS.md` (or equivalent) under a "Custom skills" section.
+  > 2. When you scaffold a project, the `open-obsidian-project` skill's output writes a session stub to the project folder. That stub references the companion skills' canonical URLs so the AI knows where to find them at session start.
+
+**Collision audit trail.** Whichever surface you're on, log any collision (skill-already-exists refusal) to the round-trip test report in Substep 7.4 so the user sees it explicitly. Do not pass over collisions silently.
 
 **Substep 6.7 — Write the project-stub templates (do NOT instantiate).**
 
-These files are templates for `new-project-setup` to read when the user creates their first project. They live at the vault root with the `.template` suffix preserved:
+These files are templates for `open-obsidian-project` to read when the user creates their first project. They live at the vault root with the `.template` suffix preserved:
 
 - `CLAUDE.md.template` → vault root, leave `{{PROJECT_NAME}}`, `{{PROJECT_DESCRIPTION}}`, `{{COMPANY_NAME}}`, `{{VAULT_ABSOLUTE_PATH}}`, `{{TODAY}}` as literal placeholders for the downstream skill.
 - `AGENTS.md.template` → same.
 
-These files are NOT in `index.md` (they are not wiki pages); they sit at the root as a discoverable handoff to the user's `new-project-setup` skill.
+These files are NOT in `index.md` (they are not wiki pages); they sit at the root as a discoverable handoff to the user's `open-obsidian-project` skill.
 
 **Substep 6.8 — Write a one-line scaffold-version marker.**
 
@@ -332,7 +355,7 @@ Write `_meta/scaffold-version.txt` containing (this file is built fresh from run
 
 ```
 skill: obsidian-company-memory
-version: 1.0.0
+version: 1.1.0
 scaffolded: <resolved {{TODAY}} value>
 date_format_preference: <detected per Step 4b>
 sync_provider: <normalized token from Step 3 Q2>
@@ -387,8 +410,8 @@ the wikilink, the round-trip works.
 ## Next
 
 Read [[HOW-TO-USE-THIS]] for the ongoing-use guide. When you are ready to
-start your first real project, run the `new-project-setup` skill (it ships
-separately in your AI tool's skill list).
+start your first real project, run the `open-obsidian-project` skill (auto-
+installed alongside this main skill; appears in your AI tool's skill list).
 ```
 
 **Substep 7.2 — Update `index.md`.**
@@ -439,7 +462,7 @@ If the user reported a failure in 7.4 instead, append a different entry naming t
 
 This step is mostly a check-and-tell — the file was already written in Substep 6.3. Confirm it exists at the vault root and the first 5 lines parse as valid YAML frontmatter. Then tell the user:
 
-> A Phase 2 living guide is in your vault root at `HOW-TO-USE-THIS.md`. It covers the weekly lint habit, the close-session protocol, how to capture knowledge mid-session, common failures, and recovery. Read it once now (about 10 minutes) and bookmark the path; revisit any time you need a reminder.
+> A Phase 2 living guide is in your vault root at `HOW-TO-USE-THIS.md`. It covers the weekly lint habit, the close-obsidian-project protocol, how to capture knowledge mid-session, common failures, and recovery. Read it once now (about 10 minutes) and bookmark the path; revisit any time you need a reminder.
 
 This is the canonical handoff from "install moment" (Phase 1, this skill) to "ongoing use" (Phase 2, the guide). Reinforcing the split keeps the user from expecting the skill to do everything for them forever.
 
@@ -513,13 +536,16 @@ loop. Your knowledge accumulates as a by-product of using it.
 What to do next
 ---------------
 1. Read HOW-TO-USE-THIS.md (about 10 minutes).
-2. Create two custom skills in your AI tool, using the prompts at
-   _meta/skill-prompts/ inside your vault. Five minutes once at install
-   time; saves you hours on every session afterward.
-   - new-project-setup — for starting new projects
-   - close-session    — for ending every working session
-   Install instructions for Cowork, Claude Code, Codex, and opencode
-   are inside each prompt file. Start with _meta/skill-prompts/README.md.
+2. Verify the two companion skills are installed in your AI tool.
+   The install just auto-installed these alongside the main skill:
+   - open-obsidian-project — for starting new projects
+   - close-obsidian-project — for ending every working session
+   Verify by asking your AI: "List my available skills." Both should
+   appear. (If they don't, see Substep 6.6 of the install procedure
+   for surface-specific recovery — Codex / opencode users have a
+   different install path; Cowork users may need to paste one or two
+   extra URLs depending on whether the multi-skill plugin manifest
+   takes cleanly.)
 3. After your first real working session, run a lint by asking your AI:
    "run a lint on the vault". It will produce a baseline report you can
    compare against in future sessions.
@@ -616,7 +642,7 @@ It is NOT idempotent on a partially-scaffolded directory, on a directory with us
 | Install Obsidian itself | User does this manually; preamble docs link `obsidian.md/download` |
 | Install an agent CLI (Cowork / Code / Codex / opencode) | User installs separately; we don't bundle |
 | Install Dataview / community plugins | User installs from Obsidian's browser; we don't ship plugin bundles (key decision #6) |
-| Scaffold the first project folder | `new-project-setup` skill (key decision #8) |
+| Scaffold the first project folder | `open-obsidian-project` skill (key decision #8) |
 | Initialise git in the vault | Cloud sync provides versioning; git is out of scope (key decision #9) |
 | Schedule recurring lint | Out of scope; lint is manual-invocation only (key decision #5) |
 | Multi-client `clients/<slug>/` layout | Permanently out of scope (key decision #4); use the AbsoLabs CKB shape for multi-client |

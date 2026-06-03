@@ -60,7 +60,7 @@ your-vault/
 ├── index.md                     ← table of contents (always in sync)
 ├── log.md                       ← audit trail of every session
 ├── HOW-TO-USE-THIS.md           ← Phase 2 living guide (~10-min read)
-├── CLAUDE.md.template           ← project-stub for new-project-setup
+├── CLAUDE.md.template           ← project-stub for open-obsidian-project
 ├── AGENTS.md.template           ← project-stub for Codex / opencode users
 ├── entities/                    ← one page per thing worth remembering
 │   └── test-welcome.md          ← the round-trip test result
@@ -76,15 +76,13 @@ your-vault/
 ├── _meta/
 │   ├── expectations.yml         ← lint thresholds (editable)
 │   ├── scaffold-version.txt     ← which version installed this vault
-│   ├── templates/               ← page templates (entity / concept / query)
-│   └── skill-prompts/           ← prompts for two custom skills you'll build
-│       ├── README.md            ← 2-min overview of the skill-prompts design
-│       ├── new-project-setup.md ← prompt for the new-project skill
-│       └── close-session.md     ← prompt for the close-session skill
+│   └── templates/               ← page templates (entity / concept / query)
 └── .obsidian/                   ← Obsidian config (sensible defaults)
 ```
 
-~23 files. All markdown / YAML / JSON. No binaries, no secrets, no telemetry inside the vault.
+~20 files. All markdown / YAML / JSON. No binaries, no secrets, no telemetry inside the vault.
+
+The install ALSO copies two companion skills (`open-obsidian-project`, `close-obsidian-project`) to your AI tool's skill folder — those live alongside the main `obsidian-company-memory` install skill, not inside the vault. See [companion-skills/README.md](companion-skills/README.md).
 
 ## What the skill does NOT install
 
@@ -93,7 +91,7 @@ These are deliberate cuts. We hold the full design rationale internally; email `
 - **Obsidian itself.** You install Obsidian from `obsidian.md` separately. We tell you when.
 - **Community plugins.** Dataview, Templater, etc. are installed by you from Obsidian's own plugin browser. We don't bundle third-party binaries inside our distributable.
 - **An AI assistant.** Cowork, Code, Codex, opencode — you install whichever you use separately.
-- **A first project.** The install ships prompt files for two custom skills you'll build in your AI tool — `new-project-setup` and `close-session` — at `_meta/skill-prompts/`. Five minutes once at install time; runs forever. The bundle ships the prompts, not the pre-built skills, because every AI tool installs custom skills differently and your workflow matters more than ours.
+- **A first project.** Use the auto-installed `open-obsidian-project` companion skill when you're ready to start one. The install auto-installs that skill (plus `close-obsidian-project` for session-close discipline) alongside the main install skill — no manual steps required on Claude Code; one or two URL pastes at worst on Cowork. See [companion-skills/README.md](companion-skills/README.md) for details. Names use `-obsidian-project` namespacing so they coexist with any other "open project" / "close" skills you already have.
 - **Multi-client routing.** This is single-company by permanent design. If you need multi-client, this isn't the right shape — email `info@absolutionlabs.com`.
 - **A scheduled lint.** Lint is manual-invocation only: just ask your AI to "run a lint on the vault" when you want it.
 - **A way to migrate an existing vault.** The skill refuses to scaffold into non-empty folders. If you have an existing vault, email `info@absolutionlabs.com` — we'll help.

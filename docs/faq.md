@@ -190,7 +190,7 @@ No. The vault works with any model the skill's host CLI supports (Claude Opus, C
 
 ### Can I use this without an AI?
 
-Yes. The vault is plain markdown; you can write to it by hand in Obsidian. The skill, the lint, and the close-session prompt all assume an AI as the editor — but the underlying artefact is yours regardless.
+Yes. The vault is plain markdown; you can write to it by hand in Obsidian. The skill, the lint, and the close-obsidian-project prompt all assume an AI as the editor — but the underlying artefact is yours regardless.
 
 ### Why does the AI keep suggesting we ingest things?
 
@@ -198,13 +198,13 @@ Because Ingest is the default-good action per SCHEMA's three-operation model (In
 
 ### Why does the AI sometimes refuse to scaffold a project?
 
-It's running `new-project-setup` and the target folder exists with content. Same shape as the skill's refuse-to-scaffold gate. The custom skill you built from `_meta/skill-prompts/new-project-setup.md` should refuse on non-empty target folders. If it doesn't refuse: it's misconfigured — re-read the prompt file and adjust.
+It's running `open-obsidian-project` and the target folder exists with content. Same shape as the skill's refuse-to-scaffold gate. The custom skill you built from `_meta/skill-prompts/open-obsidian-project.md` should refuse on non-empty target folders. If it doesn't refuse: it's misconfigured — re-read the prompt file and adjust.
 
 ### What's the difference between the skill and the custom skills I built?
 
 This skill scaffolds the vault — one-shot, install time only.
 
-The custom skills you built from `_meta/skill-prompts/` (`new-project-setup` and `close-session`) run repeatedly — every time you start a project, every time you end a session. They live in your AI tool, not the vault.
+The custom skills you built from `_meta/skill-prompts/` (`open-obsidian-project` and `close-obsidian-project`) run repeatedly — every time you start a project, every time you end a session. They live in your AI tool, not the vault.
 
 ---
 

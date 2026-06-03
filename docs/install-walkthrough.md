@@ -180,7 +180,7 @@ The files that land:
 - `index.md` — table of contents (always in sync)
 - `log.md` — audit trail of every session
 - `HOW-TO-USE-THIS.md` — the Phase 2 living guide you'll read next
-- `CLAUDE.md.template` and `AGENTS.md.template` — project stubs that get used the first time you scaffold a project with `new-project-setup`
+- `CLAUDE.md.template` and `AGENTS.md.template` — project stubs that get used the first time you scaffold a project with `open-obsidian-project`
 
 **Under `concepts/`:**
 
@@ -236,7 +236,7 @@ Reply "verified" once all five work. If one doesn't — most often a wikilinks-d
 
 The skill confirms `HOW-TO-USE-THIS.md` is in your vault root and tells you to read it next:
 
-> A Phase 2 living guide is in your vault root at `HOW-TO-USE-THIS.md`. It covers the weekly lint habit, the close-session protocol, how to capture knowledge mid-session, common failures, and recovery. Read it once now (about 10 minutes) and bookmark the path; revisit any time you need a reminder.
+> A Phase 2 living guide is in your vault root at `HOW-TO-USE-THIS.md`. It covers the weekly lint habit, the close-obsidian-project protocol, how to capture knowledge mid-session, common failures, and recovery. Read it once now (about 10 minutes) and bookmark the path; revisit any time you need a reminder.
 
 This is the canonical handoff. The install (Phase 1) is complete. Ongoing use (Phase 2) is governed by the living guide. The two are deliberately separate — the install is a one-off, the guide is the long-lived reference.
 
@@ -261,8 +261,8 @@ What to do next
 2. Create two custom skills in your AI tool, using the prompts at
    _meta/skill-prompts/ inside your vault. Five minutes once at install
    time; saves you hours on every session afterward.
-   - new-project-setup — for starting new projects
-   - close-session    — for ending every working session
+   - open-obsidian-project — for starting new projects
+   - close-obsidian-project    — for ending every working session
    Install instructions for Cowork, Claude Code, Codex, and opencode
    are inside each prompt file. Start with _meta/skill-prompts/README.md.
 3. After your first real working session, run a lint by asking your AI:
