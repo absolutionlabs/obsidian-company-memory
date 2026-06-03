@@ -1,7 +1,7 @@
 ---
 name: obsidian-company-memory
-description: Scaffold an Obsidian-based company-memory vault — single-company, three-layer architecture, AI-session-ready in about 25 minutes. Walks the user through a compliance gate, a 2-question intake, an idempotent vault scaffold, a round-trip test that proves the system works end-to-end, and auto-installation of two companion skills (open-obsidian-project, close-obsidian-project) so the lifecycle is wired by the time the install finishes. No telemetry; the skill never phones home. Single source, dual install paths (Cowork plugin + Claude Code user-global skill). Triggers when the user says "set up Obsidian", "install company memory", "scaffold a vault", "set up the Absolution Labs vault", "I want a company memory system", or pastes the install URL. Hands off to `open-obsidian-project` for the first project; does NOT scaffold projects itself. Ships from Absolution Labs LTD.
-version: 1.2.0
+description: Scaffold an Obsidian-based company-memory vault — single-company, three-layer architecture, AI-session-ready in about 25 minutes. Walks the user through a 2-checkbox compliance gate, a 2-question intake, an idempotent vault scaffold, and a round-trip test that proves the system works end-to-end. Distributed as a zip uploadable via Cowork's Upload-skill UI, or copied into ~/.claude/skills/ for Claude Code. No telemetry; the skill never phones home. Triggers when the user says "set up Obsidian", "install company memory", "scaffold a vault", "set up the Absolution Labs vault", or "I want a company memory system". Hands off to `open-obsidian-project` for the first project; does NOT scaffold projects itself. Ships from Absolution Labs LTD.
+version: 1.2.1
 license: MIT
 publisher: Absolution Labs LTD
 support: info@absolutionlabs.com
@@ -60,14 +60,10 @@ Verify writability by attempting a no-op write (`.tmp-skill-probe` then delete).
 
 ### Step 0c — Verify skill-bundle integrity
 
-Confirm the skill bundle contains the expected files:
+Confirm the skill bundle (the contents of the uploaded zip) contains the expected files:
 
 ```
 SKILL.md                                       (this file)
-README.md
-LICENSE
-DISCLAIMERS.md
-COMPATIBILITY.md
 templates/SCHEMA.md
 templates/CONTEXT.md
 templates/index.md
@@ -85,24 +81,26 @@ templates/.obsidian/core-plugins.json
 templates/.obsidian/hotkeys.json
 templates/CLAUDE.md.template
 templates/AGENTS.md.template
-companion-skills/README.md
-companion-skills/open-obsidian-project/SKILL.md
-companion-skills/close-obsidian-project/SKILL.md
 ```
 
-If anything is missing, the bundle is corrupt — STOP and tell the user to re-install from the canonical URL. Do not improvise replacement content.
+If anything is missing, the bundle is corrupt — STOP and tell the user to re-download from the GitHub Release: https://github.com/absolutionlabs/obsidian-company-memory/releases/latest. Do not improvise replacement content.
+
+The companion skills (`open-obsidian-project`, `close-obsidian-project`) ship as separate zips on the same Release and are installed by the user in Substep 5.6 — they are NOT part of this bundle's integrity check.
 
 ---
 
-## Step 1 — First-screen compliance gate (3 mandatory checkboxes)
+## Step 1 — First-screen compliance gate (2 mandatory checkboxes)
 
 Before any data is written, surface the compliance gate. This is a hard gate: every box must be ticked. If any is left unchecked, refuse to scaffold and explain why.
 
-Render (verbatim shape, adapted to the surface's question UI — `AskUserQuestion` on Code, the Cowork equivalent):
+**Render boxes 1 and 2 verbatim.** Do not summarise the body text into a short label — the full sentences are the user's compliance affirmation and must be visible at the point of consent. Adapt only the surface's question UI (`AskUserQuestion` on Code, the Cowork equivalent).
 
 ```
-Before this skill writes any files to your folder, please confirm three things.
-These are compliance prerequisites; the skill cannot continue without all three.
+This skill writes files only to your folder. Nothing is sent to Absolution
+Labs at install or afterwards. Full terms: DISCLAIMERS.md in the repo.
+
+Before this skill writes any files, please confirm two things. These are
+compliance prerequisites; the skill cannot continue without both.
 
 [ ] 1. The folder I am about to scaffold into is a folder I own or am
        authorised to write to. It does not contain any client data, regulated
@@ -112,16 +110,13 @@ These are compliance prerequisites; the skill cannot continue without all three.
        / Google Drive / local-only) is one my organisation permits for the
        type of content I intend to store. I have checked any applicable data
        processing agreement (DPA) requirements.
-
-[ ] 3. I understand this vault will be a record of facts and decisions about
-       my company. Absolution Labs LTD has no access to its contents at any
-       point. The skill does not collect telemetry and does not phone home
-       at install time or afterwards.
 ```
 
-If all three are ticked: log to internal session memory that the gate passed, then continue. If any is unticked: refuse, surface a one-paragraph explanation of which box would be needed (no "next time" — re-run the skill when the user is ready), and exit.
+If both are ticked: log to internal session memory that the gate passed, then continue. If either is unticked: refuse, surface a one-paragraph explanation of which box would be needed (no "next time" — re-run the skill when the user is ready), and exit.
 
 **Why this gate exists.** Regulated-sector prospects (the explicit target audience per the pre-mortem in `brief.md`) need compliance concerns surfaced BEFORE any data is written. A scaffold that ran first and asked questions later would have already damaged trust by the time the gate appeared.
+
+**Why only two boxes (not three).** Earlier versions had a third box affirming "Absolution Labs has no access to your vault contents." It was cut in v1.2.1 because confirmations should be about the user's own commitments (folder ownership, DPA awareness), not about our behaviour. Our behaviour is stated as a passive fact in the preamble above and covered in full at DISCLAIMERS.md; we don't ask the user to consent to it.
 
 ---
 
@@ -248,7 +243,7 @@ _meta/templates/
 .obsidian/
 ```
 
-`_meta/skill-prompts/` is NOT created in v1.1.0+ — companion skills auto-install to the user's AI tool instead of being written to the vault as prompts. See Substep 5.6.
+`_meta/skill-prompts/` is NOT created in v1.1.0+ — companion skills are installed by the user as separate Cowork uploads (or by-hand copy on Code) rather than written into the vault as prompts. See Substep 5.6.
 
 **Substep 5.2 — Write `.obsidian/` config files.**
 
@@ -281,33 +276,37 @@ For each, read the template, substitute `{{COMPANY_NAME}}` and `{{TODAY}}`, writ
 - `_meta/expectations.yml` → from template; append a `date_format_preference: <detected>` line for downstream tools that want it.
 - `_meta/templates/entity.md`, `concept.md`, `query.md` → from `templates/_meta/templates/`. Substitute `{{COMPANY_NAME}}` but DO NOT substitute `{{TODAY}}` (these are user-copy templates per the substitution-scope exception above; leaving `{{TODAY}}` as a placeholder is correct).
 
-**Substep 5.6 — Auto-install the two companion skills.**
+**Substep 5.6 — Surface the companion-skill install path to the user.**
 
-In v1.0.0 the bundle shipped skill prompts the user manually installed. In v1.1.0+ the two companion skills (`open-obsidian-project`, `close-obsidian-project`) auto-install alongside the vault scaffold so the lifecycle is wired by the time the install finishes. **Naming uses the `-obsidian-project` suffix so the skills can coexist with any other "open project" or "close" skill the user already has for non-Obsidian work** (this was a beta-tester finding 2026-06-03; pre-rename, the older `close-session` name collided with an existing skill on the tester's laptop).
+The lifecycle of an Obsidian Company Memory vault uses two companion skills: `open-obsidian-project` (scaffold a new project against the vault) and `close-obsidian-project` (run the session-close protocol). **These ship as separate zips on the GitHub Release**, not as files inside this bundle the main skill copies for the user. The reason: Cowork's install paradigm is "user uploads a zip via the Upload-skill UI" — there's no programmatic way for this skill to install another skill into Cowork on the user's behalf.
 
-The companion skill SKILL.md files ship inside the bundle at `companion-skills/open-obsidian-project/SKILL.md` and `companion-skills/close-obsidian-project/SKILL.md`. **The companion skill bodies require no substitution** — they read the vault's `_meta/scaffold-version.txt` and `CONTEXT.md` at runtime to know which company / vault path they're operating against. Copy them verbatim.
+**Surface-specific guidance to display to the user:**
 
-**Surface-specific install paths:**
+- **Cowork.** Tell the user to download the two companion zips from the GitHub Release and upload each via **Cowork → Skills → Upload skill**:
+  > Download both, then upload via Cowork → Skills → Upload skill (drag-drop each):
+  > - https://github.com/absolutionlabs/obsidian-company-memory/releases/latest/download/open-obsidian-project-v1.2.1.zip
+  > - https://github.com/absolutionlabs/obsidian-company-memory/releases/latest/download/close-obsidian-project-v1.2.1.zip
+  >
+  > Suggested order: companions first (these), then re-confirm your main skill is at v1.2.1+. If you already have older `close-session` / `new-project-setup` skills installed, the `-obsidian-project` suffix on these names means they coexist without collision.
 
-- **Claude Code.** Copy `companion-skills/open-obsidian-project/` and `companion-skills/close-obsidian-project/` from the bundle to `~/.claude/skills/` as sibling folders to `obsidian-company-memory/`. For each:
+- **Claude Code.** If the bundle is present on local disk (e.g. cloned for inspection), the user can copy the two companion folders into `~/.claude/skills/`. For each:
   1. Check whether `~/.claude/skills/<skill-name>/` already exists.
   2. If it does NOT exist: copy the folder. Confirm `SKILL.md` parses cleanly.
-  3. If it DOES exist: refuse the auto-install for that specific skill and tell the user:
-     > A skill named `<skill-name>` already exists at `~/.claude/skills/<skill-name>/`. The auto-install will not overwrite it. To use the companion skill the bundle ships, rename or move your existing one and re-run the install — or skip the companion skill and continue using your existing one.
-  4. Proceed to the other companion skill regardless of whether one succeeded.
+  3. If it DOES exist: refuse and tell the user:
+     > A skill named `<skill-name>` already exists at `~/.claude/skills/<skill-name>/`. To use the companion skill this bundle ships, rename or move your existing one and re-copy — or skip and continue using your existing one.
 
-- **Cowork.** Cowork's plugin system installs one plugin per URL paste. The bundle's `plugin.json` declares the two companion skills as sub-skills of the main plugin (`plugin.json.companion_skills` array — see plugin.json for exact shape). If Cowork honors the multi-skill declaration, both companion skills auto-install when the user pastes the bundle's install URL. If Cowork does NOT honor the multi-skill declaration (we are validating this in private beta), the user must paste the companion-skill URLs separately:
-  - `https://raw.githubusercontent.com/absolutionlabs/obsidian-company-memory/main/companion-skills/open-obsidian-project/SKILL.md` (or the equivalent `plugin.json`, once added)
-  - `https://raw.githubusercontent.com/absolutionlabs/obsidian-company-memory/main/companion-skills/close-obsidian-project/SKILL.md`
+  If the user installed via the GitHub Release zip (and doesn't have a local clone), surface the same two download URLs as the Cowork path above — they can unzip each into `~/.claude/skills/<name>/`.
 
-  Surface the URLs in Step 8.1's final message regardless of whether multi-skill auto-install worked — they're useful for reinstalls, migrations, and second-laptop setups.
+  *Native `claude plugin marketplace add absolutionlabs/obsidian-company-memory` is queued for v1.3.0 — it needs `.claude-plugin/marketplace.json` at the repo root, not yet shipped.*
 
 - **Codex / opencode / other AGENTS.md-aware tools.** These tools don't have a separate skill mechanism. Tell the user:
   > Your AI tool reads `AGENTS.md` at session start, not separate skill files. Two options for using the companion skills:
-  > 1. Append the body of each companion `SKILL.md` (at `companion-skills/open-obsidian-project/SKILL.md` and `companion-skills/close-obsidian-project/SKILL.md` inside the bundle) to your home `~/.codex/AGENTS.md` (or equivalent) under a "Custom skills" section.
+  > 1. Download each companion zip from the GitHub Release URLs above, unzip, and append the body of each `SKILL.md` to your home `~/.codex/AGENTS.md` (or equivalent) under a "Custom skills" section.
   > 2. When you scaffold a project, the `open-obsidian-project` skill's output writes a session stub to the project folder. That stub references the companion skills' canonical URLs so the AI knows where to find them at session start.
 
-**Collision audit trail.** Whichever surface you're on, log any collision (skill-already-exists refusal) to the round-trip test report in Substep 6.4 so the user sees it explicitly. Do not pass over collisions silently.
+**Naming.** Both companions use the `-obsidian-project` suffix so they coexist with any other "open project" or "close" skill the user already has for non-Obsidian work (this was a beta-tester finding 2026-06-03; pre-rename, the older `close-session` name collided with an existing skill on the tester's laptop).
+
+**Collision audit trail.** If the Code-side copy refuses on a name collision, log it to the round-trip test report in Substep 6.4 so the user sees it explicitly. Do not pass over collisions silently.
 
 **Substep 5.7 — Write the project-stub templates (do NOT instantiate).**
 
@@ -459,16 +458,20 @@ loop. Your knowledge accumulates as a by-product of using it.
 What to do next
 ---------------
 1. Read HOW-TO-USE-THIS.md (about 10 minutes).
-2. Verify the two companion skills are installed in your AI tool.
-   The install just auto-installed these alongside the main skill:
+2. Install the two companion skills from the GitHub Release:
    - open-obsidian-project — for starting new projects
    - close-obsidian-project — for ending every working session
+
+   Cowork: download each zip from
+   https://github.com/absolutionlabs/obsidian-company-memory/releases/latest
+   and upload via Cowork → Skills → Upload skill (drag-drop).
+
+   Claude Code: unzip each into ~/.claude/skills/<name>/ (or copy
+   from a local clone of the bundle's companion-skills/ folder).
+
    Verify by asking your AI: "List my available skills." Both should
-   appear. (If they don't, see Substep 5.6 of the install procedure
-   for surface-specific recovery — Codex / opencode users have a
-   different install path; Cowork users may need to paste one or two
-   extra URLs depending on whether the multi-skill plugin manifest
-   takes cleanly.)
+   appear. The -obsidian-project suffix means they coexist cleanly
+   with any other open/close skills you already have.
 3. After your first real working session, run a lint by asking your AI:
    "run a lint on the vault". It will produce a baseline report you can
    compare against in future sessions.
@@ -508,7 +511,7 @@ This gives the user a frictionless first move that exercises the Ingest operatio
 | 0b mount confirm | `request_directory` must already have fired | Working directory or explicit absolute path |
 | 4 date auto-detect | Read session locale | Read OS locale via shell |
 | 5 file writes | Write via mounted-directory tool | Write directly to disk |
-| 5.6 companion-skill install | Multi-skill plugin manifest declares both companions (Cowork honors if supported; raw-URL paste fallback otherwise) | Copy companion-skills/* to ~/.claude/skills/ with collision check |
+| 5.6 companion-skill install | Surface GH Release zip URLs; user uploads via Cowork's Upload-skill UI | If local clone available, copy companion-skills/* to ~/.claude/skills/ with collision check; otherwise surface same zip URLs |
 
 The vault produced is byte-identical across surfaces. Surface differences are purely about HOW the files land; the WHAT is uniform.
 
@@ -570,14 +573,15 @@ It is NOT idempotent on a partially-scaffolded directory, on a directory with us
 
 For agents / harnesses that introspect this file beyond the YAML frontmatter:
 
-- **Triggers:** "set up obsidian", "scaffold a vault", "install company memory", install URL paste
-- **Inputs:** target directory (mounted or CWD), 2 user-supplied answers (company name + sync provider), 3 compliance confirmations
-- **Outputs:** scaffolded vault directory, 1 welcome entity, 2 companion skills auto-installed to user's AI tool
-- **Side effects:** writes ~20 files to user disk; copies 2 companion-skill folders to ~/.claude/skills/ (Code) or registers them via Cowork multi-skill plugin manifest (Cowork). No network egress from the install procedure itself.
+- **Triggers:** "set up obsidian", "scaffold a vault", "install company memory"
+- **Inputs:** target directory (mounted or CWD), 2 user-supplied answers (company name + sync provider), 2 compliance confirmations
+- **Outputs:** scaffolded vault directory, 1 welcome entity. (Companion skills `open-obsidian-project` and `close-obsidian-project` ship as separate zips on the GitHub Release and are installed by the user via the same Upload-skill UI; this skill does NOT install them automatically.)
+- **Side effects:** writes ~20 files to user disk. No network egress from the install procedure itself.
 - **Idempotent:** yes, on empty directories only
 - **Reversible:** yes, by deleting the vault directory (cloud sync provides version history)
 - **Time-to-run:** ~5 minutes of skill time + ~20 minutes of user-side reading and Obsidian setup
-- **Hard gates:** worktree refusal (OP #19), compliance gate (3 boxes), refuse-to-scaffold on non-empty directory, skill-bundle integrity check
+- **Hard gates:** worktree refusal (OP #19), compliance gate (2 boxes), refuse-to-scaffold on non-empty directory, skill-bundle integrity check
+- **Distribution:** zip uploaded via Cowork's Upload-skill UI (and manual copy into `~/.claude/skills/` for Claude Code; native `/plugin marketplace add` path queued for v1.3.0). The earlier `plugin.json` URL-paste approach (v1.0.0 / v1.1.0 / v1.2.0 internal) was discarded after the Cowork install paradigm was verified — see [cowork-plugin-install-paradigm](https://github.com/absolutionlabs/obsidian-company-memory) wiki note.
 - **Telemetry:** none. The skill does not phone home at install time or afterwards. Removed in v1.2.0 (was a 9-field anonymous opt-out ping in v1.0.0 / v1.1.0; value to us was structurally near-zero per the design retrospective).
 
 ---

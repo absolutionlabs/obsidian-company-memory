@@ -1,5 +1,6 @@
 {
-  "_note": "Cowork plugin manifest for the open-obsidian-project companion skill. Installed standalone via URL paste in Cowork (the main obsidian-company-memory install skill also tries to auto-install this on Code via copy-to-~/.claude/skills/ — see SKILL.md Substep 5.6). Bundled inside the obsidian-company-memory repository at companion-skills/open-obsidian-project/.",
+  "_deprecated": "v1.2.1 — DEPRECATED. plugin.json + URL-paste is NOT how Cowork installs skills; see ../../plugin.json for the full rationale. Current install: download open-obsidian-project-vX.Y.Z.zip from the GitHub Release and upload via Cowork → Skills → Upload skill (or unzip into ~/.claude/skills/open-obsidian-project/ on Claude Code).",
+  "_note": "Original note (historical): Cowork plugin manifest for the open-obsidian-project companion skill. Bundled inside the obsidian-company-memory repository at companion-skills/open-obsidian-project/.",
   "$schema": "https://cowork.anthropic.com/schemas/plugin.json",
   "id": "open-obsidian-project",
   "name": "Open Obsidian Project",

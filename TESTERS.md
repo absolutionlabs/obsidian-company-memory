@@ -24,38 +24,45 @@ You will not need:
 
 ## Install
 
-The current install URL is on the project's GitHub repo. Rob will have sent you the link directly — it's a `https://github.com/...` URL.
+The bundle is published as a GitHub Release. Rob will have sent you the URL — it's `https://github.com/absolutionlabs/obsidian-company-memory/releases/latest`.
 
 ### If you're using Cowork
 
-1. Open Cowork.
-2. Settings → Plugins → Install from URL.
-3. Paste the URL Rob sent you.
-4. Approve the install.
-5. Start a new conversation and say: **"Set up my Obsidian company memory."**
+1. Open the release page in a browser. Download **all three zips**:
+   - `open-obsidian-project-vX.Y.Z.zip`
+   - `close-obsidian-project-vX.Y.Z.zip`
+   - `obsidian-company-memory-vX.Y.Z.zip`
+2. Open Cowork. Go to **Skills → Upload skill**.
+3. Drag-drop each zip, one at a time. Suggested order: companions first, main install skill last. Three uploads total, ~30 seconds.
+4. Start a new conversation and say: **"Set up my Obsidian company memory."**
 
 ### If you're using Claude Code
 
 1. Open a terminal.
-2. Clone the repo Rob linked into `~/.claude/skills/obsidian-company-memory/`:
+2. Clone the repo:
    ```
-   git clone <repo-url> ~/.claude/skills/obsidian-company-memory
+   git clone https://github.com/absolutionlabs/obsidian-company-memory.git ~/tmp/obsidian-company-memory
+   cp -r ~/tmp/obsidian-company-memory ~/.claude/skills/
+   cp -r ~/tmp/obsidian-company-memory/companion-skills/open-obsidian-project ~/.claude/skills/
+   cp -r ~/tmp/obsidian-company-memory/companion-skills/close-obsidian-project ~/.claude/skills/
    ```
 3. Restart Claude Code.
 4. Start a session in any folder (it doesn't matter where) and say: **"Set up my Obsidian company memory."**
+
+The native `claude plugin marketplace add` path is queued for v1.3.0 — it needs `.claude-plugin/marketplace.json` at the repo root, which we haven't shipped yet.
 
 ---
 
 ## What you should see during install
 
-The skill walks you through seven user-visible steps (plus a few silent pre-flight checks). Pay attention to each — they're designed to be visible, not magical.
+The skill walks you through six user-visible steps (plus a few silent pre-flight checks). Pay attention to each — they're designed to be visible, not magical.
 
-1. **Compliance gate (3 checkboxes).** The skill won't write anything until you tick three boxes confirming the folder is yours, your cloud sync is allowed for the content, and Absolution Labs has no access. Take a moment to read each.
+1. **Compliance gate (2 checkboxes).** Above the gate you'll see a one-line statement that the skill writes only to your folder and nothing is sent to Absolution Labs. You don't confirm that — it's stated for the record. You DO tick two boxes confirming the folder is yours to write to, and your cloud sync provider is permitted for the content you intend to store. Take a moment to read each.
 2. **Refuse-to-scaffold check.** If your folder isn't empty, the skill refuses. This is intentional. If it refuses incorrectly: tell us.
 3. **Two questions.** Company name (any test name — "Acme Co" is fine) and your sync provider (pick whichever applies).
 4. **Scaffold writes.** About 20 files land in your folder over a few seconds. The skill names each one.
 5. **Round-trip test.** The skill creates one welcome page and asks you to open it in Obsidian to confirm everything works.
-6. **Phase 2 handoff.** The skill points you at `HOW-TO-USE-THIS.md` in your vault, and confirms the two companion skills (`open-obsidian-project`, `close-obsidian-project`) auto-installed alongside the main install skill.
+6. **Phase 2 handoff.** The skill points you at `HOW-TO-USE-THIS.md` in your vault and reminds you to install the two companion skills (`open-obsidian-project`, `close-obsidian-project`) from the same GitHub Release if you haven't already.
 
 If at any step something feels confusing, scary, or broken: **note it** and tell us. There are no stupid observations.
 

@@ -13,46 +13,44 @@ Both names use `-obsidian-project` as a suffix so they don't collide with any ot
 
 ## Install
 
+Both companions ship as separate zips on the [latest GitHub Release](https://github.com/absolutionlabs/obsidian-company-memory/releases/latest). The install paradigm is the same as the main `obsidian-company-memory` bundle: upload a zip via Cowork's Upload-skill UI, or unzip into your Code skills folder.
+
+### Cowork
+
+1. Download both zips from the [latest GitHub Release](https://github.com/absolutionlabs/obsidian-company-memory/releases/latest):
+   - `open-obsidian-project-vX.Y.Z.zip`
+   - `close-obsidian-project-vX.Y.Z.zip`
+2. In Cowork: **Skills → Upload skill → drag-drop each**. Restart if Cowork prompts.
+3. Confirm both appear in your skills list. Each zip is small (~4 KB) and contains only a `SKILL.md` — no extra files, no surprises.
+
 ### Claude Code
 
-**Auto-install (recommended).** The main `obsidian-company-memory` install skill, when run on Claude Code, copies both companion skills to `~/.claude/skills/` as part of the install procedure. You don't need to do anything; restart Code after install and both skills will appear.
-
-If you missed the auto-install (e.g. installed a previous version of the bundle by hand), do it manually:
+If you have a local clone of the main bundle, copy each companion folder into `~/.claude/skills/`:
 
 ```bash
-# Assuming you cloned obsidian-company-memory to ~/.claude/skills/obsidian-company-memory/
 cp -r ~/.claude/skills/obsidian-company-memory/companion-skills/open-obsidian-project ~/.claude/skills/
 cp -r ~/.claude/skills/obsidian-company-memory/companion-skills/close-obsidian-project ~/.claude/skills/
 
 # Restart Code; both /open-obsidian-project and /close-obsidian-project should now autocomplete.
 ```
 
-### Cowork
+If you don't have a local clone, download the same two zips from the GitHub Release and unzip each into a new folder under `~/.claude/skills/`:
 
-**Multi-skill plugin (in test).** The bundle's `plugin.json` declares all three skills (main install + both companions) under one plugin. When you paste the install URL into Cowork, all three should install together. We are validating this in private beta; if Cowork's plugin system only installs the main skill, fall back to the manual path below.
+```bash
+mkdir -p ~/.claude/skills/open-obsidian-project
+unzip ~/Downloads/open-obsidian-project-vX.Y.Z.zip -d ~/.claude/skills/open-obsidian-project/
 
-**Standard install path on Cowork (3 URL pastes).** Cowork's plugin system installs one skill per URL paste, so the cleanest install for all three skills is three URL pastes in order:
-
-```
-1. Main install skill (scaffolds the vault):
-   https://raw.githubusercontent.com/absolutionlabs/obsidian-company-memory/main/plugin.json
-
-2. Open-obsidian-project companion (starts new projects against the vault):
-   https://raw.githubusercontent.com/absolutionlabs/obsidian-company-memory/main/companion-skills/open-obsidian-project/plugin.json
-
-3. Close-obsidian-project companion (closes working sessions cleanly):
-   https://raw.githubusercontent.com/absolutionlabs/obsidian-company-memory/main/companion-skills/close-obsidian-project/plugin.json
+mkdir -p ~/.claude/skills/close-obsidian-project
+unzip ~/Downloads/close-obsidian-project-vX.Y.Z.zip -d ~/.claude/skills/close-obsidian-project/
 ```
 
-Settings → Plugins → Install from URL → paste each, approve each, restart Cowork. About 30 seconds of operator time total.
-
-The bundle's main `plugin.json` also declares both companion skills under a `companion_skills` array as a hopeful multi-skill manifest. If a future Cowork release honors that pattern, one URL paste (the first one above) installs all three. Until that's verified empirically, the three-paste path is the reliable one.
+The native `claude plugin marketplace add absolutionlabs/obsidian-company-memory` path is queued for v1.3.0 (needs `.claude-plugin/marketplace.json` at the repo root).
 
 ### Codex / opencode
 
 These tools read `AGENTS.md` at session start; they don't have a separate skill mechanism. Two options:
 
-1. **Inline at session start.** Append a "Custom skills" section to your home `~/.codex/AGENTS.md` (or equivalent) and paste each `SKILL.md` body into it.
+1. **Inline at session start.** Download both zips from the GitHub Release, unzip each, and append the body of each `SKILL.md` to your home `~/.codex/AGENTS.md` (or equivalent) under a "Custom skills" section.
 2. **Reference from your project's session stub.** When `open-obsidian-project`'s output writes `<project>/AGENTS.md`, append a line at the top pointing at the companion skills' canonical URLs so the AI knows where to find them. The session-stub template already supports this pattern.
 
 ### Any other tool
@@ -63,13 +61,13 @@ Each `SKILL.md` body is self-contained. Tell your AI: *"Run this skill"* and pas
 
 ## Skill collision handling
 
-Both companion skills use `obsidian-project` in their names to avoid colliding with generic "open project" / "close" / "close session" skills you may have for non-Obsidian work. If you already have a skill named exactly `open-obsidian-project` or `close-obsidian-project` — unlikely, but possible if you've forked an earlier version — the auto-install procedure refuses cleanly with a "skill already exists at this name" message. Move or rename your existing skill before re-running install.
+Both companion skills use `obsidian-project` in their names to avoid colliding with generic "open project" / "close" / "close session" skills you may have for non-Obsidian work. If you already have a skill named exactly `open-obsidian-project` or `close-obsidian-project` — unlikely, but possible if you've forked an earlier version — the Cowork upload-skill UI surfaces a "skill already exists" error and refuses; on Claude Code the manual copy commands above will overwrite unless you rename your existing skill first.
 
 ---
 
 ## Version contract
 
-These companion skills are versioned alongside the main bundle. v1.1.0 of `obsidian-company-memory` ships v1.1.0 of these two companion skills. If you upgrade the main bundle, the companions upgrade too; if you've customised your local copy of a companion skill, the auto-install detects the collision and asks you whether to overwrite (losing your edits) or skip (keeping your edits).
+These companion skills are versioned alongside the main bundle. The same vX.Y.Z tag on the GitHub Release ships all three (main + two companions) at matching versions, even when only one of them changed materially in a given release. If you upgrade the main bundle, re-download the companions too; manual re-upload (Cowork) or re-copy (Code) is required — there's no auto-update channel.
 
 ---
 

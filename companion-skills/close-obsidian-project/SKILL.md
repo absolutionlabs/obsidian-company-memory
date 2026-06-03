@@ -1,7 +1,7 @@
 ---
 name: close-obsidian-project
 description: Close a working session against an Obsidian Company Memory vault project. Use at the end of every session — even short ones. Triggers on "close out the session", "close-obsidian-project", "wrap up the session", "end this session", "/close-obsidian-project", or any close paraphrase. Updates the project brief's session log if one exists, verifies at least one Ingest happened, appends a dated entry to the vault's log.md, reports every KB write made this session, generates a copy-paste continuation prompt for the next session, and prints a structured close report. Named `close-obsidian-project` (not `close-session`) so it can coexist with any other "close" or "close session" skill you may have for non-Obsidian work.
-version: 1.2.0
+version: 1.2.1
 license: MIT
 publisher: Absolution Labs LTD
 support: info@absolutionlabs.com

@@ -2,7 +2,7 @@
 
 A step-by-step reading-version of what happens when you install the Obsidian Company Memory skill. Useful if you'd rather read than watch the Loom — or if you need to vet the procedure before running it (regulated-sector due diligence, IT review, sceptical-by-default temperament). Either is a good reason.
 
-> **This document mirrors what the skill actually does.** The procedure the AI follows lives in [SKILL.md](../SKILL.md); this walkthrough is the human-readable description of the same nine steps. The two MUST stay in sync — if you spot a divergence, that's a bug. Email `info@absolutionlabs.com` and we'll fix it.
+> **This document mirrors what the skill actually does.** The procedure the AI follows lives in [SKILL.md](../SKILL.md); this walkthrough is the human-readable description of the same eight steps. The two MUST stay in sync — if you spot a divergence, that's a bug. Email `info@absolutionlabs.com` and we'll fix it.
 >
 > The Loom walkthrough on [absolutionlabs.com](https://absolutionlabs.com) shows the same procedure visually, in about 7 minutes. Same content, different format.
 
@@ -52,7 +52,11 @@ If all three pass, you'll see the first gate.
 
 ## Step 1 — The compliance gate
 
-Three checkboxes appear on screen. The skill cannot proceed unless all three are ticked. This is the first surface where you confirm — to yourself and on the record — that the install is appropriate.
+A one-line passive statement appears above the gate, for the record:
+
+> This skill writes files only to your folder. Nothing is sent to Absolution Labs at install or afterwards. Full terms: DISCLAIMERS.md.
+
+Then two checkboxes appear. The skill cannot proceed unless both are ticked. This is the first surface where you confirm — to yourself and on the record — that the install is appropriate.
 
 ```
 [ ] 1. The folder I am about to scaffold into is a folder I own or am
@@ -63,16 +67,13 @@ Three checkboxes appear on screen. The skill cannot proceed unless all three are
        / Google Drive / local-only) is one my organisation permits for the
        type of content I intend to store. I have checked any applicable data
        processing agreement (DPA) requirements.
-
-[ ] 3. I understand this vault will be a record of facts and decisions about
-       my company. Absolution Labs LTD has no access to its contents at any
-       point. The skill collects no telemetry and does not phone home at
-       install time or afterwards.
 ```
 
 **Box 2 is the one that matters most for regulated-sector users.** We don't enforce anything about your provider — we can't. But the gate makes you think about it before any data lands. If your industry has DPA requirements for the content you plan to store, check them before ticking.
 
-If you can't honestly tick all three: **don't force-tick**. Resolve the underlying question first. The gate is not a friction tax; it's the trust signal.
+If you can't honestly tick both: **don't force-tick**. Resolve the underlying question first. The gate is not a friction tax; it's the trust signal.
+
+**Why two boxes, not three.** Earlier versions had a third box asking you to confirm "Absolution Labs has no access to your vault contents." It was cut in v1.2.1 because that's a fact about *our* behaviour, not *your* commitment. Asking you to consent to something only we control read as CYA theatre and weakened the trust signal of the other two boxes. The fact is now stated above the gate (and in DISCLAIMERS.md in full) — we own the assertion; you don't have to tick a box agreeing we said it.
 
 ---
 
@@ -214,13 +215,16 @@ Phase 2 guide:      HOW-TO-USE-THIS.md at the vault root
 What to do next
 ---------------
 1. Read HOW-TO-USE-THIS.md (about 10 minutes).
-2. Verify the two companion skills are installed in your AI tool.
-   The install auto-installed these alongside the main skill:
+2. Install the two companion skills (if you haven't already):
    - open-obsidian-project — for starting new projects
    - close-obsidian-project — for ending every working session
-   Verify by asking your AI: "List my available skills." Both should
-   appear. If they don't, see Substep 5.6 of SKILL.md for surface-
-   specific recovery.
+
+   Download each zip from
+   https://github.com/absolutionlabs/obsidian-company-memory/releases/latest
+   and upload via Cowork → Skills → Upload skill (or unzip into
+   ~/.claude/skills/<name>/ on Claude Code). Verify by asking your AI:
+   "List my available skills." Both should appear.
+
 3. After your first real working session, run a lint by asking your AI:
    "run a lint on the vault". It will produce a baseline report you can
    compare against in future sessions.

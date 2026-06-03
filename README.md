@@ -22,11 +22,36 @@ By installing the skill, you accept those terms.
 
 ## Install
 
-> **The current install URL, version picker, and Loom walkthrough live on the Absolution Labs website at [absolutionlabs.com](https://absolutionlabs.com).**
->
-> The website is the canonical install surface. It shows the current version, the install URL for Cowork (paste into Cowork's plugin settings), and the one-line install for Claude Code. It also embeds the guided-install Loom video (~7 min), which is the recommended first watch for anyone in a regulated sector.
+The install is **three zip uploads in Cowork** (or three folder copies in Claude Code), then ~25 minutes — most of which is you installing Obsidian itself and granting your AI tool access to a folder.
 
-Total elapsed install time: ~25 minutes — most of which is you installing Obsidian itself and granting your AI tool access to a folder.
+### Cowork (recommended)
+
+1. Go to the latest GitHub Release: [github.com/absolutionlabs/obsidian-company-memory/releases/latest](https://github.com/absolutionlabs/obsidian-company-memory/releases/latest)
+2. Download three zips:
+   - `open-obsidian-project-vX.Y.Z.zip` — companion: starts new projects against the vault
+   - `close-obsidian-project-vX.Y.Z.zip` — companion: runs the session-close protocol
+   - `obsidian-company-memory-vX.Y.Z.zip` — main install skill (~25-min vault scaffold)
+3. In Cowork: open **Skills → Upload skill** and drag-drop each zip, one at a time. Suggested order: companions first (small, self-contained), main install skill last.
+4. Once all three are installed, ask your AI: *"Set up Obsidian company memory"* (or paraphrase). The main skill takes it from there.
+
+### Claude Code
+
+Native `claude plugin marketplace add` is on the v1.3.0 roadmap. For now, clone the repo and copy the three skills into `~/.claude/skills/`:
+
+```bash
+git clone https://github.com/absolutionlabs/obsidian-company-memory.git ~/tmp/obsidian-company-memory
+cp -r ~/tmp/obsidian-company-memory ~/.claude/skills/
+cp -r ~/tmp/obsidian-company-memory/companion-skills/open-obsidian-project ~/.claude/skills/
+cp -r ~/tmp/obsidian-company-memory/companion-skills/close-obsidian-project ~/.claude/skills/
+```
+
+Restart Code; ask your AI to *"set up Obsidian company memory"* to invoke.
+
+### Codex / opencode / other AGENTS.md tools
+
+Download the three zips as above, unzip each, and append the body of each `SKILL.md` to your home `~/.codex/AGENTS.md` (or equivalent) under a "Custom skills" section. The skills are written to be tool-agnostic — anything that reads `AGENTS.md` can run them.
+
+> The install URL, version picker, and Loom walkthrough also live on the Absolution Labs website at [absolutionlabs.com](https://absolutionlabs.com).
 
 ## Before you install
 
@@ -39,11 +64,12 @@ Total elapsed install time: ~25 minutes — most of which is you installing Obsi
 
 ### You will be asked to confirm
 
-The skill won't write anything until you tick three compliance checkboxes confirming:
+Above the gate, you'll see a one-line passive statement: *"This skill writes files only to your folder. Nothing is sent to Absolution Labs at install or afterwards. Full terms: DISCLAIMERS.md."* That's the privacy posture, stated for the record — you don't confirm it.
+
+You DO confirm two things about *your* setup:
 
 1. The folder is yours to write to (no other party's data already inside).
 2. Your cloud sync provider is permitted for the content you intend to store (DPA awareness).
-3. You understand Absolution Labs has no access to your vault contents.
 
 If you're in a regulated sector (drinks, healthcare, finance, professional services), box 2 is the one that matters — we don't enforce anything about your provider, but we surface the question before any data lands. Compliance starts at install, not at first incident.
 
@@ -82,7 +108,7 @@ your-vault/
 
 ~20 files. All markdown / YAML / JSON. No binaries, no secrets, no telemetry inside the vault.
 
-The install ALSO copies two companion skills (`open-obsidian-project`, `close-obsidian-project`) to your AI tool's skill folder — those live alongside the main `obsidian-company-memory` install skill, not inside the vault. See [companion-skills/README.md](companion-skills/README.md).
+The two companion skills (`open-obsidian-project`, `close-obsidian-project`) ship as separate zips on the same GitHub Release — you install them via the same Upload-skill UI before (or after) the main install. They live in your AI tool's skill folder, alongside the main `obsidian-company-memory` install skill, not inside the vault. See [companion-skills/README.md](companion-skills/README.md).
 
 ## What the skill does NOT install
 
@@ -91,7 +117,7 @@ These are deliberate cuts. We hold the full design rationale internally; email `
 - **Obsidian itself.** You install Obsidian from `obsidian.md` separately. We tell you when.
 - **Community plugins.** Dataview, Templater, etc. are installed by you from Obsidian's own plugin browser. We don't bundle third-party binaries inside our distributable.
 - **An AI assistant.** Cowork, Code, Codex, opencode — you install whichever you use separately.
-- **A first project.** Use the auto-installed `open-obsidian-project` companion skill when you're ready to start one. The install auto-installs that skill (plus `close-obsidian-project` for session-close discipline) alongside the main install skill — no manual steps required on Claude Code; one or two URL pastes at worst on Cowork. See [companion-skills/README.md](companion-skills/README.md) for details. Names use `-obsidian-project` namespacing so they coexist with any other "open project" / "close" skills you already have.
+- **A first project.** Use the `open-obsidian-project` companion skill (installed separately from its own zip on the same GitHub Release) when you're ready to start one. Pair it with `close-obsidian-project` for session-close discipline. See [companion-skills/README.md](companion-skills/README.md) for details. Names use `-obsidian-project` namespacing so they coexist with any other "open project" / "close" skills you already have.
 - **Multi-client routing.** This is single-company by permanent design. If you need multi-client, this isn't the right shape — email `info@absolutionlabs.com`.
 - **A scheduled lint.** Lint is manual-invocation only: just ask your AI to "run a lint on the vault" when you want it.
 - **A way to migrate an existing vault.** The skill refuses to scaffold into non-empty folders. If you have an existing vault, email `info@absolutionlabs.com` — we'll help.

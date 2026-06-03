@@ -29,7 +29,7 @@ Options:
 
 ### "The compliance checkboxes won't let me proceed."
 
-The skill enforces all three checkboxes before any file write. If "Continue" is greyed out: one or more is unticked. Scroll back through the gate — each checkbox should show a tick when selected.
+The skill enforces both checkboxes before any file write. If "Continue" is greyed out: one or both is unticked. Scroll back through the gate — each checkbox should show a tick when selected. (Earlier versions had three boxes; v1.2.1 cut the third — see [install-walkthrough.md](install-walkthrough.md) § Step 1 for why.)
 
 If you genuinely can't tick one of them (e.g. you're not sure the folder is yours to write to): don't force-install. Resolve the underlying question first. The checkbox gate is the trust signal, not a friction tax.
 

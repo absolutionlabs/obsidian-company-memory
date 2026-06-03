@@ -1,5 +1,21 @@
 #!/usr/bin/env python3
 """
+DEPRECATED — v1.2.1, 2026-06-03.
+
+This lint validated the plugin.json ↔ SKILL.md mirror contract. That contract
+was retired in v1.2.1 when the Cowork install paradigm was verified: Cowork
+takes zip uploads via Upload-skill UI, not plugin.json via URL paste. The
+plugin.json files remain in the repo with `_deprecated` headers but are not
+read at install time.
+
+The lint script is preserved per OP #4 (don't delete documentation; mark
+deprecated). Do not include it in v1.2.1+ release validation. A replacement
+build-and-validate script (scripts/build_cowork_zips.py) ships in v1.2.1.
+
+Original docstring below.
+
+---
+
 Pre-release manifest lint for the Obsidian Company Memory skill.
 
 Implements the 7 checks documented in MANIFESTS.md § "Pre-release manifest lint".

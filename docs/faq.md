@@ -98,7 +98,7 @@ The vault itself is plain markdown — not encrypted. Encryption lives at the cl
 
 ### What if I'm in a regulated sector (finance, legal, healthcare)?
 
-The compliance gate at install Step 1 asks you to confirm three things up front. The third confirmation specifically: *Absolution Labs LTD has no access to your vault contents at any point.* If your DPA requirements still flag anything, email us before installing — we'd rather lose an install than ship a problem.
+The compliance gate at install Step 1 asks you to confirm two things up front: that the folder is yours to write to, and that your cloud sync provider is permitted for the content you intend to store (DPA awareness). Above the gate, a passive statement records that the skill is local-only — nothing is sent to Absolution Labs at install or afterwards. (Earlier versions had a third checkbox asking you to confirm that fact about *us*; v1.2.1 cut it because confirmations should be about your commitments, not our behaviour. Full disclosure in [DISCLAIMERS.md](../DISCLAIMERS.md).) If your DPA requirements still flag anything, email us before installing — we'd rather lose an install than ship a problem.
 
 ### Can my company's IT see what's in my vault?
 

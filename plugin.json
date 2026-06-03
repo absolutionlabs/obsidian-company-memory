@@ -1,5 +1,6 @@
 {
-  "_note": "Cowork plugin manifest for the Obsidian Company Memory skill. Mirrors the YAML frontmatter at the top of SKILL.md, which serves as the Claude Code skill manifest. See MANIFESTS.md for the mirror contract and per-field rationale. Schema URL below is provisional; align against Cowork's published plugin spec before public ship (Chunk 7 deliverable).",
+  "_deprecated": "v1.2.1 — DEPRECATED. The plugin.json + URL-paste install paradigm this file was built for is NOT how Cowork installs skills. Cowork's Upload-skill UI takes a .zip / .skill / .md file containing a SKILL.md with YAML frontmatter; the plugin.json shape below is never read. Verified via the Cowork Upload-skill dialog 2026-06-03. The file is kept for historical reference and as a structured record of the v1.0.0–v1.2.0 distribution design that was discarded; do NOT reference it from install instructions. Canonical install paradigm: zip uploaded via Cowork → Skills → Upload skill, sourced from the GitHub Release. See README.md and SKILL.md Substep 5.6 for current install paths.",
+  "_note": "Original note (kept for context): Cowork plugin manifest for the Obsidian Company Memory skill. Mirrors the YAML frontmatter at the top of SKILL.md, which serves as the Claude Code skill manifest. See MANIFESTS.md for the mirror contract and per-field rationale.",
   "$schema": "https://cowork.anthropic.com/schemas/plugin.json",
   "id": "obsidian-company-memory",
   "name": "Obsidian Company Memory",

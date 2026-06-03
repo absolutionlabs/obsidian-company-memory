@@ -1,5 +1,15 @@
 # Manifest Mirror Contract
 
+> **SUPERSEDED 2026-06-03 (v1.2.1).** This document described a `plugin.json` ↔ `SKILL.md` mirror contract built for a URL-paste install paradigm. **That install paradigm turned out NOT to be how Cowork installs skills.** Cowork takes zip / .skill / .md uploads via its Upload-skill UI; the `plugin.json` shape is never read. Verified 2026-06-03. The mirror contract is therefore retired.
+>
+> The single canonical manifest is now the YAML frontmatter at the top of [SKILL.md](SKILL.md). The `plugin.json` files at the repo root and inside `companion-skills/*/` are kept for historical reference and carry `_deprecated` headers naming the current install paradigm.
+>
+> This file remains in place per OP #4 (preserve documentation, append addendums). The body below documents the original mirror-contract design.
+
+---
+
+## Original mirror-contract design (historical, do not act on)
+
 This skill ships from one source repo, installable on two surfaces. Each surface uses its own manifest format:
 
 | Surface | Manifest | Format | Location |

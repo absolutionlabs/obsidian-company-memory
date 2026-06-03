@@ -10,7 +10,7 @@ tags: [guide, ongoing-use, phase-2]
 
 *Read once after install. Revisit any time you need a reminder. ~10-minute read.*
 
-This is the Phase 2 living guide for the {{COMPANY_NAME}} vault. The install skill set up the vault and verified it works, and auto-installed two companion skills (`open-obsidian-project` and `close-obsidian-project`) into your AI tool. From here on, **this doc is your reference for everything that happens during ongoing use** — the weekly lint habit, the close-session protocol, what to do when something breaks, when to update what.
+This is the Phase 2 living guide for the {{COMPANY_NAME}} vault. The install skill set up the vault and verified it works. Two companion skills (`open-obsidian-project` and `close-obsidian-project`) ship as separate zips on the same GitHub Release — install them via Cowork's Upload-skill UI (or copy into `~/.claude/skills/` on Claude Code) if you haven't already. From here on, **this doc is your reference for everything that happens during ongoing use** — the weekly lint habit, the close-session protocol, what to do when something breaks, when to update what.
 
 The vault is yours. You can edit this guide as you learn things; you can ignore parts you don't need; you can add sections that make sense for your company. It lives in your vault root so you'll see it in Obsidian's file explorer.
 
@@ -22,7 +22,7 @@ You sit down to work. You open an AI session (Cowork, Claude Code, Codex, openco
 
 As facts surface during the session ("the supplier's lead time is 6 weeks," "we decided to drop the smaller SKU"), the AI proposes wiki updates inline. You confirm or correct. The page gets written immediately; the `updated:` date changes; `index.md` gets a new entry; `log.md` gets a session entry.
 
-At the end of the session, you invoke your `close-obsidian-project` skill (or just say "let's close out"). The AI runs the close protocol, writes the audit-trail entry, and gives you a prompt for next time. The companion skills auto-installed alongside the main install skill — they should already be available in your AI tool. (If they're not — typically a Cowork install where the multi-skill plugin manifest didn't carry through — see [the companion-skills README](../companion-skills/README.md) for the manual install paths.)
+At the end of the session, you invoke your `close-obsidian-project` skill (or just say "let's close out"). The AI runs the close protocol, writes the audit-trail entry, and gives you a prompt for next time. If you haven't installed the companion skills yet, grab the two companion zips from the [latest GitHub Release](https://github.com/absolutionlabs/obsidian-company-memory/releases/latest) and upload via Cowork → Skills → Upload skill (or unzip into `~/.claude/skills/<name>/` on Claude Code). See [companion-skills/README.md](../companion-skills/README.md) for the per-tool detail.
 
 That's the whole loop. You don't curate the vault; the vault grows as a by-product.
 
@@ -30,14 +30,14 @@ That's the whole loop. You don't curate the vault; the vault grows as a by-produ
 
 ## The two companion skills you have
 
-The install auto-installed two companion skills alongside the main vault-setup skill. They should already be available in your AI tool:
+Two companion skills pair with the main vault-setup skill:
 
 - **`open-obsidian-project`** — run when you start a new project. Scaffolds a project folder, writes a session stub the AI reads at every session, and (if you want) creates a brief.
 - **`close-obsidian-project`** — run at the end of every session. Updates the brief, verifies an Ingest ran, appends the log, reports what changed, and gives you a continuation prompt for next time.
 
 Both skills use the `-obsidian-project` namespace suffix so they don't collide with generic "new project" / "close session" skills you may already have for non-Obsidian work.
 
-If for any reason the auto-install didn't take cleanly (typically on Cowork if the multi-skill plugin manifest isn't honored), see [companion-skills/README.md](../companion-skills/README.md) at the top of the bundle for the manual install paths. Each is a one-URL paste away.
+Install each via the same path you used for the main skill: download the zip from the [latest GitHub Release](https://github.com/absolutionlabs/obsidian-company-memory/releases/latest) and upload via Cowork → Skills → Upload skill (or unzip into `~/.claude/skills/<name>/` on Claude Code). See [companion-skills/README.md](../companion-skills/README.md) for per-tool detail.
 
 You can also customise these skills — they're MIT-licensed and yours to edit. Common modifications are documented in each skill's body.
 

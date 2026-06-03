@@ -11,6 +11,10 @@ loom-script.md
 # (no deadline; orphan rows contain no PII).
 telemetry/
 
+# Cowork-uploadable zip artifacts are built by scripts/build_cowork_zips.py
+# and attached to GitHub Releases — they don't belong in git history.
+release/cowork-zips/
+
 # Build / OS noise
 node_modules/
 .DS_Store

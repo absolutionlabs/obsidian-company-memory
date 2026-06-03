@@ -119,7 +119,13 @@ If the count is dramatically off, the bundle didn't download cleanly. Re-downloa
 
 ## Section 3 — Self-check the compliance gate
 
-The skill enforces this gate at install time with checkboxes. The manual path asks you to read each item and answer it honestly to yourself before continuing. If you can't answer YES to all three, stop.
+The skill enforces this gate at install time with checkboxes. The manual path asks you to read each item and answer it honestly to yourself before continuing. If you can't answer YES to both, stop.
+
+First, a one-line factual statement (not a check — read it for the record):
+
+> This skill (and its manual equivalent) writes files only to your folder. Nothing is sent to Absolution Labs at install or afterwards. Full terms: DISCLAIMERS.md.
+
+Then two checks:
 
 > **1. The folder I am about to scaffold into is a folder I own or am authorised to write to. It does not contain any client data, regulated data, or personal data belonging to someone else.**
 >
@@ -129,9 +135,9 @@ The skill enforces this gate at install time with checkboxes. The manual path as
 >
 > Regulated-sector folders: confirm the DPA covers what you're about to store. This is the box that matters most in finance / legal / healthcare.
 
-> **3. I understand this vault will be a record of facts and decisions about my company. Absolution Labs LTD has no access to its contents at any point. The skill collects no telemetry and does not phone home at install time or afterwards.**
+If either answer is NO, stop here. The skill — automated or manual — is not the right path until both answers are YES.
 
-If any answer is NO, stop here. The skill — automated or manual — is not the right path until those answers are YES.
+**Why only two checks, not three.** Earlier versions had a third box affirming "Absolution Labs LTD has no access to your vault contents." It was cut in v1.2.1 because confirmations should be about *your* commitments, not *our* behaviour. The fact is now stated above the two checks (and in [DISCLAIMERS.md](../DISCLAIMERS.md) in full) — we own the assertion; you don't tick a box agreeing to it.
 
 ---
 
