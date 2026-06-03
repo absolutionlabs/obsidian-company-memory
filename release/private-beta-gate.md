@@ -60,7 +60,7 @@ If any of the above is false, the private beta is not ready to start. **Do not i
 **As feedback arrives:**
 
 1. Reply to acknowledge within 1 business day (per the SLA the install page promises).
-2. Log each piece of feedback into a triage document at `release/beta-feedback-runs/<YYYY-MM-DD>.md`. Don't paraphrase; capture the tester's actual words.
+2. Log each piece of feedback into a triage document at `release/beta-feedback-runs/<YYYY-MM-DD>.md`. Don't paraphrase; capture the tester's actual words. Copy [`beta-feedback-runs/_template.md`](beta-feedback-runs/_template.md) as the starting shape — it carries the capture table, the bucket rubric inline, and the Stage 4 decision checklist.
 3. Tag each piece: `bug` / `friction` / `cut suggestion` / `add suggestion` / `vibe`.
 4. After receiving 3 testers' feedback, hold a triage decision (alone or with a peer): what's blocking, what's nice-to-have, what's a "no."
 
@@ -97,7 +97,7 @@ Three buckets for every piece of feedback:
 - Style preferences (typography, colour, copy tone) that don't materially affect trust
 - Feature ideas that would expand scope
 
-**Action:** log in a backlog file at `release/post-launch-backlog.md`. Do NOT block public ship.
+**Action:** log in the backlog file at [`release/post-launch-backlog.md`](post-launch-backlog.md). Do NOT block public ship.
 
 ---
 
