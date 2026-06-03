@@ -1,3 +1,11 @@
+# Install landing page — `absolutionlabs.com/obsidian` *(SUPERSEDED 2026-06-03)*
+
+> **Superseded by [overview-page.md](overview-page.md).** Rob's call 2026-06-03: the dual-install-buttons-above-the-fold shape in this draft is wrong for the actual audience (regulated-sector founders who haven't seen the skill before and want to read what we shipped before clicking anything). The new shape is story-led, with a single "Get it on GitHub" CTA at the bottom after the qualifier, methodology, substrate, and honesty-about-incentive paragraphs.
+>
+> This file is preserved as the historical first draft per OP #4 (preserve documentation, don't rewrite). DO NOT deploy this version of the page — render [overview-page.md](overview-page.md) at `absolutionlabs.com/obsidian` instead.
+
+---
+
 # Install landing page — `absolutionlabs.com/obsidian`
 
 The single canonical install surface. Drives prospects from "saw a link, considering it" → "installed and watched it work."
