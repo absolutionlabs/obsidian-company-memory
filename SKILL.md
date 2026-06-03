@@ -250,10 +250,11 @@ Substitution variables (build once before any write):
 **Substitution scope exceptions** (read carefully; bugs from missing these have shipped in past sessions):
 
 - **In `templates/_meta/templates/*.md` (the per-page templates `entity.md`, `concept.md`, `query.md`):** substitute `{{COMPANY_NAME}}` but DO NOT substitute `{{TODAY}}`. These files are USER-COPY templates the user clones in Obsidian months from now to create new pages — baking the scaffold date into them defeats the lint's stale-page detection. The `{{TODAY}}` placeholder is left in place for the user's Obsidian Templates plugin (or the AI at page-creation time) to fill in.
-- **In `CLAUDE.md.template` and `AGENTS.md.template` at the vault root:** do NOT substitute anything; preserve `{{PROJECT_NAME}}`, `{{PROJECT_DESCRIPTION}}`, `{{COMPANY_NAME}}`, `{{VAULT_ABSOLUTE_PATH}}`, `{{TODAY}}` all as literal. The `new-project-setup` skill substitutes these at first project invocation, with the project-creation date — NOT the vault-scaffold date.
-- **In `_meta/scaffold-version.txt` (Substep 6.7):** the file is built fresh from the runtime values, not from a template. `{{TODAY}}` in the example block below means "the resolved value at scaffold time," not "leave the literal text."
+- **In `templates/_meta/skill-prompts/new-project-setup.md` and `close-session.md`:** substitute `{{COMPANY_NAME}}` and `{{VAULT_ABSOLUTE_PATH}}` only. DO NOT substitute `{{TODAY}}`, `{{PROJECT_NAME}}`, or `{{PROJECT_DESCRIPTION}}` — those are consumed by the user's `new-project-setup` skill at per-project use time, not at vault scaffold time. The skill-prompts `README.md` is the exception within the exception: it gets `{{TODAY}}` substituted because the README is a one-time-at-scaffold artifact.
+- **In `CLAUDE.md.template` and `AGENTS.md.template` at the vault root:** do NOT substitute anything; preserve `{{PROJECT_NAME}}`, `{{PROJECT_DESCRIPTION}}`, `{{COMPANY_NAME}}`, `{{VAULT_ABSOLUTE_PATH}}`, `{{TODAY}}` all as literal. The user's `new-project-setup` skill substitutes these at first project invocation, with the project-creation date — NOT the vault-scaffold date.
+- **In `_meta/scaffold-version.txt` (Substep 6.8):** the file is built fresh from the runtime values, not from a template. `{{TODAY}}` in the example block below means "the resolved value at scaffold time," not "leave the literal text."
 
-The substitution table above is otherwise applied universally; the three exceptions above are the only carve-outs.
+The substitution table above is otherwise applied universally; the four exceptions above are the only carve-outs.
 
 **Substep 6.1 — Create folder structure.**
 
@@ -271,6 +272,7 @@ raw/assets/
 lint-reports/
 _meta/
 _meta/templates/
+_meta/skill-prompts/
 .obsidian/
 ```
 
@@ -305,16 +307,26 @@ For each, read the template, substitute `{{COMPANY_NAME}}` and `{{TODAY}}`, writ
 - `_meta/expectations.yml` → from template; append a `date_format_preference: <detected>` line for downstream tools that want it.
 - `_meta/templates/entity.md`, `concept.md`, `query.md` → from `templates/_meta/templates/`. Substitute `{{COMPANY_NAME}}` but DO NOT substitute `{{TODAY}}` (these are user-copy templates per the substitution-scope exception above; leaving `{{TODAY}}` as a placeholder is correct).
 
-**Substep 6.6 — Write the project-stub templates (do NOT instantiate).**
+**Substep 6.6 — Write the skill prompts (the user installs these as custom skills in their AI tool).**
+
+The bundle does NOT install a `new-project-setup` or `close-session` skill into the user's AI tool — those are user-built, because Cowork / Claude Code / Codex / opencode all install custom skills differently and the user's workflow matters more than ours. Instead the bundle ships ready-to-install prompts the user copies into their tool. Write these three files from `templates/_meta/skill-prompts/`:
+
+- `_meta/skill-prompts/README.md` → substitute `{{COMPANY_NAME}}`, `{{VAULT_ABSOLUTE_PATH}}`, and `{{TODAY}}` (the README is timestamped at scaffold; the prompts inside are not).
+- `_meta/skill-prompts/new-project-setup.md` → substitute `{{COMPANY_NAME}}` and `{{VAULT_ABSOLUTE_PATH}}` only. DO NOT substitute `{{TODAY}}`, `{{PROJECT_NAME}}`, `{{PROJECT_DESCRIPTION}}` — those are consumed by the skill at per-project use time, not at vault scaffold time.
+- `_meta/skill-prompts/close-session.md` → same substitution rules: `{{COMPANY_NAME}}` and `{{VAULT_ABSOLUTE_PATH}}` only. Leave `{{TODAY}}` literal.
+
+Step 9.2's final message will tell the user where these files live and that they're the next thing to install.
+
+**Substep 6.7 — Write the project-stub templates (do NOT instantiate).**
 
 These files are templates for `new-project-setup` to read when the user creates their first project. They live at the vault root with the `.template` suffix preserved:
 
 - `CLAUDE.md.template` → vault root, leave `{{PROJECT_NAME}}`, `{{PROJECT_DESCRIPTION}}`, `{{COMPANY_NAME}}`, `{{VAULT_ABSOLUTE_PATH}}`, `{{TODAY}}` as literal placeholders for the downstream skill.
 - `AGENTS.md.template` → same.
 
-These files are NOT in `index.md` (they are not wiki pages); they sit at the root as a discoverable handoff to the next skill.
+These files are NOT in `index.md` (they are not wiki pages); they sit at the root as a discoverable handoff to the user's `new-project-setup` skill.
 
-**Substep 6.7 — Write a one-line scaffold-version marker.**
+**Substep 6.8 — Write a one-line scaffold-version marker.**
 
 Write `_meta/scaffold-version.txt` containing (this file is built fresh from runtime values, NOT from a template — the placeholders below show what to substitute):
 
@@ -329,7 +341,7 @@ telemetry_uuid: <UUID or "opted-out">
 
 This is the fingerprint used by `docs/upgrading.md` and the lint to detect drift between vault and skill version. No PII.
 
-**Substep 6.8 — Verify the write batch.**
+**Substep 6.9 — Verify the write batch.**
 
 Read every file just written and confirm it parses (markdown loads cleanly, JSON parses, YAML parses). If anything fails, surface which file and which error, and STOP — do not proceed to the round-trip test on a corrupt scaffold.
 
@@ -501,11 +513,16 @@ loop. Your knowledge accumulates as a by-product of using it.
 What to do next
 ---------------
 1. Read HOW-TO-USE-THIS.md (about 10 minutes).
-2. When you are ready to start your first real project, invoke the
-   new-project-setup skill in your AI tool. It will scaffold a project
-   folder pointing at this vault.
-3. After your first working session, run a lint (just ask: "run a lint on
-   the vault"). It will produce a baseline report you can compare against.
+2. Create two custom skills in your AI tool, using the prompts at
+   _meta/skill-prompts/ inside your vault. Five minutes once at install
+   time; saves you hours on every session afterward.
+   - new-project-setup — for starting new projects
+   - close-session    — for ending every working session
+   Install instructions for Cowork, Claude Code, Codex, and opencode
+   are inside each prompt file. Start with _meta/skill-prompts/README.md.
+3. After your first real working session, run a lint by asking your AI:
+   "run a lint on the vault". It will produce a baseline report you can
+   compare against in future sessions.
 
 Feedback + support
 ------------------

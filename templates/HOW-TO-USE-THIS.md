@@ -22,9 +22,22 @@ You sit down to work. You open an AI session (Cowork, Claude Code, Codex, openco
 
 As facts surface during the session ("the supplier's lead time is 6 weeks," "we decided to drop the smaller SKU"), the AI proposes wiki updates inline. You confirm or correct. The page gets written immediately; the `updated:` date changes; `index.md` gets a new entry; `log.md` gets a session entry.
 
-At the end of the session, you type `/close-full` (or just "let's close out"). The AI runs the close protocol, writes the audit-trail entry, and gives you a prompt for next time.
+At the end of the session, you invoke your `close-session` skill (or just say "let's close out"). The AI runs the close protocol, writes the audit-trail entry, and gives you a prompt for next time. (If you haven't created the `close-session` skill yet, the prompt is at `_meta/skill-prompts/close-session.md` — about five minutes to install once.)
 
 That's the whole loop. You don't curate the vault; the vault grows as a by-product.
+
+---
+
+## The two custom skills you'll build
+
+The install left two prompt files in your vault at `_meta/skill-prompts/`. Spend five minutes following the instructions inside each one to install them as custom skills in whichever AI tool you use:
+
+- **`new-project-setup`** — run when you start a new project. Scaffolds a project folder, writes a session stub the AI reads at every session, and (if you want) creates a brief.
+- **`close-session`** — run at the end of every session. Updates the brief, verifies an Ingest ran, appends the log, reports what changed, and gives you a continuation prompt for next time.
+
+The bundle didn't install these as ready-made skills because every AI tool installs custom skills differently — and we'd rather you build your own (and modify them later) than have us in your tool's skill folder. Install once per tool; if you use more than one tool, install in each.
+
+Start at `_meta/skill-prompts/README.md` — it's a 2-minute overview of the design.
 
 ---
 
@@ -72,7 +85,7 @@ Bad moments to force an Ingest:
 
 ## The close-session protocol
 
-Every session ends with `/close-full` (or "let's close out, run the close protocol"). The AI:
+Every session ends with your `close-session` skill (or just "let's close out, run the close protocol"). The AI:
 
 1. Updates any project brief if one exists.
 2. Verifies at least one Ingest ran this session. If not, asks why.

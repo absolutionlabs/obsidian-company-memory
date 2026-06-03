@@ -64,11 +64,15 @@ your-vault/
 ├── _meta/
 │   ├── expectations.yml         ← lint thresholds (editable)
 │   ├── scaffold-version.txt     ← which version installed this vault
-│   └── templates/               ← page templates (entity / concept / query)
+│   ├── templates/               ← page templates (entity / concept / query)
+│   └── skill-prompts/           ← prompts for two custom skills you'll build
+│       ├── README.md            ← 2-min overview of the skill-prompts design
+│       ├── new-project-setup.md ← prompt for the new-project skill
+│       └── close-session.md     ← prompt for the close-session skill
 └── .obsidian/                   ← Obsidian config (sensible defaults)
 ```
 
-~20 files. All markdown / YAML / JSON. No binaries, no secrets, no telemetry inside the vault.
+~23 files. All markdown / YAML / JSON. No binaries, no secrets, no telemetry inside the vault.
 
 ## What the skill does NOT install
 
@@ -77,7 +81,7 @@ These are deliberate cuts; see [brief.md](brief.md) for the full reasoning.
 - **Obsidian itself.** You install Obsidian from `obsidian.md` separately. We tell you when.
 - **Community plugins.** Dataview, Templater, etc. are installed by you from Obsidian's own plugin browser. We don't bundle third-party binaries inside our distributable.
 - **An AI assistant.** Cowork, Code, Codex, opencode — you install whichever you use separately.
-- **A first project.** Project scaffolding is handled by a separate skill called `new-project-setup`. Run it after this skill, when you're ready to start real work.
+- **A first project.** The install ships prompt files for two custom skills you'll build in your AI tool — `new-project-setup` and `close-session` — at `_meta/skill-prompts/`. Five minutes once at install time; runs forever. The bundle ships the prompts, not the pre-built skills, because every AI tool installs custom skills differently and your workflow matters more than ours.
 - **Multi-client routing.** This is single-company by permanent design. If you need multi-client, this isn't the right shape — email `info@absolutionlabs.com`.
 - **A scheduled lint.** Lint is manual-invocation only: just ask your AI to "run a lint on the vault" when you want it.
 - **A way to migrate an existing vault.** The skill refuses to scaffold into non-empty folders. If you have an existing vault, email `info@absolutionlabs.com` — we'll help.

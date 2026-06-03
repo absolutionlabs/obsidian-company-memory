@@ -258,11 +258,16 @@ Telemetry UUID:     <UUID or "opted out">
 What to do next
 ---------------
 1. Read HOW-TO-USE-THIS.md (about 10 minutes).
-2. When you are ready to start your first real project, invoke the
-   new-project-setup skill in your AI tool. It will scaffold a project
-   folder pointing at this vault.
-3. After your first working session, run a lint (just ask: "run a lint on
-   the vault"). It will produce a baseline report you can compare against.
+2. Create two custom skills in your AI tool, using the prompts at
+   _meta/skill-prompts/ inside your vault. Five minutes once at install
+   time; saves you hours on every session afterward.
+   - new-project-setup — for starting new projects
+   - close-session    — for ending every working session
+   Install instructions for Cowork, Claude Code, Codex, and opencode
+   are inside each prompt file. Start with _meta/skill-prompts/README.md.
+3. After your first real working session, run a lint by asking your AI:
+   "run a lint on the vault". It will produce a baseline report you can
+   compare against in future sessions.
 
 Feedback + support
 ------------------
