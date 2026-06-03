@@ -4,7 +4,7 @@ Before any public release, run the install against each of the 7 personas below.
 
 The matrix maps 1:1 to the 6 assumptions + the pre-mortem failure shape captured in our internal project brief. The bundle survives this matrix or it doesn't ship.
 
-> **v1.2.1 updates to pass criteria across every persona.** (a) Install procedure now reads: *Download three zips from the latest GitHub Release → Cowork → Skills → Upload skill → drag-drop each. Then say "Set up my Obsidian company memory."* (Persona-specific paths for Code / MDM / Codex still differ.) (b) Compliance gate is **2 checkboxes**, not 3 (v1.2.1 cut box 3 — "Absolution Labs has no access" — because confirmations should be about user commitments, not our behaviour; a one-line passive privacy statement appears above the gate instead). (c) **Telemetry pass criteria are deleted** — v1.2.0 removed the install ping; v1.2.1 retains that decision. References below to "telemetry surface explains 9 fields", "telemetry HTTPS POST succeeds", "final UUID shown to user", or "telemetry ping arrives in Supabase install_events" do NOT apply to v1.2.1+ runs. Strike them when running the matrix.
+The matrix below is current for v1.2.1+. Earlier versions (v1.0.0–v1.2.0) used a different install paradigm (URL-paste of `plugin.json`) and a 3-checkbox compliance gate; if you find yourself running the matrix against an earlier version, the install procedure and pass criteria don't match. Re-cut to the current version before running.
 
 ---
 
@@ -27,8 +27,8 @@ A persona "passes" only when all checks in its row pass. Partial passes do not c
 | | |
 |---|---|
 | **Setup** | A Mac (12+) with Obsidian downloaded but no vault created. A fresh Dropbox folder named `CompanyMemory-Test/` (empty). A Cowork account with no prior install of this skill. The Mac has not been used for development; assume zero terminal experience for this persona. |
-| **Install procedure** | Open Cowork → Settings → Plugins → Install from URL → paste the install URL → approve. Start a new conversation: "Set up my Obsidian company memory." Follow the prompts. |
-| **Pass criteria** | (a) Compliance gate appears with 3 checkboxes; (b) refuses to scaffold into a non-empty folder when retested with `~/Downloads`; (c) 2-question intake (company name + sync provider); (d) telemetry surface explains the 9 fields + opt-out; (e) ~20 files land in the test folder; (f) round-trip test creates `entities/test-welcome.md` + index updated + log appended; (g) Phase 2 guide handoff renders cleanly; (h) telemetry ping arrives in Supabase `install_events` table; (i) final UUID is shown to the user. |
+| **Install procedure** | Download all three zips from the [latest GitHub Release](https://github.com/absolutionlabs/obsidian-company-memory/releases/latest). Open Cowork → Skills → Upload skill → drag-drop each zip (companions first, main last). Start a new conversation: "Set up my Obsidian company memory." Follow the prompts. |
+| **Pass criteria** | (a) all three skills appear in the Cowork skills list after upload, with v1.2.1+ versions shown in the description; (b) the main skill is invoked successfully via the "Set up my Obsidian company memory" prompt; (c) compliance gate appears with a one-line passive privacy preamble + 2 checkboxes (NOT 3 — v1.2.1 cut the third); (d) refuses to scaffold into a non-empty folder when retested with `~/Downloads`; (e) 2-question intake (company name + sync provider); (f) ~20 files land in the test folder; (g) round-trip test creates `entities/test-welcome.md` + index updated + log appended; (h) Phase 2 guide handoff renders cleanly; (i) the final message names both companion skills as installed (or, if they weren't uploaded, tells the user where to get them on the GitHub Release). |
 | **Why this persona matters** | This is the modal user. Failure here is failure of the v1 promise. |
 
 ---
@@ -38,7 +38,7 @@ A persona "passes" only when all checks in its row pass. Partial passes do not c
 | | |
 |---|---|
 | **Setup** | Windows 10 or 11 with Obsidian downloaded but no vault. An empty folder in OneDrive (personal, not Business) named `CompanyMemory-Test\`. Cowork account, no prior install. |
-| **Install procedure** | Same as Persona 1 — paste install URL into Cowork, approve, run setup. |
+| **Install procedure** | Same as Persona 1 — download the three zips from the GitHub Release, drag-drop each into Cowork → Skills → Upload skill, then invoke. |
 | **Pass criteria** | All (a)–(i) from Persona 1, plus: (j) Windows path handling works (backslashes don't break wikilinks; the scaffold uses forward slashes inside vault references); (k) `app.json` config points at `raw/assets` not `raw\assets`. |
 | **Why this persona matters** | Windows is half the prospect base and the most likely persona to surface path-separator bugs. |
 
@@ -83,7 +83,7 @@ A persona "passes" only when all checks in its row pass. Partial passes do not c
 |---|---|
 | **Setup** | A Windows device under an organization's MDM (Intune, Workspace ONE, or similar). Test on an actual managed device — do not simulate. Empty folder in a location the user has write access to (not a corporate-managed path). |
 | **Install procedure** | Same as Persona 1. Watch for: silent file-write refusals from group policy; AppLocker blocks; restricted-execution warnings on Obsidian. |
-| **Pass criteria** | All (a)–(i), plus: (v) every file write succeeds OR the skill surfaces an explicit "blocked by policy" error (no silent failures); (w) Obsidian launches; (x) telemetry HTTPS POST succeeds (egress not blocked by the proxy). If the MDM blocks the install entirely: that's a valid pass for the persona ONLY if the skill's error message clearly says what's blocked and recommends an action the user can take. |
+| **Pass criteria** | All (a)–(i), plus: (v) every file write succeeds OR the skill surfaces an explicit "blocked by policy" error (no silent failures); (w) Obsidian launches; (x) the user can reach the GitHub Release page to download zips (i.e. egress to github.com isn't blocked by the proxy — if it is, that's a documented failure with a clear remediation path, not a silent break). If the MDM blocks the install entirely: that's a valid pass for the persona ONLY if the skill's error message clearly says what's blocked and recommends an action the user can take. |
 | **Why this persona matters** | The brief's pre-mortem specifically called this out. Regulated-sector founders often own personal laptops but use MDM-managed work laptops. Failing silently here is the kind of incident the brief was designed to prevent. |
 
 ---
