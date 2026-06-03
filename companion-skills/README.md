@@ -31,15 +31,22 @@ cp -r ~/.claude/skills/obsidian-company-memory/companion-skills/close-obsidian-p
 
 **Multi-skill plugin (in test).** The bundle's `plugin.json` declares all three skills (main install + both companions) under one plugin. When you paste the install URL into Cowork, all three should install together. We are validating this in private beta; if Cowork's plugin system only installs the main skill, fall back to the manual path below.
 
-**Manual fallback (if auto-install on Cowork doesn't work).** After installing the main `obsidian-company-memory` plugin, paste each of these URLs separately into Cowork's plugin install field:
+**Standard install path on Cowork (3 URL pastes).** Cowork's plugin system installs one skill per URL paste, so the cleanest install for all three skills is three URL pastes in order:
 
 ```
-https://raw.githubusercontent.com/absolutionlabs/obsidian-company-memory/main/companion-skills/open-obsidian-project/plugin.json
+1. Main install skill (scaffolds the vault):
+   https://raw.githubusercontent.com/absolutionlabs/obsidian-company-memory/main/plugin.json
 
-https://raw.githubusercontent.com/absolutionlabs/obsidian-company-memory/main/companion-skills/close-obsidian-project/plugin.json
+2. Open-obsidian-project companion (starts new projects against the vault):
+   https://raw.githubusercontent.com/absolutionlabs/obsidian-company-memory/main/companion-skills/open-obsidian-project/plugin.json
+
+3. Close-obsidian-project companion (closes working sessions cleanly):
+   https://raw.githubusercontent.com/absolutionlabs/obsidian-company-memory/main/companion-skills/close-obsidian-project/plugin.json
 ```
 
-(Standalone `plugin.json` files for each companion will be added in v1.1.1 if the multi-skill bundling doesn't carry across cleanly.)
+Settings → Plugins → Install from URL → paste each, approve each, restart Cowork. About 30 seconds of operator time total.
+
+The bundle's main `plugin.json` also declares both companion skills under a `companion_skills` array as a hopeful multi-skill manifest. If a future Cowork release honors that pattern, one URL paste (the first one above) installs all three. Until that's verified empirically, the three-paste path is the reliable one.
 
 ### Codex / opencode
 

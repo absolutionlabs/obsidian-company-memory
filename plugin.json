@@ -65,7 +65,7 @@
       "entry": "companion-skills/open-obsidian-project/SKILL.md",
       "version": "1.2.0",
       "purpose": "Scaffold a new project folder against the vault. Auto-installed alongside the main skill on v1.1.0+; falls back to manual URL paste if a Cowork multi-skill plugin install doesn't carry both companions through.",
-      "raw_url_fallback": "https://raw.githubusercontent.com/absolutionlabs/obsidian-company-memory/main/companion-skills/open-obsidian-project/SKILL.md"
+      "raw_url_fallback": "https://raw.githubusercontent.com/absolutionlabs/obsidian-company-memory/main/companion-skills/open-obsidian-project/plugin.json"
     },
     {
       "id": "close-obsidian-project",
@@ -73,7 +73,7 @@
       "entry": "companion-skills/close-obsidian-project/SKILL.md",
       "version": "1.2.0",
       "purpose": "Run the session-close protocol (update brief, verify Ingest, append vault log, generate continuation prompt). Auto-installed alongside the main skill on v1.1.0+. The name uses `-obsidian-project` namespacing to avoid colliding with generic `close` / `close-session` skills the user may already have installed.",
-      "raw_url_fallback": "https://raw.githubusercontent.com/absolutionlabs/obsidian-company-memory/main/companion-skills/close-obsidian-project/SKILL.md"
+      "raw_url_fallback": "https://raw.githubusercontent.com/absolutionlabs/obsidian-company-memory/main/companion-skills/close-obsidian-project/plugin.json"
     }
   ],
   "_companion_skills_note": "v1.1.0 introduces companion-skill auto-install (closes the manual prompt workflow that shipped in v1.0.0). On Claude Code, the install procedure copies both companion-skills/* folders to ~/.claude/skills/ as siblings. On Cowork, the multi-skill declaration above is the install vector; if Cowork's plugin system only installs the primary skill at v1.1.0 release, users paste the raw_url_fallback URLs as standalone plugin installs. Naming uses `-obsidian-project` (not `new-project-setup` / `close-session` per v1.0.0) to avoid collisions with non-Obsidian skills — surfaced as a beta-tester finding 2026-06-03.",
@@ -86,7 +86,9 @@
     "COMPATIBILITY.md",
     "companion-skills/README.md",
     "companion-skills/open-obsidian-project/SKILL.md",
+    "companion-skills/open-obsidian-project/plugin.json",
     "companion-skills/close-obsidian-project/SKILL.md",
+    "companion-skills/close-obsidian-project/plugin.json",
     "templates/SCHEMA.md",
     "templates/CONTEXT.md",
     "templates/index.md",
