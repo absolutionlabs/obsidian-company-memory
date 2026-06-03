@@ -13,8 +13,8 @@ This file is the **copy + structure spec** for the page; render it in whatever y
 **Headline** (H1):
 > Obsidian Company Memory
 
-**Subhead** (one line):
-> A long-term memory for your company, scaffolded onto your machine in 25 minutes. Free. From Absolution Labs.
+**Subhead** (one paragraph):
+> Not a template. A control system. Built from the same patterns Absolution Labs uses for our own client engagements — bespoke rulebooks and prompts engineered for reliability across hundreds of AI sessions. 25 minutes to install. Free. MIT-licensed.
 
 **Two install buttons, side by side:**
 

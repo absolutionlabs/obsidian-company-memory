@@ -1,10 +1,10 @@
 # Obsidian Company Memory
 
-**An AI-session-ready long-term memory for your company. Scaffolded onto your machine in about 25 minutes. Free, MIT-licensed, distributed by [Absolution Labs LTD](https://absolutionlabs.com).**
+**Not an Obsidian template. A control system for how AI agents read, write, and stay accountable to your company's knowledge. Scaffolded onto your machine in about 25 minutes. Free, MIT-licensed, distributed by [Absolution Labs LTD](https://absolutionlabs.com).**
 
 ---
 
-A single-folder Obsidian vault, configured for AI-assisted writing and retrieval, governed by a three-layer schema: raw source documents, a structured wiki of pages-per-thing, and a small set of rulebook files every AI session reads on start. You run a one-off install. From then on, knowledge accumulates as a by-product of normal AI-assisted work.
+The folder structure is the rendering layer; the bespoke prompts, rulebooks, and operating principles inside it are the product. A small set of files governs how every AI session interacts with the vault: it reads `SCHEMA.md` first, follows the Ingest / Query / Lint procedure, and writes the result back to an audit trail. You run a one-off install. From then on, your company's knowledge accumulates as a by-product of normal AI-assisted work — not as a wiki you have to maintain on the side.
 
 This skill is the install moment. It does not run again once your vault exists; ongoing use is governed by the living guide it drops at your vault root.
 

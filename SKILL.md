@@ -490,6 +490,14 @@ Round-trip test:    Passed
 Phase 2 guide:      HOW-TO-USE-THIS.md at the vault root
 Telemetry UUID:     <UUID or "opted out">
 
+What you just installed
+-----------------------
+Not an Obsidian template. A control system. The folder structure you
+see is the rendering layer; the rulebooks and prompts inside it are
+the product. Every AI session reads SCHEMA.md first, follows the
+procedure, and writes the result back to the audit trail. That's the
+loop. Your knowledge accumulates as a by-product of using it.
+
 What to do next
 ---------------
 1. Read HOW-TO-USE-THIS.md (about 10 minutes).
