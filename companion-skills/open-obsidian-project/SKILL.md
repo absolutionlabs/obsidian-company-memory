@@ -1,7 +1,7 @@
 ---
 name: open-obsidian-project
 description: Open a new project against an Obsidian Company Memory vault. Use when the user says "open a new project", "start a new Obsidian project", "/open-obsidian-project", "set up an Obsidian project", "scaffold a project against the vault", or any close paraphrase. Reads the vault's SCHEMA.md and CONTEXT.md, scaffolds a project folder structure (notes/, outputs/, raw/), writes a session-start stub (CLAUDE.md or AGENTS.md) the AI will read on every future session for that project, optionally creates a Forge-style project brief, appends an entry to the vault log, and prints a continuation prompt for the first real session on the project. Refuses if the target project folder already exists.
-version: 1.1.0
+version: 1.2.0
 license: MIT
 publisher: Absolution Labs LTD
 support: info@absolutionlabs.com

@@ -70,9 +70,9 @@ Pull verbatim from the bundle's README. Eight bullet points; each one a delibera
 H2: **Privacy in one paragraph**
 
 Body (verbatim from README):
-> The skill writes to your local folder via your AI assistant's mounted-directory access. Nothing flows back to Absolution Labs at any point during normal use. The one exception: at install time, by default, one anonymous ping is sent to a Supabase database we operate in London. It contains a random UUID (not linked to your name, company, or vault contents), the skill version, your OS family, the install surface, the sync provider you confirmed, and whether the install succeeded or failed. No PII. You can opt out with one click at install time.
+> The skill writes to your local folder via your AI assistant's mounted-directory access. Nothing flows back to Absolution Labs at any point. The skill collects no telemetry and does not phone home — at install time or afterwards.
 
-CTA below: **[Read the full privacy policy →](/privacy)**
+*(Older draft body retained earlier mentions of a 9-field opt-out install ping to a Supabase project; v1.2.0 removed that surface entirely.)*
 
 ---
 

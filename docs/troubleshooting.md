@@ -134,21 +134,9 @@ If the issue persists, you may have hit a Dropbox conflict file or a partial wri
 
 ## Post-install — runtime issues
 
-### "Telemetry could not be sent."
+### "I'm seeing an old reference to a Supabase telemetry endpoint."
 
-Non-blocking. The install proceeded; the success ping just didn't reach our endpoint. Common causes:
-
-- Your firewall blocks `vujwcvqiwwpncnhgxjsu.supabase.co` (the raw Supabase project URL — a custom domain `telemetry.absolutionlabs.com` is planned but not yet deployed).
-- Supabase had a brief outage.
-- You're behind a corporate proxy that strips outbound POSTs.
-
-No action needed. Your vault works. If you want us to know your install succeeded (it would help our funnel data), send a one-line email to `info@absolutionlabs.com`. Or ignore — it's genuinely opt-in for us, not just for you.
-
-### "I want to delete my install telemetry."
-
-Email `privacy@absolutionlabs.com` with the subject line `DSAR — Obsidian Company Memory — <your-UUID>`. The UUID was shown to you at install time in the final message. We delete all rows matching that UUID within one business day and reply confirming.
-
-If you've lost your UUID: by design, we have no other way to identify your rows (no email, no IP, no company name in the data). The deletion right can't be exercised against rows you can't identify — but the same property means nobody else can either. That's the trade-off of true anonymisation.
+You're probably on a v1.0.0 or v1.1.0 install. The telemetry surface was removed entirely in v1.2.0. Upgrade your install via [upgrading.md](upgrading.md) and the references will go away. If you've already installed v1.2.0 and you're seeing a stale reference somewhere, please email `info@absolutionlabs.com` with the file path so we can clean it up.
 
 ### "I want to refresh my vault to the latest skill version."
 
@@ -373,15 +361,6 @@ What to do:
 - Click "More info" → "Run anyway" if you trust the source (the install script is open-source on GitHub; inspect before running if uncertain).
 - Or: download the script directly from GitHub, inspect it (~30 lines), run it locally without piping. The script does a `git clone` + `mv` — nothing system-level.
 
-### "Corporate proxy blocks `vujwcvqiwwpncnhgxjsu.supabase.co` (telemetry endpoint)."
-
-Telemetry failures are non-blocking. The install proceeds and your vault works. The success ping just doesn't reach our endpoint.
-
-What to do (if you want telemetry to land anyway):
-- Ask IT to allowlist `*.supabase.co` for outbound POST (the endpoint is EU-hosted, GDPR-compliant, no PII).
-- Or: send a one-line email to `info@absolutionlabs.com` confirming your install succeeded; we can manually log it for funnel data.
-- Or: ignore. The vault is fully functional without telemetry.
-
 ### "Obsidian's plugin browser is blocked by corporate policy."
 
 Dataview is strongly recommended but optional (per COMPATIBILITY.md). If your IT blocks Obsidian's plugin browser, you can:
@@ -418,10 +397,6 @@ The skill auto-detects locale and writes `date_format_preference` to `_meta/expe
 What to do:
 - Edit `_meta/expectations.yml` directly. Change the `date_format_preference` line to what you want. Save.
 - This is informational only — YAML frontmatter dates in pages remain ISO `YYYY-MM-DD` because the lint depends on it. The preference affects body text only.
-
-### "I'm on a regulated Windows tenant with Microsoft Defender for Cloud Apps in front of all SaaS."
-
-Defender for Cloud Apps may flag the Supabase telemetry POST as "shadow IT" and block it. Same answer as the proxy section above: install proceeds, telemetry fails silently. If your security team needs to allowlist: the endpoint is `vujwcvqiwwpncnhgxjsu.supabase.co` (EU-hosted, anonymous payload, public privacy policy at [absolutionlabs.com/privacy](https://absolutionlabs.com/privacy)).
 
 ### "The skill ran but my MDM-managed Windows blocks creation of `.obsidian/`."
 

@@ -46,7 +46,7 @@ A scaffolded vault with five things bolted in by design:
 4. **An audit trail.** `log.md` records every Ingest, Query, and close-obsidian-project event with a date and a one-liner. Future you reads it to understand why your past self made certain calls.
 5. **An operating-principles starter.** `concepts/claude-operating-principles.md` ships with 5 principles tailored to AI-assisted work; you extend over time as your team learns what to repeat and what to stop.
 
-Plus: a procedural skill that scaffolds it in ~5 minutes, a 5-step round-trip test that verifies the system works end-to-end, an idempotency contract that refuses partial scaffolds, a compliance gate at install time, opt-out telemetry for failure detection, and ready-to-install prompt files for two custom skills (`open-obsidian-project` for starting projects, `close-obsidian-project` for ending sessions cleanly).
+Plus: a procedural skill that scaffolds it in ~5 minutes, a 5-step round-trip test that verifies the system works end-to-end, an idempotency contract that refuses partial scaffolds, a compliance gate at install time, no telemetry (the skill does not phone home), and two companion skills (`open-obsidian-project` for starting projects, `close-obsidian-project` for ending sessions cleanly) that auto-install alongside the main install skill.
 
 ---
 
@@ -105,7 +105,7 @@ Plus: a procedural skill that scaffolds it in ~5 minutes, a 5-step round-trip te
 - **You have a team** (even of 2) and want shared conventions an AI can enforce. SCHEMA.md is the contract; the lint catches violations.
 - **You've felt the pain of "what did we decide about X" not being findable.** The audit trail in `log.md` plus the index is precisely shaped for that.
 - **You want explicit decision-trace.** Every Ingest is logged. Future you (or a future AI session, or a teammate) can read the log and understand why the vault grew the way it did.
-- **Regulated-sector context.** The compliance gate at install + privacy policy + opt-out telemetry + EU-residency + DSAR procedure are all built in. Most standard patterns leave this surface entirely to you.
+- **Regulated-sector context.** The compliance gate at install plus a no-telemetry posture (the skill does not phone home in any version from v1.2.0 onward) covers the basics. Your own legal and regulatory due diligence still applies — the skill cannot substitute for it. Most standard patterns leave this surface entirely to you, with no compliance prompt at install time.
 - **You're a consultancy / agency working with multiple clients.** The bundle ships single-company; for multi-client, the Absolution Labs Client Knowledge Base shape is the right derivative (same underlying schema, with `clients/<slug>/` routing).
 - **You want recovery to be obvious if anything breaks.** The vault is plain markdown; cloud sync gives versioning; the Recovery Drill is documented; uninstalling the skill has zero impact on your vault.
 

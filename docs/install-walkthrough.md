@@ -66,8 +66,8 @@ Three checkboxes appear on screen. The skill cannot proceed unless all three are
 
 [ ] 3. I understand this vault will be a record of facts and decisions about
        my company. Absolution Labs LTD has no access to its contents at any
-       point. If I have opted in to telemetry, only anonymous install +
-       success pings are sent.
+       point. The skill collects no telemetry and does not phone home at
+       install time or afterwards.
 ```
 
 **Box 2 is the one that matters most for regulated-sector users.** We don't enforce anything about your provider — we can't. But the gate makes you think about it before any data lands. If your industry has DPA requirements for the content you plan to store, check them before ticking.
@@ -110,26 +110,13 @@ This name appears in your vault's templates wherever the placeholder `{{COMPANY_
 
 > Is this folder synced by Dropbox, iCloud, OneDrive, Google Drive, or local-only (no cloud sync)?
 
-Pick one. Your answer is normalized to one of five tokens — `dropbox`, `icloud`, `onedrive`, `google-drive`, `local-only` — before anything is stored or transmitted. This answer:
-
-- Goes into the anonymous telemetry ping (if you don't opt out) so we can detect provider-specific failures.
-- Is recorded in `_meta/scaffold-version.txt` inside your vault as a fingerprint.
-- Doesn't change the install itself — every provider produces the same vault.
+Pick one. Your answer is normalized to one of five tokens — `dropbox`, `icloud`, `onedrive`, `google-drive`, `local-only` — and recorded in `_meta/scaffold-version.txt` inside your vault as informational metadata. It doesn't change the install itself; every provider produces the same vault.
 
 If you pick `local-only`, the skill adds a quiet reminder at the end about quarterly zip backups, since you don't have cloud sync versioning as a safety net.
 
 ---
 
-## Step 4 — Resolve `os` value + auto-detect date format
-
-### 4a. `os` for telemetry
-
-The telemetry endpoint accepts your operating system family as one of `darwin` (macOS), `win32` (Windows), or `linux`. The skill resolves this differently depending on where it runs:
-
-- **In Claude Code:** runs `python -c "import sys; print(sys.platform)"` (or `uname -s` / `$env:OS` as fallback) to determine the value automatically.
-- **In Cowork:** asks you once — *"What operating system are you on — macOS, Windows, or Linux?"* — because the Cowork sandbox has no host-machine API. If you'd rather not answer, the skill skips the telemetry ping entirely (the install still proceeds).
-
-### 4b. Date format auto-detect
+## Step 4 — Auto-detect date format
 
 You won't see this step on screen — the skill auto-detects your system locale and picks a sensible date format preference (DD/MM/YYYY for UK / EU / AU, MM/DD/YYYY for US, YYYY-MM-DD ISO for East Asia and fallback). It records the preference in `_meta/expectations.yml` for downstream tools.
 
@@ -137,37 +124,7 @@ Note: regardless of preference, all the YAML frontmatter dates inside vault page
 
 ---
 
-## Step 5 — Telemetry surface
-
-The skill renders the telemetry disclosure and an opt-out checkbox. On screen during install, it's brief:
-
-> When this skill installs, we send one anonymous ping so we can detect installs that fail and fix them quickly. No personal data. No vault contents. No company name. EU-hosted. Full text of what we receive at absolutionlabs.com/privacy.
-
-The data is retained for 24 months; you can request deletion any time via `privacy@absolutionlabs.com` with the UUID shown to you at install. The full nine-field schema sits below for readers who want it (rather than on the user's screen at install — the install moment doesn't need the catalog).
-
-**What we receive if you don't opt out:**
-
-| Field | Example | Why |
-|---|---|---|
-| UUID | `7c2e3a14-9b8d-4f12-bc55-2e0c41d8a9b3` | Random; no link to you. The only handle to request deletion. |
-| skill | `obsidian-company-memory` | Identifies which skill |
-| version | `1.0.0` | Detect installs failing on a specific version |
-| os | `darwin` / `win32` / `linux` | Detect installs failing on a platform |
-| surface | `cowork` / `code` | Prioritise fixes by surface |
-| sync_provider | `dropbox` / `icloud` / etc. | Detect installs failing on a provider |
-| outcome | `attempted` / `success` / `failed` | The funnel — failures are the most useful signal |
-| failure_step | `round_trip` (optional) | If failed, which step (short string, capped at 64 chars) |
-| ts | `2026-06-03T12:34:56Z` | When the ping was sent (UTC) |
-
-**Nothing else.** No IP, no email, no company name, no vault contents.
-
-If you tick the opt-out box, no pings are sent for this install. The install proceeds identically.
-
-You'll see your UUID at the end of the install — note it down if you might want deletion later.
-
----
-
-## Step 6 — Scaffold writes
+## Step 5 — Scaffold writes
 
 This is the main work step. About 20 files land in your folder over a few seconds. The skill writes each in a deliberate order; if any single write fails, the skill stops cleanly and tells you which file failed (it does not try to continue partway).
 
@@ -206,7 +163,7 @@ After writing, the skill re-reads each file to verify it parses cleanly. If anyt
 
 ---
 
-## Step 7 — The round-trip test
+## Step 6 — The round-trip test
 
 The skill creates one real wiki page so you can see the system work end-to-end. This is the proof step.
 
@@ -232,7 +189,7 @@ Reply "verified" once all five work. If one doesn't — most often a wikilinks-d
 
 ---
 
-## Step 8 — Phase 2 handoff
+## Step 7 — Phase 2 handoff
 
 The skill confirms `HOW-TO-USE-THIS.md` is in your vault root and tells you to read it next:
 
@@ -242,7 +199,7 @@ This is the canonical handoff. The install (Phase 1) is complete. Ongoing use (P
 
 ---
 
-## Step 9 — Final message + continuation prompt
+## Step 8 — Final message + continuation prompt
 
 The skill prints a summary:
 
@@ -253,18 +210,17 @@ Vault location:     <absolute-path>
 Files created:      <count>
 Round-trip test:    Passed
 Phase 2 guide:      HOW-TO-USE-THIS.md at the vault root
-Telemetry UUID:     <UUID or "opted out">
 
 What to do next
 ---------------
 1. Read HOW-TO-USE-THIS.md (about 10 minutes).
-2. Create two custom skills in your AI tool, using the prompts at
-   _meta/skill-prompts/ inside your vault. Five minutes once at install
-   time; saves you hours on every session afterward.
+2. Verify the two companion skills are installed in your AI tool.
+   The install auto-installed these alongside the main skill:
    - open-obsidian-project — for starting new projects
-   - close-obsidian-project    — for ending every working session
-   Install instructions for Cowork, Claude Code, Codex, and opencode
-   are inside each prompt file. Start with _meta/skill-prompts/README.md.
+   - close-obsidian-project — for ending every working session
+   Verify by asking your AI: "List my available skills." Both should
+   appear. If they don't, see Substep 5.6 of SKILL.md for surface-
+   specific recovery.
 3. After your first real working session, run a lint by asking your AI:
    "run a lint on the vault". It will produce a baseline report you can
    compare against in future sessions.
@@ -275,9 +231,8 @@ info@absolutionlabs.com — replies within one business day.
 
 Privacy
 -------
-absolutionlabs.com/privacy
-Delete your telemetry UUID at any time by emailing privacy@absolutionlabs.com
-with the UUID shown above.
+The skill never phones home. No install ping, no UUID, no record
+of your install reaches Absolution Labs at any point.
 ```
 
 Plus a suggested opener for your next session:
@@ -294,7 +249,6 @@ The skill is designed to fail clearly, not silently. If something doesn't work:
 
 - **Mid-install error** — the skill stops, lists which files were written successfully and which failed, and tells you to delete the folder contents and re-run. It does not try to "continue from where we left off." Partial scaffolds are not recoverable; delete-and-restart is the safe answer.
 - **Round-trip test fails** — Obsidian shows something different from what the skill said it would. Walk through [docs/troubleshooting.md](troubleshooting.md) § "Round-trip verification failures" — five specific causes covered there.
-- **Telemetry can't reach the endpoint** — non-blocking. Your install still works. The skill notes the failure in the final message but doesn't stall.
 - **Slow file writes (>10s per file)** — usually a cloud sync provider throttling `.obsidian/` writes. Pause sync, complete the install, resume sync. Covered in [docs/troubleshooting.md](troubleshooting.md) § "Pathologically slow write".
 - **You're stuck on something not covered above** — email `info@absolutionlabs.com`. Response within one business day, replied to by a human. If you're a tester, you can also WhatsApp Rob directly using the number you have for him.
 
@@ -322,7 +276,7 @@ Until that lint check exists: the discipline is manual. The cost of getting it w
 
 ---
 
-*Cross-references: [SKILL.md](../SKILL.md), [README.md](../README.md), [TESTERS.md](../TESTERS.md), [loom-script.md](../loom-script.md), [docs/troubleshooting.md](troubleshooting.md), [docs/privacy-policy.md](privacy-policy.md), [templates/HOW-TO-USE-THIS.md](../templates/HOW-TO-USE-THIS.md).*
+*Cross-references: [SKILL.md](../SKILL.md), [README.md](../README.md), [TESTERS.md](../TESTERS.md), [loom-script.md](../loom-script.md), [docs/troubleshooting.md](troubleshooting.md), [templates/HOW-TO-USE-THIS.md](../templates/HOW-TO-USE-THIS.md).*
 
 ---
 

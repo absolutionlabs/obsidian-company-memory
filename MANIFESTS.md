@@ -33,12 +33,11 @@ The Cowork plugin manifest carries additional fields that the Code skill manifes
 | Field | Why Cowork-only |
 |---|---|
 | `permissions.directory_access` | Cowork requires explicit per-mount grant; Code inherits CWD access |
-| `permissions.network_egress.endpoints` | Cowork sandbox egress is allowlist-gated; Code does not have a sandbox |
 | `surfaces` | Tells the marketplace which install paths to surface |
 | `categories` / `keywords` | Marketplace discoverability metadata |
 | `homepage` / `repository` / `release_signing` | Marketplace + integrity surfaces |
 | `files` | Cowork plugin bundle declares which files are part of the package |
-| `telemetry.endpoint` / `telemetry.anon_key` / `telemetry.endpoint_provider` / `telemetry.endpoint_region` | Telemetry config consumed by SKILL.md Steps 5 + 9.1. The anon key is public-by-design (Supabase model: security via RLS, not via key secrecy). When the telemetry endpoint moves (e.g. to a custom domain) or the anon key rotates, ONLY plugin.json changes — SKILL.md references the values by path (`plugin.json.telemetry.endpoint`, `plugin.json.telemetry.anon_key`), not by literal. |
+| `companion_skills` | Multi-skill plugin manifest declares the two companion skills (`open-obsidian-project`, `close-obsidian-project`) so Cowork can auto-install them alongside the main install skill on a single URL paste. Code-side companion install happens via the SKILL.md procedure (Substep 5.6), not via a frontmatter field. |
 
 These do not need a Code-side mirror. Code installs the whole skill directory verbatim; the agent reads `SKILL.md` and runs the procedure.
 
@@ -78,9 +77,7 @@ Before public ship of any version:
 6. Confirm `plugin.json.entry` resolves to a file that parses as valid SKILL.md (frontmatter + body).
 7. Confirm `plugin.json.permissions.directory_access.writes` matches the list of writes SKILL.md Step 6 actually performs.
 8. Confirm no path in `plugin.json.permissions.directory_access.writes` is missing from SKILL.md Step 6's substep list (no silent writes).
-9. Confirm `plugin.json.telemetry.endpoint` is reachable (HTTP probe to the `/v1/health` equivalent — for Supabase, a GET on the project URL should return a 4xx but not a network error).
-10. Confirm `plugin.json.telemetry.anon_key` parses as a valid JWT and decodes to `{"role": "anon"}`.
-11. Confirm `plugin.json.permissions.network_egress.endpoints` matches `plugin.json.telemetry.endpoint` exactly.
+9. Confirm no live telemetry endpoint or `network_egress` block is declared (sanity check against accidental reintroduction; v1.0.0 / v1.1.0 had a telemetry surface, v1.2.0 removed it entirely).
 
 A failure on any of these blocks the release. Codified into [`scripts/lint_manifest.py`](scripts/lint_manifest.py) — run before every public ship:
 
@@ -88,7 +85,7 @@ A failure on any of these blocks the release. Codified into [`scripts/lint_manif
 python scripts/lint_manifest.py
 ```
 
-All 11 checks run in under a second; the script returns exit code 1 on any failure with detail printed.
+All 8 checks run in under a second; the script returns exit code 1 on any failure with detail printed.
 
 ---
 

@@ -152,7 +152,7 @@ What you should know:
 
 If we ever need to withdraw a published version (e.g. a critical security issue we can't patch backwards), we'll:
 - Replace the version's entry on the install page with a clear "this version was withdrawn because [reason]; please install [recommended replacement]" notice.
-- Email everyone we have a contact for (which, given the telemetry shape, is: nobody — we have no email addresses for installers).
+- Email everyone we have a contact for (which is: nobody — we don't collect any contact information at install, by design).
 - Post the withdrawal on the Absolution Labs site.
 
 This is a hard-thought policy; we expect to use it never.

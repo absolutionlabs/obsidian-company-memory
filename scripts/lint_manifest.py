@@ -2,8 +2,15 @@
 """
 Pre-release manifest lint for the Obsidian Company Memory skill.
 
-Implements the 11 checks documented in MANIFESTS.md § "Pre-release manifest lint".
+Implements the 7 checks documented in MANIFESTS.md § "Pre-release manifest lint".
 Run from the bundle root. A failure on any check blocks the release.
+
+In v1.0.0 / v1.1.0 the lint also ran 4 telemetry-specific checks (9. endpoint
+reachability, 10. anon_key JWT validation, 11. network_egress matches endpoint,
+12. endpoint-hostname-to-JWT-ref binding). Those checks were removed in v1.2.0
+when the telemetry surface itself was removed from the bundle. The remaining
+7 checks cover the mirror contract between plugin.json and SKILL.md frontmatter
+plus the files-list-exists check.
 
 Usage:
     python scripts/lint_manifest.py
@@ -15,12 +22,9 @@ Exit codes:
 
 from __future__ import annotations
 
-import base64
 import json
 import re
 import sys
-import urllib.error
-import urllib.request
 from pathlib import Path
 
 # Force UTF-8 on stdout so Unicode in check messages doesn't crash on Windows cmd.
@@ -172,81 +176,21 @@ def run_checks() -> None:
         f"declared in plugin.json but not mentioned anywhere in SKILL.md: {missing_from_skill}",
     )
 
-    # 9. Telemetry endpoint reachable
-    endpoint = (plugin.get("telemetry") or {}).get("endpoint", "")
-    if not endpoint:
-        check("9. telemetry endpoint defined", False, "plugin.json.telemetry.endpoint missing")
-    else:
-        try:
-            req = urllib.request.Request(endpoint, method="OPTIONS")
-            with urllib.request.urlopen(req, timeout=5) as resp:
-                code = resp.status
-            check(f"9. telemetry endpoint reachable ({endpoint} → HTTP {code})", 200 <= code < 500)
-        except urllib.error.HTTPError as e:
-            # PostgREST may return 4xx on OPTIONS; that still means reachable
-            check(f"9. telemetry endpoint reachable ({endpoint} → HTTP {e.code})", 200 <= e.code < 500)
-        except Exception as e:
-            check("9. telemetry endpoint reachability", False, f"{type(e).__name__}: {e}")
-
-    # 10. Anon key parses as JWT with role=anon, iss=supabase, future exp,
-    #     AND ref matches the endpoint hostname (defends against malicious
-    #     manifest-swap where attacker forks the bundle and swaps in their
-    #     own endpoint + key pair pointing at attacker infrastructure).
-    anon = (plugin.get("telemetry") or {}).get("anon_key", "")
-    try:
-        parts = anon.split(".")
-        if len(parts) != 3:
-            raise ValueError(f"expected 3 JWT parts, got {len(parts)}")
-        payload_b64 = parts[1] + "=" * ((4 - len(parts[1]) % 4) % 4)
-        payload = json.loads(base64.urlsafe_b64decode(payload_b64))
-        role = payload.get("role")
-        iss = payload.get("iss")
-        ref = payload.get("ref", "")
-        exp = payload.get("exp", 0)
-        from datetime import datetime, timezone
-        now_ts = int(datetime.now(timezone.utc).timestamp())
-        thirty_days = 30 * 24 * 60 * 60
-
-        problems: list[str] = []
-        if role != "anon":
-            problems.append(f"role={role!r} expected 'anon'")
-        if iss != "supabase":
-            problems.append(f"iss={iss!r} expected 'supabase'")
-        if exp <= now_ts:
-            problems.append(f"exp={exp} is in the past")
-        elif exp - now_ts < thirty_days:
-            problems.append(f"exp expires in < 30 days (rotate before public ship)")
-
-        check(
-            f"10. anon_key JWT validates (role=anon, iss=supabase, exp future, ref={ref!r})",
-            not problems,
-            "; ".join(problems) if problems else "",
-        )
-    except Exception as e:
-        check("10. anon_key JWT decode", False, f"{type(e).__name__}: {e}")
-        ref = ""
-
-    # 11. Network-egress endpoint matches telemetry endpoint
-    egress = (
-        ((plugin.get("permissions") or {}).get("network_egress") or {}).get("endpoints") or []
-    )
-    egress_first = egress[0] if egress else ""
+    # 9. No-telemetry sanity check: plugin.json must not declare a live
+    #    telemetry endpoint or a network_egress block. Defends against
+    #    accidental reintroduction during refactors.
+    tele = plugin.get("telemetry") or {}
+    live_endpoint = tele.get("endpoint") or tele.get("anon_key")
+    egress = ((plugin.get("permissions") or {}).get("network_egress") or {}).get("endpoints") or []
+    problems: list[str] = []
+    if live_endpoint:
+        problems.append(f"plugin.json.telemetry contains live endpoint/anon_key (should be 'collected:none'); got {tele.keys()}")
+    if egress:
+        problems.append(f"plugin.json.permissions.network_egress declares {len(egress)} endpoint(s); should be absent")
     check(
-        "11. permissions.network_egress.endpoints[0] == telemetry.endpoint",
-        egress_first == endpoint and endpoint != "",
-        f"egress={egress_first!r}  telemetry={endpoint!r}",
-    )
-
-    # 12. Endpoint hostname matches anon_key's ref claim (binds manifest to
-    #     the specific Supabase project; a malicious fork that swaps the key
-    #     but not the endpoint — or vice versa — fails this check).
-    from urllib.parse import urlparse
-    endpoint_host = urlparse(endpoint).netloc
-    expected_host = f"{ref}.supabase.co" if ref else ""
-    check(
-        f"12. endpoint hostname matches anon_key.ref ({endpoint_host!r} == {expected_host!r})",
-        bool(ref) and endpoint_host == expected_host,
-        f"endpoint host={endpoint_host!r}  ref-derived={expected_host!r}",
+        "9. no-telemetry sanity (no live endpoint, no network_egress)",
+        not problems,
+        "; ".join(problems) if problems else "",
     )
 
 

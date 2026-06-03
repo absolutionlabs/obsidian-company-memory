@@ -1,8 +1,8 @@
 # Loom embed snippet
 
-Paste this above the install URL fold on the install landing page (`absolutionlabs.com/obsidian` per [install-page.md](install-page.md) §2 "Loom video block").
+Paste this above the install URL fold on the install landing page (`absolutionlabs.com/obsidian` per [overview-page.md](overview-page.md) § 2 "Loom video block").
 
-Until the Loom is recorded (operator task, blocked on `absolutionlabs.com/privacy` being live so Scene 6 reads true), this is a placeholder spec.
+Until the Loom is recorded (operator task), this is a placeholder spec. Scene 6 of the script no longer requires `absolutionlabs.com/privacy` to be live (v1.2.0 removed the telemetry surface that earlier scripts referenced).
 
 ---
 

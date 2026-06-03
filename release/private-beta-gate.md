@@ -9,12 +9,9 @@ The bundle survives this gate or it doesn't ship publicly. There is no fast path
 ## Prerequisites (must be true before this gate begins)
 
 - [ ] All 7 personas in [test-matrix.md](test-matrix.md) PASSED
-- [ ] Manifest lint (`python scripts/lint_manifest.py`) → 10/10 passing
-- [ ] Recovery Drill completed and passed (see [recovery-drill.md](recovery-drill.md))
-- [ ] Privacy policy published at `absolutionlabs.com/privacy`
-- [ ] Telemetry endpoint live, smoke-tested in production state
+- [ ] Manifest lint (`python scripts/lint_manifest.py`) → 8/8 passing
 - [ ] info@absolutionlabs.com mailbox monitored daily
-- [ ] Skill bundle hosted on a public GitHub repo (or equivalent install surface)
+- [ ] Skill bundle hosted on a public GitHub repo (or equivalent install surface) — done since v1.1.0 push
 - [ ] Loom guided-install recorded and embedded on `absolutionlabs.com/obsidian`
 
 If any of the above is false, the private beta is not ready to start. **Do not invite testers** until they're all green.
@@ -144,8 +141,7 @@ The bar for "what counts as a thank-you-worthy contribution" is intentionally lo
 
 The first 2 weeks after public ship are still "soft" — the install URL is public but the launch announcement hasn't gone out. During this window:
 
-- Daily check of `install_events` in Supabase
-- Daily check of info@ mailbox
+- Daily check of info@ mailbox (the only inbound signal channel since v1.2.0 removed telemetry)
 - Any failure spike → revert public install URL to the previous version (per `docs/upgrading.md`) until investigated
 - Tester thread stays open for follow-up; testers' feedback at install + 14 days is the most useful signal
 

@@ -3,8 +3,8 @@
   "$schema": "https://cowork.anthropic.com/schemas/plugin.json",
   "id": "obsidian-company-memory",
   "name": "Obsidian Company Memory",
-  "version": "1.1.0",
-  "description": "Scaffold an Obsidian-based company-memory vault — single-company, three-layer architecture, AI-session-ready in about 25 minutes. Walks the user through a compliance gate, a 2-question intake, an idempotent vault scaffold, a round-trip test that proves the system works end-to-end, and auto-installation of two companion skills (open-obsidian-project, close-obsidian-project) so the lifecycle is wired by the time the install finishes.",
+  "version": "1.2.0",
+  "description": "Scaffold an Obsidian-based company-memory vault — single-company, three-layer architecture, AI-session-ready in about 25 minutes. Walks the user through a compliance gate, a 2-question intake, an idempotent vault scaffold, a round-trip test that proves the system works end-to-end, and auto-installation of two companion skills (open-obsidian-project, close-obsidian-project) so the lifecycle is wired by the time the install finishes. No telemetry; the skill never phones home.",
   "entry": "SKILL.md",
   "homepage": "https://absolutionlabs.com",
   "repository": null,
@@ -23,7 +23,6 @@
     "name": "Absolution Labs LTD",
     "url": "https://absolutionlabs.com",
     "support": "info@absolutionlabs.com",
-    "privacy": "https://absolutionlabs.com/privacy",
     "support_sla_business_days": 1
   },
   "license": "MIT",
@@ -53,40 +52,18 @@
         "<vault>/AGENTS.md.template"
       ],
       "reads": ["<vault>/* (refuse-to-scaffold gate)"]
-    },
-    "network_egress": {
-      "level": "optional",
-      "endpoints": ["https://vujwcvqiwwpncnhgxjsu.supabase.co/rest/v1/install_events"],
-      "purpose": "anonymous install telemetry (opt-out at runtime per SKILL.md Step 5)",
-      "blocked_if_opted_out": true
     }
   },
   "telemetry": {
-    "default": "enabled",
-    "opt_out_at_runtime": true,
-    "opt_out_step": "SKILL.md Step 5",
-    "endpoint": "https://vujwcvqiwwpncnhgxjsu.supabase.co/rest/v1/install_events",
-    "endpoint_provider": "supabase",
-    "endpoint_region": "eu-west-2 (London)",
-    "anon_key": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ1andjdnFpd3dwbmNuaGd4anN1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0NDIxMzksImV4cCI6MjA5NjAxODEzOX0.rDi-epl_-l1gqCWh-jPW1AHaJ3Nhp1r5Skvkft0W8NM",
-    "_anon_key_note": "Supabase anon keys are public by design — security comes from RLS (anon can INSERT only into install_events, cannot SELECT/UPDATE/DELETE) and CHECK constraints (schema enforcement at the database). Not a secret. Safe to ship in the public bundle.",
-    "payload_fields": ["uuid", "skill", "version", "os", "surface", "sync_provider", "outcome", "failure_step", "ts"],
-    "_payload_fields_note": "9 fields total — 8 are mandatory on every ping; `failure_step` is included only when outcome=failed (short identifier, ≤64 chars, [a-z0-9_:.-] only).",
-    "no_pii": true,
-    "no_vault_contents": true,
-    "no_company_name": true,
-    "residency": "EU (West Europe / London)",
-    "retention_months": 24,
-    "rate_limit": "5 inserts per 60s per UUID + 1000 inserts per 60s globally (two Postgres triggers; the global ceiling defends against UUID-rotation abuse)",
-    "dsar_email": "privacy@absolutionlabs.com",
-    "privacy_policy_url": "https://absolutionlabs.com/privacy"
+    "_note": "Removed in v1.2.0. Earlier versions (v1.0.0 / v1.1.0) shipped a 9-field anonymous opt-out install ping to a Supabase project in eu-west-2 (London). The skill now never phones home: no install ping, no health check, no usage data, nothing. Vault contents have never reached our infrastructure in any version. The Supabase project will be sunset; orphan rows contain no PII.",
+    "collected": "none"
   },
   "companion_skills": [
     {
       "id": "open-obsidian-project",
       "name": "Open Obsidian Project",
       "entry": "companion-skills/open-obsidian-project/SKILL.md",
-      "version": "1.1.0",
+      "version": "1.2.0",
       "purpose": "Scaffold a new project folder against the vault. Auto-installed alongside the main skill on v1.1.0+; falls back to manual URL paste if a Cowork multi-skill plugin install doesn't carry both companions through.",
       "raw_url_fallback": "https://raw.githubusercontent.com/absolutionlabs/obsidian-company-memory/main/companion-skills/open-obsidian-project/SKILL.md"
     },
@@ -94,7 +71,7 @@
       "id": "close-obsidian-project",
       "name": "Close Obsidian Project",
       "entry": "companion-skills/close-obsidian-project/SKILL.md",
-      "version": "1.1.0",
+      "version": "1.2.0",
       "purpose": "Run the session-close protocol (update brief, verify Ingest, append vault log, generate continuation prompt). Auto-installed alongside the main skill on v1.1.0+. The name uses `-obsidian-project` namespacing to avoid colliding with generic `close` / `close-session` skills the user may already have installed.",
       "raw_url_fallback": "https://raw.githubusercontent.com/absolutionlabs/obsidian-company-memory/main/companion-skills/close-obsidian-project/SKILL.md"
     }

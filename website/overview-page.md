@@ -44,7 +44,7 @@ H2: **What it is**
 >
 > Once installed, you point your AI assistant — Cowork, Claude Code, Codex, opencode, anything that reads `CLAUDE.md` or `AGENTS.md` — at the vault folder. The AI follows the procedure. Your knowledge accumulates as a by-product of normal work, not as a wiki you maintain on the side.
 >
-> No login. No account creation. No subscription. No data flows back to Absolution Labs at runtime. One anonymous install ping at scaffold time (opt-out, EU-hosted), and from then on the vault is yours, on your disk, plain markdown, no vendor lock-in.
+> No login. No account creation. No subscription. **No telemetry** — the skill does not phone home at install time or afterwards. The vault is yours, on your disk, plain markdown, no vendor lock-in.
 
 ---
 
@@ -58,9 +58,9 @@ H2: **How we built it**
 >
 > The threat-modelling phase covered six surfaces — secrets, privacy and data, prompt injection, attack surface, backup and rollback, and external platform configuration. Every surface has an answer recorded; none were left blank.
 >
-> The build phase produced the skill itself, a manifest mirror contract, an eleven-check pre-release lint, and an end-to-end telemetry endpoint live on Supabase EU. The confirm phase pre-mortemed the entire pipeline and put adversarial sub-agents through it before considering it ready to ship.
+> The build phase produced the skill itself, a manifest mirror contract, and a pre-release lint that runs against every commit. The confirm phase pre-mortemed the entire pipeline and put adversarial sub-agents through it before considering it ready to ship.
 >
-> The work is open. The skill, templates, manifests, lint, telemetry infrastructure, compatibility matrix, and full disclaimer set all live in the GitHub repo. We hold the internal project brief — design rationale, threat model, decisions log — privately, and share specifics on written request.
+> The work is open. The skill, templates, manifests, lint, companion skills, compatibility matrix, and full disclaimer set all live in the GitHub repo. We hold the internal project brief — design rationale, threat model, decisions log — privately, and share specifics on written request.
 
 ---
 
@@ -139,10 +139,7 @@ H2: **Get the skill**
 
 H2: **Privacy in one paragraph**
 
-> The skill writes to your local folder via your AI assistant's mounted-directory access. Nothing flows back to Absolution Labs during normal use. The one exception: at install time, by default, one anonymous ping is sent to a Supabase database we operate in London. It contains a random UUID (not linked to your name, company, or vault contents), the skill version, your OS family, the install surface, the sync provider you confirmed, and whether the install succeeded or failed. No PII. You can opt out with one click at install time.
-
-CTA below:
-> [Full privacy policy →](/privacy)
+> The skill writes to your local folder via your AI assistant's mounted-directory access. **Nothing flows back to Absolution Labs at any point** — no install ping, no health check, no usage data, no error reports. The skill does not phone home at install time or afterwards. Your vault contents have never reached our infrastructure in any version. Earlier releases (v1.0.0 / v1.1.0) shipped a 9-field anonymous opt-out install ping; we removed it entirely in v1.2.0 because the value to us was structurally near-zero and the trust framing didn't earn the compliance overhead.
 
 ---
 
@@ -211,4 +208,4 @@ Revise on the same cadence the bundle releases — they're paired surfaces.
 
 ---
 
-*Render this in whatever stack absolutionlabs.com runs on. The structure here is the canonical brief. Cross-references: [install-page.md](install-page.md) (superseded shape, kept for history), [resources-page-card.md](resources-page-card.md), [privacy-page-deploy.md](privacy-page-deploy.md), [loom-embed-snippet.md](loom-embed-snippet.md), [website/README.md](README.md), and the bundle's [README.md](../README.md) + [DISCLAIMERS.md](../DISCLAIMERS.md).*
+*Render this in whatever stack absolutionlabs.com runs on. The structure here is the canonical brief. Cross-references: [install-page.md](install-page.md) (superseded shape, kept for history), [resources-page-card.md](resources-page-card.md), [loom-embed-snippet.md](loom-embed-snippet.md), [website/README.md](README.md), and the bundle's [README.md](../README.md) + [DISCLAIMERS.md](../DISCLAIMERS.md).*

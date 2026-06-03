@@ -104,11 +104,9 @@ Full architecture detail in [templates/SCHEMA.md](templates/SCHEMA.md) and the p
 
 ## Privacy
 
-The skill writes to your local folder via your AI assistant's mounted-directory access. Nothing flows back to Absolution Labs at any point during normal use.
+The skill writes to your local folder via your AI assistant's mounted-directory access. **Nothing flows back to Absolution Labs at any point** — no install ping, no health check, no usage data, no error reports. The skill never phones home, at install time or afterwards.
 
-The one exception: at install time, by default, one anonymous ping is sent to a Supabase database we operate in West Europe (London). It contains nine fields — a random UUID (not linked to your name, company, or vault contents), the skill identifier and version, your OS family, the install surface, the sync provider you confirmed, the outcome (`attempted` / `success` / `failed`), an optional short failure-step identifier (only on failure), and a UTC timestamp. No PII. You can opt out with one click at install time, or request deletion later by emailing `privacy@absolutionlabs.com` with the UUID shown to you during install.
-
-Full disclosure: **[absolutionlabs.com/privacy](https://absolutionlabs.com/privacy)**.
+Earlier releases (v1.0.0 / v1.1.0) shipped an opt-out 9-field anonymous install ping to an EU-hosted Supabase project. That surface was removed entirely in v1.2.0 — the value to us was structurally near-zero (Cowork sandbox couldn't fire the POST, so half our data was missing by design) and the compliance overhead disproportionate. The infrastructure is being sunset; orphan rows contain no PII.
 
 ## Security & integrity
 
@@ -134,7 +132,6 @@ If you hit a compatibility issue we haven't documented, please send it to `info@
 - **[docs/faq.md](docs/faq.md)** — question-shape help: "can I", "what if", "why does it". Different surface from troubleshooting (which is problem-shape).
 - **[docs/standard-vs-ours.md](docs/standard-vs-ours.md)** — diff between common Obsidian + AI patterns and what this bundle ships. Read this if you're deciding whether to install.
 - **[docs/upgrading.md](docs/upgrading.md)** — version pinning, rollback, manual refresh.
-- **[docs/privacy-policy.md](docs/privacy-policy.md)** — full text of the install-telemetry privacy policy.
 - **[DISCLAIMERS.md](DISCLAIMERS.md)** — full disclaimer, limitation of liability, statutory carve-outs (UK), indemnity (for forks), governing law. **Required reading before install.**
 - **[MANIFESTS.md](MANIFESTS.md)** — the mirror contract between `plugin.json` (Cowork) and `SKILL.md` frontmatter (Claude Code).
 
@@ -143,7 +140,6 @@ If you hit a compatibility issue we haven't documented, please send it to `info@
 - **Email:** `info@absolutionlabs.com` — replied to by a human at Absolution Labs within one business day.
 - **Feedback:** same email; subject line "Feedback — Obsidian Company Memory".
 - **Security issues:** `security@absolutionlabs.com`.
-- **Privacy / DSAR:** `privacy@absolutionlabs.com`.
 - **Anything else:** visit [absolutionlabs.com](https://absolutionlabs.com).
 
 ## License

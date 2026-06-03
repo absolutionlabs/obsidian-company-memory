@@ -53,10 +53,9 @@ The skill walks you through seven user-visible steps (plus a few silent pre-flig
 1. **Compliance gate (3 checkboxes).** The skill won't write anything until you tick three boxes confirming the folder is yours, your cloud sync is allowed for the content, and Absolution Labs has no access. Take a moment to read each.
 2. **Refuse-to-scaffold check.** If your folder isn't empty, the skill refuses. This is intentional. If it refuses incorrectly: tell us.
 3. **Two questions.** Company name (any test name — "Acme Co" is fine) and your sync provider (pick whichever applies).
-4. **Telemetry surface.** The skill explains a single anonymous install ping it sends to a Supabase database we run in London (EU). It contains no personal data. You can opt out with one click. **Whether you opt in or out, please note your choice** — we'd like to see this surface read clearly.
-5. **Scaffold writes.** About 20 files land in your folder over a few seconds. The skill names each one.
-6. **Round-trip test.** The skill creates one welcome page and asks you to open it in Obsidian to confirm everything works.
-7. **Phase 2 handoff.** The skill points you at `HOW-TO-USE-THIS.md` in your vault for ongoing use.
+4. **Scaffold writes.** About 20 files land in your folder over a few seconds. The skill names each one.
+5. **Round-trip test.** The skill creates one welcome page and asks you to open it in Obsidian to confirm everything works.
+6. **Phase 2 handoff.** The skill points you at `HOW-TO-USE-THIS.md` in your vault, and confirms the two companion skills (`open-obsidian-project`, `close-obsidian-project`) auto-installed alongside the main install skill.
 
 If at any step something feels confusing, scary, or broken: **note it** and tell us. There are no stupid observations.
 
@@ -100,7 +99,7 @@ Three more questions we'd love to know but don't expect everyone to address:
 ## A few practical notes
 
 - **Your vault is yours.** Anything you create stays on your disk. We don't see it. We can't see it. If you delete the folder, it's gone — and that's the only way to "uninstall" the data.
-- **The telemetry, if you don't opt out, is one HTTPS ping containing nine anonymous fields** (8 mandatory + an optional `failure_step` on the failure path only). Full text of what gets sent is in `docs/privacy-policy.md` inside the bundle. UUID is shown to you at the end of install; email `privacy@absolutionlabs.com` with that UUID to request deletion at any time.
+- **No telemetry.** v1.2.0 removed the install ping entirely. The skill does not phone home at install time or afterwards.
 - **You can run the skill on multiple folders.** Each one is a fresh, independent vault. Useful if you want to try once with your real company name and once with a throwaway name.
 - **If you find a bug or hit an error, please send the exact message** (screenshot or paste) along with: which AI tool, which OS, which sync provider. That gives us everything we need to reproduce.
 - **You don't need to write up your feedback formally.** A 100-word email beats a polished report — we'd rather have your raw reactions in the first hour than something considered after a week.

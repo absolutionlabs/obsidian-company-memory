@@ -4,7 +4,7 @@ How to fork this skill into your own variant — for your own company, for a con
 
 The skill is MIT-licensed. You can take it as your own starting point with no permission needed; the only requirement is that the LICENSE file travels with the copy. We'd appreciate a "based on Obsidian Company Memory by Absolution Labs LTD" line in your README, but it's not legally required.
 
-This guide assumes you're comfortable editing markdown and JSON. You don't need to write TypeScript unless you also fork the telemetry endpoint.
+This guide assumes you're comfortable editing markdown and JSON.
 
 ---
 
@@ -29,15 +29,14 @@ After editing any of these, the next person who runs your skill gets your versio
 ### Edit with care (the procedure)
 
 - `SKILL.md` — the procedure the AI runs at install time. The YAML frontmatter is metadata; the body is steps. Editing this changes how the install moment behaves: questions asked, gates enforced, files written, round-trip test shape.
-- `plugin.json` — the Cowork plugin manifest. Edit when bundle contents change, when version bumps, when you map a different telemetry endpoint.
+- `plugin.json` — the Cowork plugin manifest. Edit when bundle contents change or when version bumps.
 - `MANIFESTS.md` — the mirror contract between `SKILL.md` frontmatter and `plugin.json`. If you change one of those two, update this doc too.
 
 Most customisations don't need procedure edits. If you're editing SKILL.md beyond changing the company-branded copy, you're effectively building a different product — at that point, consider whether you're forking or replacing.
 
 ### Generally leave alone
 
-- `telemetry/` — the Supabase project for install telemetry (Postgres schema, RLS, rate-limit triggers, DSAR helper). Forking the telemetry means standing up your own Supabase project, applying the migration, capturing your own anon + service-role keys, and writing your own privacy policy. If you don't want telemetry, the simpler option is to delete the call from SKILL.md Step 5 + Step 9.1.
-- `docs/privacy-policy.md` — only applies if you keep our telemetry. If you fork telemetry, write your own policy.
+- `telemetry/` (removed in v1.2.0) — the bundle no longer ships a telemetry surface. Earlier releases (v1.0.0 / v1.1.0) included a Supabase project + Postgres schema + DSAR helper + privacy policy here; v1.2.0 removed all of it. If you want to ADD a telemetry layer to your fork: stand up your own Supabase (or equivalent) project, add a network-egress block to `plugin.json`, add a Step to SKILL.md that fires the ping, and write your own privacy policy. We strongly recommend not doing this for a free skill — the value-to-overhead ratio is poor (see the v1.2.0 release-notes commit for our reasoning).
 - `LICENSE` — required to travel with the copy unmodified. Don't delete this file.
 
 ---
@@ -46,7 +45,7 @@ Most customisations don't need procedure edits. If you're editing SKILL.md beyon
 
 ### 1. Rebrand the skill for your own company
 
-Replace every literal `Absolution Labs LTD` with your company's full legal name; replace every `absolutionlabs.com` with your domain; replace `info@absolutionlabs.com` / `privacy@absolutionlabs.com` / `security@absolutionlabs.com` with your equivalents.
+Replace every literal `Absolution Labs LTD` with your company's full legal name; replace every `absolutionlabs.com` with your domain; replace `info@absolutionlabs.com` / `security@absolutionlabs.com` with your equivalents.
 
 Files to touch:
 
@@ -127,17 +126,18 @@ Edit to your taste. Tighter thresholds = more lint noise but earlier drift detec
 
 JSON files only; no markdown substitution happens here.
 
-### 7. Replace the install telemetry
+### 7. Add an install telemetry layer (if you really want to)
 
-Three options:
+v1.2.0 of the bundle removed install telemetry entirely (see the v1.2.0 release-notes commit for our reasoning — short version: structurally incomplete data due to Cowork sandbox blocking outbound POSTs, plus a trust-framing cost that outweighed any analytics value). If you want to ADD a telemetry surface to your fork:
 
-**(a) Remove telemetry entirely.** Edit `SKILL.md` Step 5 to skip the surface; delete `SKILL.md` Step 9.1 (success ping). Delete the `telemetry/` folder. Remove the `telemetry` block from `plugin.json`. Update `docs/privacy-policy.md` to reflect "no telemetry sent."
+1. Stand up an endpoint that accepts an anonymous payload. Supabase + PostgREST + RLS is what we used; Cloudflare Workers + D1 is the obvious alternative; anything that accepts an HTTPS POST works.
+2. Add a `permissions.network_egress` block to `plugin.json` declaring your endpoint.
+3. Add a `telemetry` block to `plugin.json` declaring the payload shape, opt-out behavior, and DSAR contact.
+4. Add a new Step to `SKILL.md` (between current Step 3 and Step 5) that surfaces the telemetry opt-out to the user and fires the success/failure ping at the end of the install.
+5. Write a privacy policy at `docs/privacy-policy.md` covering exactly what fields are sent, the lawful basis, retention, DSAR procedure, and your data controller identification.
+6. Decide on a custom domain (cleaner trust signal than raw provider URLs).
 
-**(b) Point at your own endpoint.** Stand up your own Supabase project (create a project, apply the migration at `telemetry/supabase/migrations/`, capture the anon key). Edit `SKILL.md` Step 5 + Step 9.1 to point at your URL. Update `plugin.json.telemetry.endpoint` + `plugin.json.telemetry.anon_key`. Write your own privacy policy.
-
-**(c) Keep ours.** If your variant is close enough to ours that our telemetry endpoint is fine for your use too: do nothing. Pings will go to our infrastructure and we'll see your installs in our funnel. Reach out — we may want to coordinate on what counts as a release.
-
-Option (a) is the simplest. Option (b) is the most rigorous. Option (c) only makes sense if you're closely partnered with us.
+We do not recommend this. The value tends to be lower than expected and the maintenance overhead higher. If you proceed, treat your privacy policy as the load-bearing artefact, not the telemetry endpoint itself.
 
 ### 8. Change the appetite from "free tool" to "paid"
 

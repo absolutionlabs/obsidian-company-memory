@@ -1,7 +1,7 @@
 ---
 name: obsidian-company-memory
-description: Scaffold an Obsidian-based company-memory vault — single-company, three-layer architecture, AI-session-ready in about 25 minutes. Walks the user through a compliance gate, a 2-question intake, an idempotent vault scaffold, a round-trip test that proves the system works end-to-end, and auto-installation of two companion skills (open-obsidian-project, close-obsidian-project) so the lifecycle is wired by the time the install finishes. Single source, dual install paths (Cowork plugin + Claude Code user-global skill). Triggers when the user says "set up Obsidian", "install company memory", "scaffold a vault", "set up the Absolution Labs vault", "I want a company memory system", or pastes the install URL. Hands off to `open-obsidian-project` for the first project; does NOT scaffold projects itself. Ships from Absolution Labs LTD.
-version: 1.1.0
+description: Scaffold an Obsidian-based company-memory vault — single-company, three-layer architecture, AI-session-ready in about 25 minutes. Walks the user through a compliance gate, a 2-question intake, an idempotent vault scaffold, a round-trip test that proves the system works end-to-end, and auto-installation of two companion skills (open-obsidian-project, close-obsidian-project) so the lifecycle is wired by the time the install finishes. No telemetry; the skill never phones home. Single source, dual install paths (Cowork plugin + Claude Code user-global skill). Triggers when the user says "set up Obsidian", "install company memory", "scaffold a vault", "set up the Absolution Labs vault", "I want a company memory system", or pastes the install URL. Hands off to `open-obsidian-project` for the first project; does NOT scaffold projects itself. Ships from Absolution Labs LTD.
+version: 1.2.0
 license: MIT
 publisher: Absolution Labs LTD
 support: info@absolutionlabs.com
@@ -115,8 +115,8 @@ These are compliance prerequisites; the skill cannot continue without all three.
 
 [ ] 3. I understand this vault will be a record of facts and decisions about
        my company. Absolution Labs LTD has no access to its contents at any
-       point. If I have opted in to telemetry, only anonymous install +
-       success pings are sent.
+       point. The skill does not collect telemetry and does not phone home
+       at install time or afterwards.
 ```
 
 If all three are ticked: log to internal session memory that the gate passed, then continue. If any is unticked: refuse, surface a one-paragraph explanation of which box would be needed (no "next time" — re-run the skill when the user is ready), and exit.
@@ -168,9 +168,9 @@ This name is the literal substitution for `{{COMPANY_NAME}}` everywhere in `temp
 
 > Is this folder synced by Dropbox, iCloud, OneDrive, Google Drive, or local-only (no cloud sync)?
 
-Multiple-choice; one answer. The answer is captured for telemetry (no PII) and for the telemetry-display step. It does not change the scaffold itself — every sync provider produces the same vault.
+Multiple-choice; one answer. The answer is captured only for two purposes: (1) writing it as informational metadata into `_meta/scaffold-version.txt` so future tooling can know what sync provider this vault was set up on, and (2) tailoring the post-scaffold backup advice (local-only triggers a recommendation to run quarterly zip backups). It does not change the scaffold itself — every sync provider produces the same vault.
 
-**Normalize the user's answer to one of the following exact tokens before storing or transmitting it** (the telemetry endpoint's schema enforces these values — a non-matching value will be rejected with HTTP 400):
+**Normalize the user's answer to one of the following exact tokens before storing it:**
 
 | User's likely answer | Normalized token |
 |---|---|
@@ -186,18 +186,7 @@ If the normalized token is `local-only`, append a one-line note to the post-scaf
 
 ---
 
-## Step 4 — Resolve `os` value + auto-detect date format
-
-### 4a. Resolve `os` for telemetry
-
-The telemetry endpoint accepts `os` as one of `darwin`, `win32`, or `linux` only. Other values are rejected at the database. Resolve as follows:
-
-- **Claude Code:** run `python -c "import sys; print(sys.platform)"` — returns `darwin`, `win32`, or `linux` natively. If Python isn't available, fall back to `uname -s` (`Darwin` → `darwin`, `Linux` → `linux`) or `$env:OS` on PowerShell (any value containing `Windows` → `win32`).
-- **Cowork:** no host-machine API exists in the sandbox. Ask the user once: *"What operating system are you on — macOS, Windows, or Linux?"* Normalize: macOS → `darwin`, Windows → `win32`, Linux → `linux`. If the user says "something else" or refuses, skip the telemetry ping entirely (the install proceeds; you've already advertised that telemetry is opt-out anyway).
-
-Store the resolved value for use in Step 5 and Step 9.1.
-
-### 4b. Auto-detect date format
+## Step 4 — Auto-detect date format
 
 Do NOT ask the user. Auto-detect from the system locale.
 
@@ -217,27 +206,7 @@ This format is stored in `_meta/expectations.yml` as `date_format_preference` (i
 
 ---
 
-## Step 5 — Telemetry display + opt-out
-
-Render verbatim:
-
-> When this skill installs, we send one anonymous ping so we can detect installs that fail and fix them quickly. No personal data. No vault contents. No company name. EU-hosted.
->
-> The full text of exactly what we receive is at [absolutionlabs.com/privacy](https://absolutionlabs.com/privacy) if you'd like to read it. Your install UUID will be shown to you at the end so you can request deletion any time by emailing `privacy@absolutionlabs.com`.
->
-> [ ] I prefer NOT to send this ping. (Default: send.)
-
-If the user ticks the opt-out box, skip all telemetry calls for the rest of the session.
-
-If not opted out, fire the install-attempted ping NOW (before scaffold begins) and the install-succeeded or install-failed ping at the end of Step 9. Failures are signal too.
-
-Show the user their UUID (so they can request deletion later if they choose) in the final message.
-
-**Telemetry implementation note.** The endpoint is the Supabase PostgREST API of an Absolution Labs project hosted in West Europe (London) — `https://vujwcvqiwwpncnhgxjsu.supabase.co/rest/v1/install_events`. The skill ships the project's public anon key in `plugin.json.telemetry.anon_key`; Postgres-level row-level security (RLS) restricts the anon role to INSERT only — anon cannot SELECT, UPDATE, or DELETE anything. CHECK constraints on every column enforce the 9-field payload schema (8 mandatory + `failure_step` nullable); two Postgres triggers rate-limit to 5 inserts per 60 seconds per UUID AND 1000 inserts per 60 seconds globally (the global ceiling defends against UUID-rotation abuse using the public anon key). The anon key is public by design (Supabase's security model rests on RLS, not key secrecy). See `telemetry/` folder and `brief.md` for the full setup.
-
----
-
-## Step 6 — Scaffold the vault (idempotent)
+## Step 5 — Scaffold the vault (idempotent)
 
 This is the main write step. Every operation is idempotent: running it on a directory that already contains the file is a no-op, never an overwrite.
 
@@ -254,13 +223,13 @@ Substitution variables (build once before any write):
 **Substitution scope exceptions** (read carefully; bugs from missing these have shipped in past sessions):
 
 - **In `templates/_meta/templates/*.md` (the per-page templates `entity.md`, `concept.md`, `query.md`):** substitute `{{COMPANY_NAME}}` but DO NOT substitute `{{TODAY}}`. These files are USER-COPY templates the user clones in Obsidian months from now to create new pages — baking the scaffold date into them defeats the lint's stale-page detection. The `{{TODAY}}` placeholder is left in place for the user's Obsidian Templates plugin (or the AI at page-creation time) to fill in.
-- **In `companion-skills/open-obsidian-project/SKILL.md` and `companion-skills/close-obsidian-project/SKILL.md`:** substitute NOTHING. These are top-level installable skills (not vault scaffolding); they read the vault's `_meta/scaffold-version.txt` and `CONTEXT.md` at runtime to know which company / vault path they're operating against. Copy them verbatim to the user's AI tool per Substep 6.6. (In v1.0.0 the equivalent files lived in `templates/_meta/skill-prompts/` and required substitution; the auto-install pivot in v1.1.0 moved them to `companion-skills/` and removed the substitution requirement.)
+- **In `companion-skills/open-obsidian-project/SKILL.md` and `companion-skills/close-obsidian-project/SKILL.md`:** substitute NOTHING. These are top-level installable skills (not vault scaffolding); they read the vault's `_meta/scaffold-version.txt` and `CONTEXT.md` at runtime to know which company / vault path they're operating against. Copy them verbatim to the user's AI tool per Substep 5.6. (In v1.0.0 the equivalent files lived in `templates/_meta/skill-prompts/` and required substitution; the auto-install pivot in v1.1.0 moved them to `companion-skills/` and removed the substitution requirement.)
 - **In `CLAUDE.md.template` and `AGENTS.md.template` at the vault root:** do NOT substitute anything; preserve `{{PROJECT_NAME}}`, `{{PROJECT_DESCRIPTION}}`, `{{COMPANY_NAME}}`, `{{VAULT_ABSOLUTE_PATH}}`, `{{TODAY}}` all as literal. The user's `open-obsidian-project` skill substitutes these at first project invocation, with the project-creation date — NOT the vault-scaffold date.
-- **In `_meta/scaffold-version.txt` (Substep 6.8):** the file is built fresh from the runtime values, not from a template. `{{TODAY}}` in the example block below means "the resolved value at scaffold time," not "leave the literal text."
+- **In `_meta/scaffold-version.txt` (Substep 5.8):** the file is built fresh from the runtime values, not from a template. `{{TODAY}}` in the example block below means "the resolved value at scaffold time," not "leave the literal text."
 
 The substitution table above is otherwise applied universally; the four exceptions above are the only carve-outs.
 
-**Substep 6.1 — Create folder structure.**
+**Substep 5.1 — Create folder structure.**
 
 Create the following directories under the vault root. Skip any that already exist:
 
@@ -279,9 +248,9 @@ _meta/templates/
 .obsidian/
 ```
 
-`_meta/skill-prompts/` is NOT created in v1.1.0+ — companion skills auto-install to the user's AI tool instead of being written to the vault as prompts. See Substep 6.6.
+`_meta/skill-prompts/` is NOT created in v1.1.0+ — companion skills auto-install to the user's AI tool instead of being written to the vault as prompts. See Substep 5.6.
 
-**Substep 6.2 — Write `.obsidian/` config files.**
+**Substep 5.2 — Write `.obsidian/` config files.**
 
 Copy each of these from `templates/.obsidian/` to `<vault>/.obsidian/` verbatim (no substitution — JSON, not markdown):
 
@@ -293,7 +262,7 @@ Copy each of these from `templates/.obsidian/` to `<vault>/.obsidian/` verbatim 
 
 If any of these files already exists at the destination, STOP and refuse — this should be impossible after the Step 2 gate, but defence-in-depth catches a partially-scaffolded retry. Surface the path and exit.
 
-**Substep 6.3 — Write the schema and context files at vault root.**
+**Substep 5.3 — Write the schema and context files at vault root.**
 
 For each, read the template, substitute `{{COMPANY_NAME}}` and `{{TODAY}}`, write to the vault root:
 
@@ -303,16 +272,16 @@ For each, read the template, substitute `{{COMPANY_NAME}}` and `{{TODAY}}`, writ
 - `log.md` → vault root
 - `HOW-TO-USE-THIS.md` → vault root (the Phase 2 living guide)
 
-**Substep 6.4 — Write the concepts page.**
+**Substep 5.4 — Write the concepts page.**
 
 - `concepts/claude-operating-principles.md` → from `templates/concepts/claude-operating-principles.md`, substitute `{{TODAY}}` (no company-name substitution needed).
 
-**Substep 6.5 — Write `_meta` files.**
+**Substep 5.5 — Write `_meta` files.**
 
 - `_meta/expectations.yml` → from template; append a `date_format_preference: <detected>` line for downstream tools that want it.
 - `_meta/templates/entity.md`, `concept.md`, `query.md` → from `templates/_meta/templates/`. Substitute `{{COMPANY_NAME}}` but DO NOT substitute `{{TODAY}}` (these are user-copy templates per the substitution-scope exception above; leaving `{{TODAY}}` as a placeholder is correct).
 
-**Substep 6.6 — Auto-install the two companion skills.**
+**Substep 5.6 — Auto-install the two companion skills.**
 
 In v1.0.0 the bundle shipped skill prompts the user manually installed. In v1.1.0+ the two companion skills (`open-obsidian-project`, `close-obsidian-project`) auto-install alongside the vault scaffold so the lifecycle is wired by the time the install finishes. **Naming uses the `-obsidian-project` suffix so the skills can coexist with any other "open project" or "close" skill the user already has for non-Obsidian work** (this was a beta-tester finding 2026-06-03; pre-rename, the older `close-session` name collided with an existing skill on the tester's laptop).
 
@@ -331,16 +300,16 @@ The companion skill SKILL.md files ship inside the bundle at `companion-skills/o
   - `https://raw.githubusercontent.com/absolutionlabs/obsidian-company-memory/main/companion-skills/open-obsidian-project/SKILL.md` (or the equivalent `plugin.json`, once added)
   - `https://raw.githubusercontent.com/absolutionlabs/obsidian-company-memory/main/companion-skills/close-obsidian-project/SKILL.md`
 
-  Surface the URLs in Step 9.2's final message regardless of whether multi-skill auto-install worked — they're useful for reinstalls, migrations, and second-laptop setups.
+  Surface the URLs in Step 8.1's final message regardless of whether multi-skill auto-install worked — they're useful for reinstalls, migrations, and second-laptop setups.
 
 - **Codex / opencode / other AGENTS.md-aware tools.** These tools don't have a separate skill mechanism. Tell the user:
   > Your AI tool reads `AGENTS.md` at session start, not separate skill files. Two options for using the companion skills:
   > 1. Append the body of each companion `SKILL.md` (at `companion-skills/open-obsidian-project/SKILL.md` and `companion-skills/close-obsidian-project/SKILL.md` inside the bundle) to your home `~/.codex/AGENTS.md` (or equivalent) under a "Custom skills" section.
   > 2. When you scaffold a project, the `open-obsidian-project` skill's output writes a session stub to the project folder. That stub references the companion skills' canonical URLs so the AI knows where to find them at session start.
 
-**Collision audit trail.** Whichever surface you're on, log any collision (skill-already-exists refusal) to the round-trip test report in Substep 7.4 so the user sees it explicitly. Do not pass over collisions silently.
+**Collision audit trail.** Whichever surface you're on, log any collision (skill-already-exists refusal) to the round-trip test report in Substep 6.4 so the user sees it explicitly. Do not pass over collisions silently.
 
-**Substep 6.7 — Write the project-stub templates (do NOT instantiate).**
+**Substep 5.7 — Write the project-stub templates (do NOT instantiate).**
 
 These files are templates for `open-obsidian-project` to read when the user creates their first project. They live at the vault root with the `.template` suffix preserved:
 
@@ -349,32 +318,31 @@ These files are templates for `open-obsidian-project` to read when the user crea
 
 These files are NOT in `index.md` (they are not wiki pages); they sit at the root as a discoverable handoff to the user's `open-obsidian-project` skill.
 
-**Substep 6.8 — Write a one-line scaffold-version marker.**
+**Substep 5.8 — Write a one-line scaffold-version marker.**
 
 Write `_meta/scaffold-version.txt` containing (this file is built fresh from runtime values, NOT from a template — the placeholders below show what to substitute):
 
 ```
 skill: obsidian-company-memory
-version: 1.1.0
+version: 1.2.0
 scaffolded: <resolved {{TODAY}} value>
-date_format_preference: <detected per Step 4b>
+date_format_preference: <detected per Step 4>
 sync_provider: <normalized token from Step 3 Q2>
-telemetry_uuid: <UUID or "opted-out">
 ```
 
 This is the fingerprint used by `docs/upgrading.md` and the lint to detect drift between vault and skill version. No PII.
 
-**Substep 6.9 — Verify the write batch.**
+**Substep 5.9 — Verify the write batch.**
 
 Read every file just written and confirm it parses (markdown loads cleanly, JSON parses, YAML parses). If anything fails, surface which file and which error, and STOP — do not proceed to the round-trip test on a corrupt scaffold.
 
 ---
 
-## Step 7 — Round-trip test
+## Step 6 — Round-trip test
 
 The skill creates one real entity page end-to-end so the user can see the system work. This is the proof step; skipping it leaves the user with a scaffolded but unverified vault.
 
-**Substep 7.1 — Create the test entity.**
+**Substep 6.1 — Create the test entity.**
 
 Write `entities/test-welcome.md` with substituted frontmatter and a body that includes a wikilink to `[[CONTEXT]]`:
 
@@ -414,7 +382,7 @@ start your first real project, run the `open-obsidian-project` skill (auto-
 installed alongside this main skill; appears in your AI tool's skill list).
 ```
 
-**Substep 7.2 — Update `index.md`.**
+**Substep 6.2 — Update `index.md`.**
 
 Append under the `## Entities` section:
 
@@ -422,11 +390,11 @@ Append under the `## Entities` section:
 - [[entities/test-welcome]] — welcome page created at vault setup; safe to delete after first real page
 ```
 
-**Substep 7.3 — Verify the scaffold log entry.**
+**Substep 6.3 — Verify the scaffold log entry.**
 
-The starter `log.md` already contains the initial scaffold entry (per `templates/log.md`). Verify it landed correctly post-substitution; if `{{TODAY}}` is still literal anywhere, fix it. The starter entry intentionally does NOT claim the round-trip test passed — that claim is only added in Substep 7.5 after the user verifies.
+The starter `log.md` already contains the initial scaffold entry (per `templates/log.md`). Verify it landed correctly post-substitution; if `{{TODAY}}` is still literal anywhere, fix it. The starter entry intentionally does NOT claim the round-trip test passed — that claim is only added in Substep 6.5 after the user verifies.
 
-**Substep 7.4 — Tell the user to verify.**
+**Substep 6.4 — Tell the user to verify.**
 
 Render:
 
@@ -440,9 +408,9 @@ Render:
 >
 > Reply "verified" once you have seen all five, or tell me which step did not work.
 
-Wait for the user to confirm. If they report a problem, surface it; do not proceed to Step 8 with an unverified scaffold.
+Wait for the user to confirm. If they report a problem, surface it; do not proceed to Step 7 with an unverified scaffold.
 
-**Substep 7.5 — Append round-trip result to `log.md`.**
+**Substep 6.5 — Append round-trip result to `log.md`.**
 
 Once the user has confirmed verification, append a second entry to `log.md` (above the initial scaffold entry per the read-backwards-in-time convention):
 
@@ -458,9 +426,9 @@ If the user reported a failure in 7.4 instead, append a different entry naming t
 
 ---
 
-## Step 8 — Confirm `HOW-TO-USE-THIS.md` is in place
+## Step 7 — Confirm `HOW-TO-USE-THIS.md` is in place
 
-This step is mostly a check-and-tell — the file was already written in Substep 6.3. Confirm it exists at the vault root and the first 5 lines parse as valid YAML frontmatter. Then tell the user:
+This step is mostly a check-and-tell — the file was already written in Substep 5.3. Confirm it exists at the vault root and the first 5 lines parse as valid YAML frontmatter. Then tell the user:
 
 > A Phase 2 living guide is in your vault root at `HOW-TO-USE-THIS.md`. It covers the weekly lint habit, the close-obsidian-project protocol, how to capture knowledge mid-session, common failures, and recovery. Read it once now (about 10 minutes) and bookmark the path; revisit any time you need a reminder.
 
@@ -468,53 +436,9 @@ This is the canonical handoff from "install moment" (Phase 1, this skill) to "on
 
 ---
 
-## Step 9 — Final message, telemetry close, handoff
+## Step 8 — Final message + handoff
 
-**Substep 9.1 — Fire the success telemetry ping** (skip if user opted out in Step 5).
-
-POST to: `https://vujwcvqiwwpncnhgxjsu.supabase.co/rest/v1/install_events`
-
-Headers:
-
-```
-apikey: <plugin.json.telemetry.anon_key>
-Authorization: Bearer <plugin.json.telemetry.anon_key>
-Content-Type: application/json
-Prefer: return=minimal
-```
-
-Body:
-
-```json
-{
-  "uuid": "<UUID from Step 5>",
-  "skill": "obsidian-company-memory",
-  "version": "1.0.0",
-  "os": "<value resolved in Step 4a — one of darwin / win32 / linux>",
-  "surface": "<cowork|code>",
-  "sync_provider": "<normalized token from Step 3 Q2 — one of dropbox / icloud / onedrive / google-drive / local-only>",
-  "outcome": "success",
-  "ts": "<ISO timestamp UTC, e.g. 2026-06-03T12:34:56Z>"
-}
-```
-
-For the **install-failed** path only, ALSO include `failure_step` as an additional field:
-
-```json
-{
-  ...all the above...,
-  "outcome": "failed",
-  "failure_step": "<short step identifier — lowercase, digits, _ : . - only, max 64 chars; e.g. round_trip or mid_scaffold>"
-}
-```
-
-The `failure_step` field is the only field that differs between outcomes (omitted on `attempted` and `success`, required on `failed`). The `outcome` field itself takes one of `attempted` / `success` / `failed`. Every other field is identical across the three pings.
-
-Expected response: `HTTP 201` (Created) with empty body.
-
-If the call fails (network error, HTTP 400 from a schema-validation rejection, HTTP 429 from rate-limit, or HTTP 400 with body containing `rate_limit_exceeded` / `global_rate_limit_exceeded` from the Postgres triggers), swallow silently — telemetry failure does not block the install. Log the failure to internal session state so the operator can see it on close.
-
-**Substep 9.2 — Render the final message.**
+**Substep 8.1 — Render the final message.**
 
 ```
 Your <company-name> vault is set up.
@@ -523,7 +447,6 @@ Vault location:     <absolute-path>
 Files created:      <count> (see list in chat above)
 Round-trip test:    Passed
 Phase 2 guide:      HOW-TO-USE-THIS.md at the vault root
-Telemetry UUID:     <UUID or "opted out">
 
 What you just installed
 -----------------------
@@ -541,7 +464,7 @@ What to do next
    - open-obsidian-project — for starting new projects
    - close-obsidian-project — for ending every working session
    Verify by asking your AI: "List my available skills." Both should
-   appear. (If they don't, see Substep 6.6 of the install procedure
+   appear. (If they don't, see Substep 5.6 of the install procedure
    for surface-specific recovery — Codex / opencode users have a
    different install path; Cowork users may need to paste one or two
    extra URLs depending on whether the multi-skill plugin manifest
@@ -557,12 +480,12 @@ felt clunky during setup, or did not work the way you expected: send it.
 
 Privacy
 -------
-absolutionlabs.com/privacy
-Delete your telemetry UUID at any time by emailing privacy@absolutionlabs.com
-with the UUID shown above.
+The skill never phones home. Nothing about your install, your vault,
+or its contents reaches Absolution Labs at any point. You delete your
+vault by deleting the folder; there is no other record.
 ```
 
-**Substep 9.3 — Suggest the continuation prompt for the next session.**
+**Substep 8.2 — Suggest the continuation prompt for the next session.**
 
 ```
 Suggested opener for your first real session:
@@ -584,8 +507,8 @@ This gives the user a frictionless first move that exercises the Ingest operatio
 | 0a worktree check | N/A (no git in Cowork sandbox by default) | Run `git rev-parse --git-dir`; refuse if in worktree |
 | 0b mount confirm | `request_directory` must already have fired | Working directory or explicit absolute path |
 | 4 date auto-detect | Read session locale | Read OS locale via shell |
-| 6 file writes | Write via mounted-directory tool | Write directly to disk |
-| 9.1 telemetry | Cowork's HTTP egress | Local `curl` or HTTPS client |
+| 5 file writes | Write via mounted-directory tool | Write directly to disk |
+| 5.6 companion-skill install | Multi-skill plugin manifest declares both companions (Cowork honors if supported; raw-URL paste fallback otherwise) | Copy companion-skills/* to ~/.claude/skills/ with collision check |
 
 The vault produced is byte-identical across surfaces. Surface differences are purely about HOW the files land; the WHAT is uniform.
 
@@ -595,31 +518,22 @@ The vault produced is byte-identical across surfaces. Surface differences are pu
 
 ### Mid-scaffold failure
 
-If Step 6 fails mid-write (network blip, disk full, permission revoked):
+If Step 5 fails mid-write (network blip, disk full, permission revoked):
 
 1. Do NOT attempt to "roll forward" — the partial scaffold is corrupt.
 2. Surface every file that was successfully written and every file that failed.
 3. Tell the user: "The scaffold did not complete. Please delete the contents of `<vault-path>` (you can verify each file against the list above) and re-run the skill. If the failure repeats, email `info@absolutionlabs.com` with the failure details."
-4. Fire the `install-failed` telemetry ping (unless opted out).
 
-Do NOT offer to "continue from where we stopped". Partial scaffolds are the failure shape from the brief's pre-mortem; the safe answer is delete-and-restart.
+Do NOT offer to "continue from where we stopped". Partial scaffolds are the failure shape from the original pre-mortem; the safe answer is delete-and-restart.
 
 ### Round-trip test failure
 
-If the user reports that one of the five verification steps in Substep 7.4 did not work:
+If the user reports that one of the five verification steps in Substep 6.4 did not work:
 
 1. Walk them through diagnostic — which step, what they saw, what they expected.
 2. Most common: Obsidian was opened against the wrong folder. Have them close and re-open against `<vault-absolute-path>`.
 3. Next most common: wikilink-clicking is disabled. Settings → Files & Links → "Use [[Wikilinks]]" must be ON. (The `app.json` config sets this, but a user who edited it manually may have flipped it.)
-4. If diagnosis fails, fire `install-failed` ping with `failure_step: round_trip`, surface support email.
-
-### Telemetry endpoint unreachable
-
-If the install-attempted ping in Step 5 fails to send (network, DNS, endpoint down):
-
-1. Continue the install — telemetry failure does not block the user's vault.
-2. Note in internal session state that telemetry was unreachable.
-3. At final message, append a one-line note: "Telemetry could not be sent (endpoint unreachable); no impact on your vault."
+4. If diagnosis fails, surface the support email.
 
 ### Pathologically slow file writes
 
@@ -658,17 +572,17 @@ For agents / harnesses that introspect this file beyond the YAML frontmatter:
 
 - **Triggers:** "set up obsidian", "scaffold a vault", "install company memory", install URL paste
 - **Inputs:** target directory (mounted or CWD), 2 user-supplied answers (company name + sync provider), 3 compliance confirmations
-- **Outputs:** scaffolded vault directory, 1 welcome entity, 1 install telemetry ping (opt-out)
-- **Side effects:** writes ~20 files to user disk; sends 0–2 HTTPS pings to Absolution Labs telemetry endpoint
+- **Outputs:** scaffolded vault directory, 1 welcome entity, 2 companion skills auto-installed to user's AI tool
+- **Side effects:** writes ~20 files to user disk; copies 2 companion-skill folders to ~/.claude/skills/ (Code) or registers them via Cowork multi-skill plugin manifest (Cowork). No network egress from the install procedure itself.
 - **Idempotent:** yes, on empty directories only
 - **Reversible:** yes, by deleting the vault directory (cloud sync provides version history)
 - **Time-to-run:** ~5 minutes of skill time + ~20 minutes of user-side reading and Obsidian setup
 - **Hard gates:** worktree refusal (OP #19), compliance gate (3 boxes), refuse-to-scaffold on non-empty directory, skill-bundle integrity check
-- **Telemetry:** default-on, opt-out, 9 anonymous fields (8 mandatory + `failure_step` on failure only), EU-residency, 24-month retention, DSAR via UUID
+- **Telemetry:** none. The skill does not phone home at install time or afterwards. Removed in v1.2.0 (was a 9-field anonymous opt-out ping in v1.0.0 / v1.1.0; value to us was structurally near-zero per the design retrospective).
 
 ---
 
-*This skill is distributed by Absolution Labs LTD under the MIT license (see `LICENSE`). Support: `info@absolutionlabs.com`. Privacy: `https://absolutionlabs.com/privacy`. Compatibility: see `COMPATIBILITY.md` for tested Obsidian / agent / Dataview versions.*
+*This skill is distributed by Absolution Labs LTD under the MIT license (see `LICENSE`). Support: `info@absolutionlabs.com`. Compatibility: see `COMPATIBILITY.md` for tested Obsidian / agent / Dataview versions.*
 
 ---
 

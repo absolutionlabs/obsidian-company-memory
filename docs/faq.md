@@ -26,7 +26,7 @@ Yes, MIT-licensed. Source is on GitHub under `absolutionlabs/obsidian-company-me
 
 ### Does this cost anything?
 
-No. The skill is free, no upsell, no paid tier. Telemetry (default-on, opt-out) is the only thing we collect; payload is 9 anonymous fields, no PII. See [absolutionlabs.com/privacy](https://absolutionlabs.com/privacy).
+No. The skill is free, no upsell, no paid tier. No telemetry either — the bundle does not phone home at install time or afterwards (v1.2.0 removed the opt-out install ping that earlier versions shipped).
 
 ### Why is Absolution Labs giving this away?
 
@@ -82,39 +82,19 @@ Yes. Delete the vault folder, re-run the skill on an empty folder. You lose ever
 
 ### What does Absolution Labs see about my vault?
 
-Nothing about the contents, ever. The skill ships one anonymous install ping (UUID + skill version + OS + surface + sync provider + outcome + timestamp). That's all. Your vault contents never leave your disk.
+Nothing. The skill collects zero telemetry — no install ping, no health check, no usage data, no error reports. Your vault contents never reach our infrastructure in any version.
 
-### What's in the telemetry payload exactly?
+### Did earlier versions collect any data?
 
-Nine anonymous fields. Field-by-field disclosure at [absolutionlabs.com/privacy](https://absolutionlabs.com/privacy). Schema-enforced at the database; we cannot accept any field we haven't disclosed. EU-residency, 24-month retention.
-
-### How do I opt out of telemetry?
-
-Tick the opt-out box at Step 5 of the install. No ping is sent for the rest of the session. There's no later opt-out because the only telemetry we send is at install time — once your vault exists, there's nothing further to opt out of.
-
-### How do I delete my telemetry after install?
-
-Email `privacy@absolutionlabs.com` with your install UUID (shown in the final install message and saved in `_meta/scaffold-version.txt`). We delete within one business day and reply confirming.
-
-### What if I've lost my UUID?
-
-By design, we have no way to identify your rows without it (no email, no IP, no company name in the data). The same property means nobody else can either. If the UUID is genuinely lost, the rows are permanently anonymous and effectively unreachable.
-
-### Is the vault encrypted?
-
-The vault itself is plain markdown — not encrypted. Encryption lives at the cloud sync provider (Dropbox / iCloud / OneDrive / Google Drive all encrypt at rest and in transit by default) and at the OS level (FileVault / BitLocker / LUKS). If you need vault-level encryption (regulated-sector data), consider local-only sync + an encrypted disk image.
-
-### Where is the telemetry data hosted?
-
-Supabase project on AWS eu-west-2 (London). UK GDPR jurisdiction. No transfer outside the UK / EEA for the install-event data.
+Yes. v1.0.0 and v1.1.0 shipped an opt-out 9-field anonymous install ping to an EU-hosted Supabase project (random UUID, skill version, OS family, install surface, sync provider, outcome, timestamp, optional failure step on failures). We removed it entirely in v1.2.0 because the value to us was structurally near-zero — Cowork's sandbox couldn't fire the POST so half of our data was missing by design — and the compliance overhead didn't earn the trust framing the bundle leans on. The infrastructure is being sunset; existing orphan rows contain no PII.
 
 ### Does the skill phone home for any other reason?
 
 No. After install, there is zero network activity from the skill (it's not running — it's a one-shot scaffold). Subsequent vault use is between you, Obsidian, and your AI tool; the skill doesn't observe it.
 
-### Can I see my row in the database?
+### Is the vault encrypted?
 
-No. Row-level security on the database restricts the public anon role to INSERT only. SELECT, UPDATE, DELETE are all blocked for anyone holding the anon key. To delete your row, use the DSAR procedure above; we can also confirm whether a row exists for your UUID upon written request.
+The vault itself is plain markdown — not encrypted. Encryption lives at the cloud sync provider (Dropbox / iCloud / OneDrive / Google Drive all encrypt at rest and in transit by default) and at the OS level (FileVault / BitLocker / LUKS). If you need vault-level encryption (regulated-sector data), consider local-only sync + an encrypted disk image.
 
 ### What if I'm in a regulated sector (finance, legal, healthcare)?
 
@@ -152,9 +132,9 @@ Yes. They're a starter, not a doctrine. Edit `concepts/claude-operating-principl
 
 In your fork, yes. The install asks two questions (company name + sync provider) by deliberate design — more questions create more friction at the trust moment. If you add (e.g.) "industry" or "team size", make it optional and explain why you're asking.
 
-### Can I disable telemetry in my fork?
+### Is there any telemetry in my fork?
 
-Yes. Edit `plugin.json` to remove the telemetry block, and remove Step 5 from SKILL.md. Your fork won't send pings. (Our published variant defaults telemetry on; your fork's defaults are your call.)
+No — telemetry was removed from the bundle entirely in v1.2.0. There's nothing to enable, disable, or reroute. If your fork is based on v1.0.0 or v1.1.0 and you want to remove the telemetry surface, the v1.2.0 commit `e8b3f63` → `<v1.2.0 hash>` shows exactly which fields, files, and SKILL.md sections to remove.
 
 ### Can I add Templater to my vault?
 

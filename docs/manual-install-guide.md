@@ -1,6 +1,6 @@
 # Manual install guide
 
-A by-hand installation procedure for **Obsidian Company Memory v1.1.0** without using the Cowork plugin or the Claude Code skill. Produces a vault byte-identical to the skill-installed one, plus the two companion skills (`open-obsidian-project`, `close-obsidian-project`) installed alongside.
+A by-hand installation procedure for **Obsidian Company Memory v1.2.0** without using the Cowork plugin or the Claude Code skill. Produces a vault byte-identical to the skill-installed one, plus the two companion skills (`open-obsidian-project`, `close-obsidian-project`) installed alongside.
 
 **Estimated time:** 45–60 minutes if you follow along carefully. The skill path is ~25 minutes; manual is slower because you do the substitutions and file copies yourself.
 
@@ -77,16 +77,17 @@ You should see a top-level structure like this:
 SKILL.md
 README.md
 LICENSE
+DISCLAIMERS.md
 COMPATIBILITY.md
 MANIFESTS.md
 TESTERS.md
 plugin.json
+companion-skills/
 templates/
 docs/
 release/
 scripts/
 website/
-telemetry/
 ```
 
 If you see a single folder named `obsidian-company-memory-main/` or similar at the top, you cloned to a wrapper folder; `cd` into the wrapper folder before continuing.
@@ -128,9 +129,7 @@ The skill enforces this gate at install time with checkboxes. The manual path as
 >
 > Regulated-sector folders: confirm the DPA covers what you're about to store. This is the box that matters most in finance / legal / healthcare.
 
-> **3. I understand this vault will be a record of facts and decisions about my company. Absolution Labs LTD has no access to its contents at any point. If I have opted in to telemetry, only anonymous install + success pings are sent.**
->
-> Telemetry choice is made in Section 9. Default is opt-out for the manual path because there's no automated way to send the ping; you'd send it by hand if you want to.
+> **3. I understand this vault will be a record of facts and decisions about my company. Absolution Labs LTD has no access to its contents at any point. The skill collects no telemetry and does not phone home at install time or afterwards.**
 
 If any answer is NO, stop here. The skill — automated or manual — is not the right path until those answers are YES.
 
@@ -195,7 +194,7 @@ Rule 2 — `companion-skills/open-obsidian-project/SKILL.md` and `companion-skil
 
 > **Substitute NOTHING. Copy verbatim.**
 >
-> The companion skills auto-install as sibling skills in your AI tool (Section 7f). They read the vault's `_meta/scaffold-version.txt` and `CONTEXT.md` at runtime to know which company / vault path they're operating against. No scaffold-time substitution required. (In v1.0.0 the equivalent files lived in `templates/_meta/skill-prompts/` and required scaffold-time substitution; v1.1.0 moved them to `companion-skills/` and removed the substitution requirement.)
+> The companion skills auto-install as sibling skills in your AI tool (Section 7f). They read the vault's `_meta/scaffold-version.txt` and `CONTEXT.md` at runtime to know which company / vault path they're operating against. No scaffold-time substitution required. (In v1.0.0 the equivalent files lived in `templates/_meta/skill-prompts/` and required scaffold-time substitution; v1.2.0 moved them to `companion-skills/` and removed the substitution requirement.)
 
 Rule 3 — `templates/CLAUDE.md.template` and `templates/AGENTS.md.template`:
 
@@ -359,7 +358,7 @@ These files become USER-COPY templates inside the vault. When you (or your AI) c
 
 ### 7f. Companion-skill install (no substitution required — copy verbatim)
 
-In v1.0.0 the bundle wrote three skill-prompt files into the vault at `_meta/skill-prompts/` and you (the user) manually installed them as custom skills in your AI tool. **In v1.1.0+ the companion skills auto-install alongside the main skill** as sibling skill folders in your AI tool's skill directory, with namespaced names that don't collide with other skills you might have.
+In v1.0.0 the bundle wrote three skill-prompt files into the vault at `_meta/skill-prompts/` and you (the user) manually installed them as custom skills in your AI tool. **In v1.2.0+ the companion skills auto-install alongside the main skill** as sibling skill folders in your AI tool's skill directory, with namespaced names that don't collide with other skills you might have.
 
 For the manual install path, you copy the two companion-skill folders out of the bundle to the appropriate skill-install location for your AI tool:
 
@@ -405,18 +404,16 @@ Create a new file at `$VAULT/_meta/scaffold-version.txt` containing exactly:
 
 ```
 skill: obsidian-company-memory
-version: 1.1.0
+version: 1.2.0
 scaffolded: 2026-06-03
 date_format_preference: DD/MM/YYYY
 sync_provider: dropbox
-telemetry_uuid: opted-out
 ```
 
-Substitute the four lower lines with your values:
+Substitute the three lower lines with your values:
 - `scaffolded:` → your `TODAY` value
 - `date_format_preference:` → DD/MM/YYYY / MM/DD/YYYY / YYYY-MM-DD
 - `sync_provider:` → dropbox / icloud / onedrive / google-drive / local-only
-- `telemetry_uuid:` → either a UUIDv4 (see Section 9) or the literal string `opted-out`
 
 This is the fingerprint downstream tools use to identify your install. No PII.
 
@@ -543,70 +540,7 @@ If the round-trip DID NOT pass: do NOT add this entry. Add a different entry nam
 
 ---
 
-## Section 9 — Telemetry (manual choice)
-
-The skill sends one anonymous install ping by default (opt-out). The manual install path defaults to NO ping because there's no automated way to send one — you'd do it by hand if you want it.
-
-If you don't want to send telemetry: skip this section. Leave `telemetry_uuid: opted-out` in `_meta/scaffold-version.txt`. Continue to Section 10.
-
-If you want to send a success ping by hand: follow below.
-
-### Generate a UUID
-
-**macOS / Linux:**
-
-```bash
-uuidgen | tr A-Z a-z
-# example output: f47ac10b-58cc-4372-a567-0e02b2c3d479
-```
-
-**Windows PowerShell:**
-
-```powershell
-[guid]::NewGuid().Guid.ToLower()
-```
-
-Save the UUID. Put it in `$VAULT/_meta/scaffold-version.txt` (replace `opted-out`).
-
-### Resolve your `os` value
-
-The endpoint expects `darwin` / `win32` / `linux`. Pick whichever matches.
-
-### Resolve your `sync_provider` value
-
-Use exactly one of: `dropbox` / `icloud` / `onedrive` / `google-drive` / `local-only`.
-
-### Send the success ping
-
-```bash
-curl -X POST "https://vujwcvqiwwpncnhgxjsu.supabase.co/rest/v1/install_events" \
-  -H "apikey: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..." \
-  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..." \
-  -H "Content-Type: application/json" \
-  -H "Prefer: return=minimal" \
-  -d '{
-    "uuid": "<your-uuid>",
-    "skill": "obsidian-company-memory",
-    "version": "1.0.0",
-    "os": "darwin",
-    "surface": "code",
-    "sync_provider": "dropbox",
-    "outcome": "success",
-    "ts": "2026-06-03T12:34:56Z"
-  }'
-```
-
-The anon key is in `$BUNDLE/plugin.json` under `telemetry.anon_key`. Copy it into both header lines.
-
-Substitute `<your-uuid>`, the four field values, and `ts` (use the current ISO timestamp in UTC).
-
-`surface` is `code` for manual installs by convention (closest match in the schema).
-
-Expected response: HTTP 201 with empty body. Anything else (400, 429, network error): the ping didn't land. The vault is unaffected; only our funnel data is. If you want us to know your install succeeded, email `info@absolutionlabs.com`.
-
----
-
-## Section 10 — Confirm the companion skills installed correctly
+## Section 9 — Confirm the companion skills installed correctly
 
 This step was already done as part of Section 7f (the companion-skill copy). What's left is verification: confirm both companion skills are visible to your AI tool and respond to invocation.
 
@@ -630,7 +564,7 @@ Both companion skills use the `-obsidian-project` namespace suffix so they coexi
 
 ---
 
-## Section 11 — Verification checklist
+## Section 10 — Verification checklist
 
 Before declaring the manual install complete, confirm:
 
@@ -655,7 +589,7 @@ If every box is ticked, you're done.
 
 ---
 
-## Section 12 — Common manual-install mistakes
+## Section 11 — Common manual-install mistakes
 
 These are the failure modes most likely to bite a manual installer. Each links to the right recovery section.
 
@@ -702,13 +636,9 @@ Easy mistake; the round-trip section is long. Without the second entry, your aud
 
 Recovery: re-read Section 8d and append. If the round-trip DIDN'T pass, append a failure entry instead — don't fake success.
 
-### Mistake 7 — Generated a UUID, then forgot to put it in `scaffold-version.txt`
-
-If you sent telemetry but `scaffold-version.txt` still says `telemetry_uuid: opted-out`, you have no record of your own UUID. Send yourself an email with the UUID + ISO timestamp now so the DSAR right is exercisable later.
-
 ---
 
-## Section 13 — Upgrading a manually-installed vault
+## Section 12 — Upgrading a manually-installed vault
 
 When a new skill version ships, your vault doesn't auto-upgrade. This is by design: vaults are yours, not ours.
 
@@ -723,7 +653,7 @@ If a version diff is too large to review by hand, the alternative is: scaffold a
 
 ---
 
-## Section 14 — When (and whether) to switch to the skill later
+## Section 13 — When (and whether) to switch to the skill later
 
 If you installed manually because the skill wasn't available to you, and then later your environment gains skill access (e.g. you switch from Codex to Claude Code, or your IT allowlists the Cowork plugin URL): should you reinstall via the skill?
 
@@ -736,7 +666,7 @@ When the skill path WOULD be the right call:
 - You're moving to a new machine and want the skill to set up the new vault from a sync-fresh state.
 - You're doing parallel installs (e.g. testing the skill before recommending it to teammates) and want a clean reference vault.
 
-In those cases: use a separate empty folder, run the skill, compare the result to your manual install. Differences should be minimal (timestamps, UUID, possibly date-format detection). Anything else points at a manual-install mistake worth investigating.
+In those cases: use a separate empty folder, run the skill, compare the result to your manual install. Differences should be minimal (timestamps, possibly date-format detection). Anything else points at a manual-install mistake worth investigating.
 
 ---
 

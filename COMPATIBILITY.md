@@ -1,6 +1,6 @@
 # Compatibility Matrix
 
-Tested combinations for **Obsidian Company Memory v1.1.0**. Last updated: 2026-06-03.
+Tested combinations for **Obsidian Company Memory v1.2.0**. Last updated: 2026-06-03.
 
 This skill is intentionally lightweight — markdown + YAML + JSON files only, no shipped binaries, no platform-specific code paths. Compatibility risk is therefore concentrated in two places: the agent CLI (Cowork / Claude Code / Codex / opencode) and the cloud sync provider's behaviour around the `.obsidian/` folder.
 
@@ -101,7 +101,6 @@ If the skill genuinely can't run on your combination, you'll see a clear error m
 - **Skill bundle incomplete:** missing template files. Re-install from canonical URL.
 - **Target folder not empty:** existing files in the vault folder. See [docs/troubleshooting.md](docs/troubleshooting.md).
 - **No write access to target:** OS permissions or cloud sync lock. See [docs/troubleshooting.md](docs/troubleshooting.md).
-- **Telemetry endpoint unreachable:** non-blocking; install continues.
 
 ---
 

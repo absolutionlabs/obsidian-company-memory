@@ -6,10 +6,10 @@ brief.md
 # Operational artefact — re-include after the Loom is recorded
 loom-script.md
 
-# Supabase CLI working state
-telemetry/supabase/.temp/
-telemetry/supabase/.branches/
-telemetry/.dev.vars
+# Telemetry surface removed from public bundle in v1.2.0; local
+# folder preserved for operator-side sunset of the Supabase project
+# (no deadline; orphan rows contain no PII).
+telemetry/
 
 # Build / OS noise
 node_modules/

@@ -15,29 +15,29 @@ Two surfaces, two jobs:
 
 | File | Purpose | Deploys to |
 |---|---|---|
-| `install-page.md` | Hero copy for the install landing page | `absolutionlabs.com/obsidian` (or `/install/obsidian-company-memory` — pick the slug at deploy time) |
-| `privacy-page-deploy.md` | Instructions for publishing `docs/privacy-policy.md` to the website's privacy URL | `absolutionlabs.com/privacy` (or `/obsidian-privacy` if you want a per-product policy) |
-| `feedback-form-spec.md` | What the feedback form should capture; tech-stack-agnostic | `absolutionlabs.com/feedback` (or replaced by mailto-only) |
-| `loom-embed-snippet.md` | HTML snippet for embedding the Loom on the install page | embedded in `install-page.md` output |
+| `overview-page.md` | Canonical install landing page (story-led; supersedes install-page.md) | `absolutionlabs.com/obsidian` |
+| `install-page.md` | SUPERSEDED — earlier button-led shape, kept for history; do not deploy | n/a |
+| `resources-page-card.md` | Card copy for the AbsoLabs resources page listing | `absolutionlabs.com/resources` (existing surface) |
+| `feedback-form-spec.md` | What the feedback form would capture if/when one ships (v1 = email-only) | `absolutionlabs.com/feedback` (not deployed in v1) |
+| `loom-embed-snippet.md` | HTML snippet for embedding the Loom on the install page | embedded in `overview-page.md` output once Loom is recorded |
 
 ---
 
 ## Deploy order (when you're ready to ship public)
 
-1. Publish `privacy-page-deploy.md` first — the SKILL.md telemetry surface references this URL.
-2. Publish `install-page.md` — links to the privacy URL from step 1.
-3. Add the feedback form (or just point at `info@absolutionlabs.com` if you'd rather skip the form for v1).
-4. Once the install page is live and the Loom is recorded, paste the Loom embed snippet into the install page above the install URL fold.
+1. Publish `overview-page.md` at `absolutionlabs.com/obsidian` (story-led, with a single "Get it on GitHub" CTA at the bottom).
+2. Update `absolutionlabs.com/resources` to render the `resources-page-card.md` card (replaces the placeholder "Coming soon" entry).
+3. Once the Loom is recorded, paste the Loom embed snippet into the overview page above the GitHub CTA.
 
-Order matters because each surface assumes the previous is live. The Loom in particular references the privacy URL during Scene 6.
+No privacy page is required for this skill — v1.2.0 removed the install-telemetry surface entirely, so there is no install-time data collection to disclose.
 
 ---
 
 ## Anti-deploy: what NOT to do
 
 - **Don't put the skill's source code on the website.** It belongs in the public GitHub repo. The website links to it, doesn't host it.
-- **Don't duplicate the privacy policy text** between this folder and `docs/privacy-policy.md`. The bundle's copy is canonical; the website should render from it (or copy at deploy time with a clear "synced from bundle on X date" footer).
-- **Don't gate the install URL behind a form fill.** The skill is free; gating it would break the trust framing in `brief.md` Decision #18.
+- **Don't reintroduce a privacy page for this skill.** v1.2.0 ships with no install telemetry, so a per-skill privacy policy would be misleading. If your wider AL website has a general privacy policy, the bundle inherits that posture (cookies / Netlify analytics / etc.) but the skill itself adds nothing.
+- **Don't gate the install URL behind a form fill.** The skill is free; gating it would break the trust framing the bundle leans on.
 
 ---
 
