@@ -643,3 +643,11 @@ For agents / harnesses that introspect this file beyond the YAML frontmatter:
 ---
 
 *This skill is distributed by Absolution Labs LTD under the MIT license (see `LICENSE`). Support: `info@absolutionlabs.com`. Privacy: `https://absolutionlabs.com/privacy`. Compatibility: see `COMPATIBILITY.md` for tested Obsidian / agent / Dataview versions.*
+
+---
+
+## Use at your own risk
+
+This document is part of the Obsidian Company Memory bundle, provided "AS IS" without warranty of any kind under the MIT License. It is for general informational and educational purposes only and does not constitute professional advice. AI-generated outputs from any vault scaffolded by this skill may contain errors and must be independently verified before reliance. **Read [DISCLAIMERS.md](DISCLAIMERS.md) in full before installing, forking, or relying on anything in this repository.**
+
+*© 2026 Absolution Labs. AbsolutionLabs Ltd, registered in England and Wales (Company No. 17091663). Registered office: 15 Westbury Road, London SE20 7QL.*

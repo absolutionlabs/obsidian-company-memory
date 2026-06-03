@@ -133,3 +133,11 @@ If you depend on a specific combination staying tested: tell us, and we'll add i
 ---
 
 *Maintained by Absolution Labs LTD. Cross-references: [README.md](README.md), [SKILL.md](SKILL.md), [docs/troubleshooting.md](docs/troubleshooting.md), [docs/upgrading.md](docs/upgrading.md).*
+
+---
+
+## Use at your own risk
+
+This document is part of the Obsidian Company Memory bundle, provided "AS IS" without warranty of any kind under the MIT License. It is for general informational and educational purposes only and does not constitute professional advice. "Verified" or "tested" entries in the matrix above record what we have observed at the time of testing; they are not guarantees that the same combinations will continue to work as upstream tools (Obsidian, your agent CLI, your sync provider) evolve. **Read [DISCLAIMERS.md](DISCLAIMERS.md) in full before relying on this matrix to make a deployment decision.**
+
+*© 2026 Absolution Labs. AbsolutionLabs Ltd, registered in England and Wales (Company No. 17091663). Registered office: 15 Westbury Road, London SE20 7QL.*

@@ -128,3 +128,11 @@ If you get genuinely stuck and don't want to wait for an email reply:
 Thanks for trying this. We owe you one.
 
 — Rob, Absolution Labs LTD
+
+---
+
+## Use at your own risk
+
+This document and the bundle it accompanies are provided "AS IS" without warranty of any kind under the MIT License. The skill is for general informational and educational purposes only and does not constitute professional advice. AI-generated outputs from any vault scaffolded by this skill may contain errors and must be independently verified before reliance. **Read [DISCLAIMERS.md](DISCLAIMERS.md) in full before installing.** As a private-beta tester, the same terms apply to you — your participation in the beta does not create any consultant–client relationship between you and Absolution Labs LTD.
+
+*© 2026 Absolution Labs. AbsolutionLabs Ltd, registered in England and Wales (Company No. 17091663). Registered office: 15 Westbury Road, London SE20 7QL.*

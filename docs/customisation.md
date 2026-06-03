@@ -185,3 +185,11 @@ The shape is yours, the work is yours, the relationship with your users is yours
 ---
 
 *Cross-references: [README.md](../README.md), [SKILL.md](../SKILL.md), [MANIFESTS.md](../MANIFESTS.md), [brief.md](../brief.md).*
+
+---
+
+## Use at your own risk
+
+This document is part of the Obsidian Company Memory bundle, provided "AS IS" without warranty of any kind under the MIT License. It is for general informational and educational purposes only and does not constitute professional advice. Forking the bundle, modifying it, redistributing it, or building a commercial product on top of it is permitted under the MIT License — but if you do, you indemnify Absolution Labs LTD against any claims arising from your fork or your downstream distribution (see [DISCLAIMERS.md](../DISCLAIMERS.md) § Indemnity). **Read [DISCLAIMERS.md](../DISCLAIMERS.md) in full before forking or redistributing this repository.**
+
+*© 2026 Absolution Labs. AbsolutionLabs Ltd, registered in England and Wales (Company No. 17091663). Registered office: 15 Westbury Road, London SE20 7QL.*

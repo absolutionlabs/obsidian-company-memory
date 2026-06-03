@@ -211,6 +211,229 @@ The vault is plain markdown. There is no proprietary database, no schema migrati
 
 ---
 
+## Bundle download issues
+
+The skill bundle is ~25 files; if even one is missing, the pre-flight integrity check refuses. These are the common reasons the download doesn't land cleanly.
+
+### "The Cowork plugin URL paste did nothing visible."
+
+Cowork's plugin install field accepts the URL silently and shows no progress indicator for the first 2-5 seconds while it resolves. If you paste-and-immediately-click-away, you may miss the success state.
+
+What to check:
+- Wait 5-10 seconds after pasting before assuming it failed.
+- Open Cowork's plugin list (Settings → Plugins) — the new plugin appears there once install completes, even if no toast notification fires.
+- If the plugin doesn't appear in the list after 30 seconds: the URL was probably rejected. See "URL paste did nothing" in the Pre-install section above.
+
+### "The Claude Code install ran but `claude` doesn't see the skill."
+
+The Code install copies the bundle to `~/.claude/skills/obsidian-company-memory/`. Code reads that directory at startup; if it was already running when you ran the install, it won't pick up the new skill until you restart.
+
+What to do:
+- Exit Code completely (close all sessions, including any in IDEs).
+- Re-open Code.
+- The skill should appear via its trigger phrases or `/obsidian-company-memory`.
+
+If still not visible:
+- Verify the install actually ran: `ls ~/.claude/skills/obsidian-company-memory/SKILL.md` should exist.
+- Check Code's loaded-skills list: `claude --list-skills` (or your version's equivalent).
+- If `SKILL.md` exists but Code doesn't list it: your Code version may pre-date user-global skills. Update Code and retry.
+
+### "git clone fails with permission denied / SSL error / proxy error."
+
+The canonical install URL uses HTTPS (`https://github.com/absolutionlabs/...`). Plain `git clone` should work without authentication.
+
+If it fails:
+- **Permission denied (publickey):** You're trying to clone via SSH (`git@github.com:...`) without an SSH key configured. Use the HTTPS URL instead.
+- **SSL certificate problem:** Your corporate proxy is intercepting HTTPS and presenting its own cert. Either configure git to trust the proxy cert (ask IT) or download the zip from the GitHub web UI as a workaround.
+- **Could not resolve host:** DNS is blocking `github.com`. Check with IT. Workaround: tether off mobile data for the install, then move the folder to your work machine.
+- **fatal: unable to access ... 403:** Rate limit or geographic block. Try again in 60 seconds; if persistent, surface to `info@absolutionlabs.com`.
+
+### "Downloaded the zip but the extracted folder structure looks wrong."
+
+Common Windows symptom: double-clicking a `.zip` file opens it in a preview-only view, and dragging "the folder" out gives you a folder containing the zip's internal folder — i.e. nested one level deeper than expected.
+
+What to check:
+- Open the extracted folder. You should see `SKILL.md`, `README.md`, `LICENSE`, `templates/`, `docs/` at the top level.
+- If instead you see ONE folder named `obsidian-company-memory-main/` or similar, descend into it — that's the actual bundle root.
+
+What to do:
+- Move the inner folder's contents up one level, OR install from the deeper level. Both work.
+- For Code installs, the `~/.claude/skills/obsidian-company-memory/` folder must directly contain `SKILL.md`, not contain another folder that contains `SKILL.md`.
+
+### "The integrity check says 'missing files' but I can see them all."
+
+Filesystem case-sensitivity disagreement. The skill expects exact-case filenames (`SKILL.md`, not `skill.md`). Most cases:
+
+- **Windows:** filenames are case-insensitive at the OS level, but some download tools normalise case during extraction (e.g. all-lowercase). If the bundle was zipped on Linux then extracted via a Windows tool that lowercases, the integrity check fails.
+- **macOS:** the default APFS volume is case-insensitive, but some external drives are case-sensitive. The same all-lowercase-after-extraction failure mode can appear.
+
+What to do:
+- Re-download via `git clone` directly (git preserves case on the wire).
+- If you must use the zip path: extract using `tar -xf bundle.zip` from a terminal rather than a GUI tool — tar preserves case more reliably than Explorer / Finder.
+
+---
+
+## File and folder structure confusions
+
+The vault is plain markdown in a folder you own. Sounds simple; trips users up because of OS quirks around hidden folders and the difference between "the folder Obsidian sees" and "the folder on disk."
+
+### "I see SCHEMA.md and the folders in Obsidian, but `.obsidian/` isn't visible."
+
+Working as designed. `.obsidian/` is a hidden folder (leading dot) holding Obsidian's own config. Obsidian deliberately doesn't list its own config folder in its file explorer.
+
+To see `.obsidian/` from your OS file manager:
+- **macOS Finder:** press `Cmd + Shift + .` to toggle hidden file visibility.
+- **Windows Explorer:** View tab → tick "Hidden items".
+- **Linux file managers:** `Ctrl + H` toggles hidden-file visibility in most (Files, Nautilus, etc.).
+
+You should rarely need to look at `.obsidian/` directly; if you do (e.g. troubleshooting plugin config), it lives at the vault root alongside SCHEMA.md.
+
+### "I see different things in Obsidian than I see on disk."
+
+Two real causes:
+
+1. **Obsidian filters by file type.** It shows `.md`, `.canvas`, images, PDFs by default; not `.template`, `.txt`, `.yml`, `.json`. The `CLAUDE.md.template` and `AGENTS.md.template` files at the vault root are invisible in Obsidian's file explorer. They're on disk; the AI tool reads them at session start.
+2. **`.obsidian/` is hidden** (see above).
+
+What to check on disk to confirm everything is there:
+```
+<vault-root>/
+├── SCHEMA.md
+├── CONTEXT.md
+├── index.md
+├── log.md
+├── HOW-TO-USE-THIS.md
+├── CLAUDE.md.template
+├── AGENTS.md.template
+├── concepts/claude-operating-principles.md
+├── entities/test-welcome.md
+├── _meta/expectations.yml
+├── _meta/scaffold-version.txt
+├── _meta/templates/{entity,concept,query}.md
+├── _meta/skill-prompts/{README,new-project-setup,close-session}.md
+└── .obsidian/{app,appearance,core-plugins,community-plugins,hotkeys}.json
+```
+
+Missing files = either partial scaffold (re-run on empty folder) or sync hasn't caught up yet.
+
+### "Obsidian shows lots of files I don't recognise (`.canvas`, `workspace.json`, etc.)"
+
+`.obsidian/workspace.json` and similar files are Obsidian's runtime state — your open tabs, sidebar widths, etc. They appear after you start using Obsidian; the skill doesn't write them. Ignore unless something specifically refers to them in troubleshooting (e.g. corrupt-workspace recovery above).
+
+Empty `.canvas` files appear if you accidentally created one via the file menu. Safe to delete from the file explorer.
+
+### "I moved the vault folder and the wikilinks broke."
+
+Wikilinks are relative to the vault root, not the OS path. Moving the vault folder should NOT break links — but Obsidian may need to be told.
+
+What to do:
+1. In Obsidian: File → Open vault → "Open folder as vault" at the NEW path.
+2. Close any old vault entries from Obsidian's vault list (they'll show as "missing" with the old path).
+3. The wikilinks should now resolve. If they don't: in the new vault, Settings → Files & Links → "Use [[Wikilinks]]" must be ON (the scaffold sets this; manual edits may have flipped it).
+
+### "I renamed the vault folder and now my AI session can't find SCHEMA.md."
+
+The AI session uses an absolute path. If you renamed `~/Dropbox/MyCompany/` to `~/Dropbox/AcmeCorp/`, your AI tool still remembers the old path.
+
+What to do:
+- In your next AI session, explicitly mount the new path (Cowork: `request_directory` with the new absolute path; Code: `cd` to the new folder before invoking).
+- Update `_meta/scaffold-version.txt` and `_meta/expectations.yml` if they contain hard-coded paths (they shouldn't, but check after major renames).
+- The skill-prompts in `_meta/skill-prompts/` reference `{{VAULT_ABSOLUTE_PATH}}` substituted at scaffold time. If you renamed the vault, re-substitute manually with sed / Find-and-Replace on those files only.
+
+### "The vault folder has a `(1)` or `-Copy` suffix and Obsidian opens it as a separate vault."
+
+You triggered a duplicate via your file manager or cloud sync. The duplicated folder may have outdated content.
+
+What to do:
+1. Identify which folder is the "real" vault (check `_meta/scaffold-version.txt` for the scaffold date — the older one usually is).
+2. Manually merge any newer content from the duplicate into the original.
+3. Delete the duplicate.
+4. Re-open the original in Obsidian; close the duplicate from Obsidian's vault list.
+
+---
+
+## Incompatibilities not already covered in COMPATIBILITY.md
+
+[COMPATIBILITY.md](../COMPATIBILITY.md) lists the verified matrix. This section covers the edge cases users hit that aren't reflected in the matrix because they're environmental (corporate policy, security software, locale-specific behaviour) rather than version-specific.
+
+### "macOS Gatekeeper / 'Obsidian is from an unidentified developer'"
+
+Obsidian's installer is signed but some macOS configurations still prompt this on first launch (older OS, restrictive security profile).
+
+What to do:
+- Right-click the Obsidian.app in Applications → Open. Confirm the "open anyway" dialog.
+- Or: System Settings → Privacy & Security → scroll to "Allow apps from" and grant Obsidian permission.
+- This is about Obsidian, not the skill. Once Obsidian runs, the scaffolded vault works normally.
+
+### "Windows Defender SmartScreen blocked the install script."
+
+Some Windows configurations flag scripts downloaded via `curl | sh` as untrusted.
+
+What to do:
+- Click "More info" → "Run anyway" if you trust the source (the install script is open-source on GitHub; inspect before running if uncertain).
+- Or: download the script directly from GitHub, inspect it (~30 lines), run it locally without piping. The script does a `git clone` + `mv` — nothing system-level.
+
+### "Corporate proxy blocks `vujwcvqiwwpncnhgxjsu.supabase.co` (telemetry endpoint)."
+
+Telemetry failures are non-blocking. The install proceeds and your vault works. The success ping just doesn't reach our endpoint.
+
+What to do (if you want telemetry to land anyway):
+- Ask IT to allowlist `*.supabase.co` for outbound POST (the endpoint is EU-hosted, GDPR-compliant, no PII).
+- Or: send a one-line email to `info@absolutionlabs.com` confirming your install succeeded; we can manually log it for funnel data.
+- Or: ignore. The vault is fully functional without telemetry.
+
+### "Obsidian's plugin browser is blocked by corporate policy."
+
+Dataview is strongly recommended but optional (per COMPATIBILITY.md). If your IT blocks Obsidian's plugin browser, you can:
+
+1. **Skip Dataview entirely.** The vault works; you lose structured queries against frontmatter (the lint's threshold report will fall back to a plain-text scan).
+2. **Manually install Dataview.** Download the plugin from its GitHub releases page, place `main.js`, `manifest.json`, `styles.css` in `<vault>/.obsidian/plugins/dataview/`. Enable from Obsidian's Community Plugins panel (which lists installed-but-not-marketplace plugins separately).
+3. **Ask IT for an exception.** Dataview is widely-deployed in enterprise Obsidian setups; the request usually gets approved.
+
+### "Obsidian fails to launch with 'electron / native module' error after install."
+
+Usually a Linux distro mismatch — Obsidian's AppImage was built against a glibc version newer than your system.
+
+What to do:
+- Use Obsidian's deb / Snap / Flatpak install instead of AppImage if available.
+- Or: upgrade your distro's glibc (typically requires a distro version bump).
+- Or: run Obsidian via Flatpak — it bundles its own runtime.
+
+### "iCloud Drive 'optimised storage' evicted the vault and now it's slow."
+
+iCloud's "Optimise Storage" setting can offload rarely-accessed files to the cloud, leaving a stub on disk. Opening the vault triggers a download — first launch can be slow.
+
+What to do:
+- Finder → navigate to the vault folder → right-click → "Keep on this Mac" (or "Keep Downloaded").
+- All files now stay local. iCloud still syncs changes but won't evict.
+
+### "Dropbox Smart Sync did the same."
+
+Same shape, different provider. Right-click the vault folder in Finder / Explorer → "Available Offline" / "Make available offline". Stays local; sync continues.
+
+### "Locale produces unexpected date format in `expectations.yml`."
+
+The skill auto-detects locale and writes `date_format_preference` to `_meta/expectations.yml`. If you see DD/MM when you expected MM/DD (or vice versa), the OS locale at install time was the source.
+
+What to do:
+- Edit `_meta/expectations.yml` directly. Change the `date_format_preference` line to what you want. Save.
+- This is informational only — YAML frontmatter dates in pages remain ISO `YYYY-MM-DD` because the lint depends on it. The preference affects body text only.
+
+### "I'm on a regulated Windows tenant with Microsoft Defender for Cloud Apps in front of all SaaS."
+
+Defender for Cloud Apps may flag the Supabase telemetry POST as "shadow IT" and block it. Same answer as the proxy section above: install proceeds, telemetry fails silently. If your security team needs to allowlist: the endpoint is `vujwcvqiwwpncnhgxjsu.supabase.co` (EU-hosted, anonymous payload, public privacy policy at [absolutionlabs.com/privacy](https://absolutionlabs.com/privacy)).
+
+### "The skill ran but my MDM-managed Windows blocks creation of `.obsidian/`."
+
+Some Windows MDM policies forbid creation of dot-prefixed folders in user directories. The skill writes `.obsidian/` as a normal folder; the OS rejects it.
+
+What to do:
+- Install the vault outside the MDM-managed user directory (e.g. on a personal drive partition, or in `C:\Vaults\` with an exception requested from IT).
+- Ask IT to grant your user account an exception for the chosen vault path.
+- This is a tenant-specific block; we can't bypass it from the skill side.
+
+---
+
 ## Escalation
 
 If nothing here describes what you're seeing, or the recovery steps don't work:
@@ -228,3 +451,11 @@ If nothing here describes what you're seeing, or the recovery steps don't work:
 ---
 
 *Cross-references: [README.md](../README.md), [SKILL.md](../SKILL.md), [COMPATIBILITY.md](../COMPATIBILITY.md), [upgrading.md](upgrading.md), [templates/HOW-TO-USE-THIS.md](../templates/HOW-TO-USE-THIS.md).*
+
+---
+
+## Use at your own risk
+
+This document is part of the Obsidian Company Memory bundle, provided "AS IS" without warranty of any kind under the MIT License. It is for general informational and educational purposes only and does not constitute professional advice. The recovery steps above describe approaches that have worked for us in testing; they are not guaranteed to recover any specific failure scenario, and following them may produce unintended consequences in environments we have not tested. **Read [DISCLAIMERS.md](../DISCLAIMERS.md) in full before installing, forking, or relying on anything in this repository.**
+
+*© 2026 Absolution Labs. AbsolutionLabs Ltd, registered in England and Wales (Company No. 17091663). Registered office: 15 Westbury Road, London SE20 7QL.*

@@ -155,3 +155,11 @@ For all other Absolution Labs LTD matters: `hello@absolutionlabs.com` and the ma
 - This document is the canonical version. The published page at `absolutionlabs.com/privacy` should be regenerated from this file, not edited in-place — drift between the two would be a Threat-Map #2 finding.
 
 *Drafted 2026-06-02 as Chunk 5b deliverable.*
+
+---
+
+## Use at your own risk
+
+This privacy policy covers the install-telemetry surface only. For the full set of disclaimers covering the bundle (use at own risk, educational purpose only, AI-output verification responsibility, limitation of liability with £100 floor, UK statutory carve-outs, indemnity for forks, governing law and jurisdiction, formal-notice address), **read [DISCLAIMERS.md](../DISCLAIMERS.md) in full before installing, forking, or relying on anything in this repository.**
+
+*© 2026 Absolution Labs. AbsolutionLabs Ltd, registered in England and Wales (Company No. 17091663). Registered office: 15 Westbury Road, London SE20 7QL.*

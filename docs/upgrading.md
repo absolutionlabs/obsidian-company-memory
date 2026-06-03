@@ -185,3 +185,11 @@ This is intentional. Auto-update is convenient but also a path through which som
 ---
 
 *Cross-references: [README.md](../README.md), [SKILL.md](../SKILL.md), [COMPATIBILITY.md](../COMPATIBILITY.md), [troubleshooting.md](troubleshooting.md), [customisation.md](customisation.md).*
+
+---
+
+## Use at your own risk
+
+This document is part of the Obsidian Company Memory bundle, provided "AS IS" without warranty of any kind under the MIT License. It is for general informational and educational purposes only and does not constitute professional advice. Upgrade procedures involve modifications to your vault; back up the vault folder via your cloud sync provider's version history before applying any upgrade. **Read [DISCLAIMERS.md](../DISCLAIMERS.md) in full before installing, upgrading, forking, or relying on anything in this repository.**
+
+*© 2026 Absolution Labs. AbsolutionLabs Ltd, registered in England and Wales (Company No. 17091663). Registered office: 15 Westbury Road, London SE20 7QL.*

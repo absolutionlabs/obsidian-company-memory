@@ -8,6 +8,18 @@ The folder structure is the rendering layer; the bespoke prompts, rulebooks, and
 
 This skill is the install moment. It does not run again once your vault exists; ongoing use is governed by the living guide it drops at your vault root.
 
+---
+
+## Use at your own risk — read this before installing
+
+The bundle is provided "AS IS" without warranty of any kind under the MIT License. It is for general informational and educational purposes only and does not constitute legal, regulatory, security, financial, or other professional advice. AI-generated outputs from any vault scaffolded by this skill may contain errors and must be independently verified before reliance. Compliance with your sector's regulatory obligations is your responsibility, not ours.
+
+**Read [DISCLAIMERS.md](DISCLAIMERS.md) in full before installing, forking, or relying on anything in this repository.** Liability cap, statutory carve-outs (UK), indemnity (for forks), governing law, and how to serve formal notice are all set out there.
+
+By installing the skill, you accept those terms.
+
+---
+
 ## Install
 
 > **The current install URL, version picker, and Loom walkthrough live on the Absolution Labs website at [absolutionlabs.com](https://absolutionlabs.com).**
@@ -118,10 +130,14 @@ If you hit a compatibility issue we haven't documented, please send it to `info@
 
 - **[templates/HOW-TO-USE-THIS.md](templates/HOW-TO-USE-THIS.md)** — the Phase 2 living guide. Read this after install. ~10 minutes.
 - **[docs/install-walkthrough.md](docs/install-walkthrough.md)** — step-by-step reading-version of the install procedure. Useful if you'd rather read than watch the Loom, or need to vet the procedure before running it.
+- **[docs/manual-install-guide.md](docs/manual-install-guide.md)** — by-hand install procedure for users on agent CLIs the skill doesn't reach (Codex / opencode), regulated-sector users who want to inspect every file, or any user blocked by proxy / firewall from the canonical install paths. ~45-60 minute follow-along.
 - **[docs/customisation.md](docs/customisation.md)** — fork your own variant; what's editable, what isn't.
-- **[docs/troubleshooting.md](docs/troubleshooting.md)** — common failure modes and recovery.
+- **[docs/troubleshooting.md](docs/troubleshooting.md)** — common failure modes and recovery (incl. download issues, file-structure confusions, environmental incompatibilities).
+- **[docs/faq.md](docs/faq.md)** — question-shape help: "can I", "what if", "why does it". Different surface from troubleshooting (which is problem-shape).
+- **[docs/standard-vs-ours.md](docs/standard-vs-ours.md)** — diff between common Obsidian + AI patterns and what this bundle ships. Read this if you're deciding whether to install.
 - **[docs/upgrading.md](docs/upgrading.md)** — version pinning, rollback, manual refresh.
 - **[docs/privacy-policy.md](docs/privacy-policy.md)** — full text of the install-telemetry privacy policy.
+- **[DISCLAIMERS.md](DISCLAIMERS.md)** — full disclaimer, limitation of liability, statutory carve-outs (UK), indemnity (for forks), governing law. **Required reading before install.**
 - **[brief.md](brief.md)** — the Forge brief that shaped this skill. Read this if you want to understand why decisions were made the way they were.
 - **[MANIFESTS.md](MANIFESTS.md)** — the mirror contract between `plugin.json` (Cowork) and `SKILL.md` frontmatter (Claude Code).
 
@@ -144,3 +160,7 @@ MIT. See [LICENSE](LICENSE). You can fork, modify, redistribute, sell, or build 
 ---
 
 *Maintained by Absolution Labs LTD. This README, the bundle, and the operator's whole memory architecture are themselves stored in an Obsidian vault of this exact shape.*
+
+---
+
+*© 2026 Absolution Labs. AbsolutionLabs Ltd, registered in England and Wales (Company No. 17091663). Registered office: 15 Westbury Road, London SE20 7QL. Full disclaimers: [DISCLAIMERS.md](DISCLAIMERS.md).*
