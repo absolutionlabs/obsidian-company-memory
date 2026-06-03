@@ -1,0 +1,32 @@
+# {{PROJECT_NAME}} — Agent Instructions
+
+This is an agent-instruction file used by Codex, opencode, and other agent CLIs that read `AGENTS.md` at session start.
+
+## Project context
+- **Project:** {{PROJECT_NAME}} — {{PROJECT_DESCRIPTION}}
+- **Company:** {{COMPANY_NAME}}
+- **Vault path:** {{VAULT_ABSOLUTE_PATH}}
+
+## Required reads at session start
+1. `SCHEMA.md` at the vault root — the rulebook
+2. `CONTEXT.md` at the vault root — company-specific context and write rules
+
+Do not proceed with any work before reading both files.
+
+## Operating rules
+- **Single-company vault.** No multi-client routing. All knowledge goes into the appropriate top-level folder.
+- **Ingest at close.** Every session that produces meaningful knowledge runs the Ingest operation (defined in `SCHEMA.md`) before closing.
+- **Update records in the same session.** Stale records fixed today, not "next time."
+- **The user is right over the wiki.** When the user contradicts a page, update the page.
+- **Frontmatter and wikilinks are mandatory** on every wiki page (see `SCHEMA.md` § 2 and § 4).
+
+## Close protocol
+At the end of every session:
+1. Update any project brief if one exists.
+2. Verify at least one Ingest ran. If not, log why in `log.md`.
+3. Append `log.md` with a one-line entry summarising the session.
+4. Report KB writes: every file touched, type of touch, one-line reason.
+5. Generate a continuation prompt for the next session.
+
+## Operating principles
+The vault's `concepts/claude-operating-principles.md` page carries the cross-cutting rules for how the agent should work with this vault. Read it at session start and apply throughout.

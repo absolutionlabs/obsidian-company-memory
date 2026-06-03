@@ -1,0 +1,134 @@
+{
+  "_note": "Cowork plugin manifest for the Obsidian Company Memory skill. Mirrors the YAML frontmatter at the top of SKILL.md, which serves as the Claude Code skill manifest. See MANIFESTS.md for the mirror contract and per-field rationale. Schema URL below is provisional; align against Cowork's published plugin spec before public ship (Chunk 7 deliverable).",
+  "$schema": "https://cowork.anthropic.com/schemas/plugin.json",
+  "id": "obsidian-company-memory",
+  "name": "Obsidian Company Memory",
+  "version": "1.0.0",
+  "description": "Scaffold an Obsidian-based company-memory vault — single-company, three-layer architecture, AI-session-ready in about 25 minutes. Walks the user through a compliance gate, a 2-question intake, an idempotent vault scaffold, and a round-trip test that proves the system works end-to-end.",
+  "entry": "SKILL.md",
+  "homepage": "https://absolutionlabs.com",
+  "repository": null,
+  "categories": ["productivity", "knowledge-management", "ai-tooling"],
+  "keywords": [
+    "obsidian",
+    "company memory",
+    "knowledge base",
+    "vault",
+    "wiki",
+    "absolution-labs",
+    "single-company",
+    "ai-session"
+  ],
+  "publisher": {
+    "name": "Absolution Labs LTD",
+    "url": "https://absolutionlabs.com",
+    "support": "info@absolutionlabs.com",
+    "privacy": "https://absolutionlabs.com/privacy",
+    "support_sla_business_days": 1
+  },
+  "license": "MIT",
+  "license_file": "LICENSE",
+  "compatibility": {
+    "obsidian_min": "1.5.0",
+    "see": "COMPATIBILITY.md"
+  },
+  "surfaces": ["cowork"],
+  "permissions": {
+    "directory_access": {
+      "level": "required",
+      "scope": "single mounted folder (the target vault)",
+      "writes": [
+        "<vault>/.obsidian/*.json",
+        "<vault>/SCHEMA.md",
+        "<vault>/CONTEXT.md",
+        "<vault>/index.md",
+        "<vault>/log.md",
+        "<vault>/HOW-TO-USE-THIS.md",
+        "<vault>/concepts/claude-operating-principles.md",
+        "<vault>/_meta/expectations.yml",
+        "<vault>/_meta/scaffold-version.txt",
+        "<vault>/_meta/templates/{entity,concept,query}.md",
+        "<vault>/entities/test-welcome.md",
+        "<vault>/CLAUDE.md.template",
+        "<vault>/AGENTS.md.template"
+      ],
+      "reads": ["<vault>/* (refuse-to-scaffold gate)"]
+    },
+    "network_egress": {
+      "level": "optional",
+      "endpoints": ["https://vujwcvqiwwpncnhgxjsu.supabase.co/rest/v1/install_events"],
+      "purpose": "anonymous install telemetry (opt-out at runtime per SKILL.md Step 5)",
+      "blocked_if_opted_out": true
+    }
+  },
+  "telemetry": {
+    "default": "enabled",
+    "opt_out_at_runtime": true,
+    "opt_out_step": "SKILL.md Step 5",
+    "endpoint": "https://vujwcvqiwwpncnhgxjsu.supabase.co/rest/v1/install_events",
+    "endpoint_provider": "supabase",
+    "endpoint_region": "eu-west-2 (London)",
+    "anon_key": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ1andjdnFpd3dwbmNuaGd4anN1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0NDIxMzksImV4cCI6MjA5NjAxODEzOX0.rDi-epl_-l1gqCWh-jPW1AHaJ3Nhp1r5Skvkft0W8NM",
+    "_anon_key_note": "Supabase anon keys are public by design — security comes from RLS (anon can INSERT only into install_events, cannot SELECT/UPDATE/DELETE) and CHECK constraints (schema enforcement at the database). Not a secret. Safe to ship in the public bundle.",
+    "payload_fields": ["uuid", "skill", "version", "os", "surface", "sync_provider", "outcome", "ts"],
+    "no_pii": true,
+    "no_vault_contents": true,
+    "no_company_name": true,
+    "residency": "EU (West Europe / London)",
+    "retention_months": 24,
+    "rate_limit": "5 inserts per 60s per UUID (Postgres trigger)",
+    "dsar_email": "privacy@absolutionlabs.com",
+    "privacy_policy_url": "https://absolutionlabs.com/privacy"
+  },
+  "files": [
+    "SKILL.md",
+    "MANIFESTS.md",
+    "README.md",
+    "LICENSE",
+    "COMPATIBILITY.md",
+    "templates/SCHEMA.md",
+    "templates/CONTEXT.md",
+    "templates/index.md",
+    "templates/log.md",
+    "templates/HOW-TO-USE-THIS.md",
+    "templates/concepts/claude-operating-principles.md",
+    "templates/_meta/expectations.yml",
+    "templates/_meta/templates/entity.md",
+    "templates/_meta/templates/concept.md",
+    "templates/_meta/templates/query.md",
+    "templates/.obsidian/app.json",
+    "templates/.obsidian/appearance.json",
+    "templates/.obsidian/community-plugins.json",
+    "templates/.obsidian/core-plugins.json",
+    "templates/.obsidian/hotkeys.json",
+    "templates/CLAUDE.md.template",
+    "templates/AGENTS.md.template",
+    "docs/customisation.md",
+    "docs/troubleshooting.md",
+    "docs/upgrading.md"
+  ],
+  "gates": {
+    "worktree_refusal": "SKILL.md Step 0a (OP #19)",
+    "compliance_checkbox_gate": "SKILL.md Step 1 (3 mandatory checkboxes)",
+    "refuse_to_scaffold_on_non_empty": "SKILL.md Step 2",
+    "skill_bundle_integrity_check": "SKILL.md Step 0c"
+  },
+  "trigger_phrases": [
+    "set up obsidian",
+    "scaffold a vault",
+    "install company memory",
+    "I want a company memory system",
+    "set up my obsidian company memory"
+  ],
+  "trigger_url_paste": "the install URL shown on absolutionlabs.com",
+  "idempotent": "on empty target directories only; refuses non-empty per gate",
+  "reversible": "yes — delete the vault directory; cloud sync provides version history",
+  "time_to_run_minutes": {
+    "skill_time": 5,
+    "user_time": 20,
+    "total": 25
+  },
+  "checksums_url": null,
+  "release_signing": null,
+  "_release_artifacts_note": "checksums + signing key URLs land at Chunk 7 release process; per-release URLs are linked from the install page on absolutionlabs.com once the release lands."
+}

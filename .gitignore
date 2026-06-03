@@ -1,0 +1,20 @@
+# Internal session + project artefacts — not for public repo
+CLAUDE.md
+Obsidian Setup - Asterley Bros.md
+
+# Operational artefact — re-include after the Loom is recorded
+loom-script.md
+
+# Supabase CLI working state
+telemetry/supabase/.temp/
+telemetry/supabase/.branches/
+telemetry/.dev.vars
+
+# Build / OS noise
+node_modules/
+.DS_Store
+Thumbs.db
+desktop.ini
+*.log
+.idea/
+.vscode/

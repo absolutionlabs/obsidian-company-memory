@@ -1,0 +1,11 @@
+{
+  "promptDelete": true,
+  "alwaysUpdateLinks": true,
+  "newLinkFormat": "shortest",
+  "useMarkdownLinks": false,
+  "attachmentFolderPath": "raw/assets",
+  "newFileLocation": "current",
+  "showUnsupportedFiles": false,
+  "showLineNumber": true,
+  "spellcheck": true
+}

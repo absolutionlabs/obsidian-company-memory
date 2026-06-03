@@ -1,0 +1,29 @@
+# {{PROJECT_NAME}} — Session Stub
+`SESSION_PROTOCOL_ANCHOR: {{TODAY}}`
+
+## Step 1: Mount the Vault
+Call your AI tool's directory-access mechanism with this absolute path:
+
+{{VAULT_ABSOLUTE_PATH}}
+
+Do NOT mount a parent folder. The vault is the unit; nothing above it is in scope.
+
+## Step 2: Read SCHEMA.md
+Read `SCHEMA.md` from the mounted vault root before doing anything else.
+**DO NOT proceed with any work until you have read SCHEMA.md.**
+
+## Step 3: Read CONTEXT.md
+Read `CONTEXT.md` for {{COMPANY_NAME}}-specific context and write rules.
+
+## Project Context
+- **Project:** {{PROJECT_NAME}} — {{PROJECT_DESCRIPTION}}
+- **Company:** {{COMPANY_NAME}}
+- **Vault scope:** Single-company. Write all knowledge to the appropriate top-level folder (`entities/`, `concepts/`, etc.). Raw source documents go in `raw/`. No multi-client routing.
+
+## Close protocol
+Every session ends with `/close-full` (or "let's close out"). The protocol:
+1. Update any project brief if one exists.
+2. Verify at least one Ingest ran. If not, log why.
+3. Append `log.md` with what happened.
+4. Report KB writes.
+5. Generate a continuation prompt for next session.

@@ -1,0 +1,39 @@
+# Lint thresholds for this vault. Edit deliberately.
+# Read by the Lint operation defined in SCHEMA.md.
+
+# Page age before lint flags as stale (days)
+stale_thresholds:
+  entity: 90
+  concept: 90
+  comparison: 180
+  query: 365
+  context: 30          # CONTEXT.md refresh cadence
+
+# Required frontmatter fields on every wiki page
+required_frontmatter:
+  - title
+  - created
+  - updated
+  - type
+
+# Allowed values for the `type` frontmatter field
+allowed_types:
+  - entity
+  - concept
+  - comparison
+  - query
+
+# Minimum wikilinks per page (orphan threshold)
+# Pages must link to at least this many other pages.
+min_wikilinks_per_page: 1
+
+# Minimum incoming wikilinks per page (reachability threshold)
+# Pages must be reachable from at least this many other pages.
+min_incoming_wikilinks: 1
+
+# Folders excluded from lint
+exclude_folders:
+  - .obsidian
+  - _meta/templates
+  - raw
+  - lint-reports
