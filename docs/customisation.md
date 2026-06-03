@@ -184,7 +184,7 @@ The shape is yours, the work is yours, the relationship with your users is yours
 
 ---
 
-*Cross-references: [README.md](../README.md), [SKILL.md](../SKILL.md), [MANIFESTS.md](../MANIFESTS.md), [brief.md](../brief.md).*
+*Cross-references: [README.md](../README.md), [SKILL.md](../SKILL.md), [MANIFESTS.md](../MANIFESTS.md).*
 
 ---
 

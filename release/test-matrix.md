@@ -2,7 +2,7 @@
 
 Before any public release, run the install against each of the 7 personas below. **Each persona is a hard gate** — a failure on any one blocks public ship. Document outcomes in `release/test-matrix-runs/<date>.md` (create the folder when first run).
 
-The matrix maps 1:1 to the 6 assumptions + the pre-mortem failure shape in [brief.md](../brief.md). The bundle survives this matrix or it doesn't ship.
+The matrix maps 1:1 to the 6 assumptions + the pre-mortem failure shape captured in our internal project brief. The bundle survives this matrix or it doesn't ship.
 
 ---
 

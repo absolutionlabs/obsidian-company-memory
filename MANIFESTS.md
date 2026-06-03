@@ -98,7 +98,7 @@ All 11 checks run in under a second; the script returns exit code 1 on any failu
 - Cowork plugin manifest: [plugin.json](plugin.json)
 - Templates: [templates/](templates/)
 - Version stamp written into every scaffolded vault: `_meta/scaffold-version.txt` (per SKILL.md Step 6.7)
-- Brief and decisions: [brief.md](brief.md)
+- Brief and decisions: held internally; email `info@absolutionlabs.com` for specifics
 - Compatibility matrix: `COMPATIBILITY.md` (Chunk 6 deliverable)
 
 ---

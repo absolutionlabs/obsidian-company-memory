@@ -306,7 +306,7 @@ The skill is designed to fail clearly, not silently. If something doesn't work:
 - **Forking the skill for your own variant** — [docs/customisation.md](customisation.md).
 - **Upgrading or rolling back** — [docs/upgrading.md](upgrading.md).
 - **Compatibility specifics for your OS / agent / sync provider** — [COMPATIBILITY.md](../COMPATIBILITY.md).
-- **Why we designed each step the way we did** — [brief.md](../brief.md) Key Decisions table.
+- **Why we designed each step the way we did** — full Key Decisions table is held internally; email `info@absolutionlabs.com` if you want the rationale for a specific cut or design choice.
 
 ---
 

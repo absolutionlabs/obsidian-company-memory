@@ -1,6 +1,6 @@
 # Recovery Drill
 
-Required before Gate 3 (production-touching project — telemetry endpoint + privacy infra count, per [brief.md](../brief.md) Recovery Drill Log).
+Required before Gate 3 (production-touching project — telemetry endpoint + privacy infra count). Drill outcomes logged in our internal project brief's Recovery Drill Log.
 
 The drill proves that if the worst case happens — the Supabase project is corrupted, deleted, or unreachable — you can restore it from backup without losing user data or the audit trail. If you can't, the system is fragile in a way the brief specifically marked as a Gate 3 blocker.
 
@@ -240,4 +240,4 @@ Document the failure mode + remediation in the log row. If a failure mode recurs
 
 ---
 
-*Per [brief.md](../brief.md) Recovery Drill Log, this is a Gate 3 deliverable — required to pass before public ship. Quarterly cadence after that.*
+*This is a Gate 3 deliverable — required to pass before public ship. Quarterly cadence after that. Outcomes logged in our internal project brief's Recovery Drill Log.*

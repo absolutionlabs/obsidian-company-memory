@@ -2,7 +2,7 @@
 
 The process for moving the skill from private beta (handful of friendly testers) to public ship. Designed to catch the failures the test matrix didn't surface — the human-in-the-loop signals that no checklist captures.
 
-The bundle survives this gate or it doesn't ship publicly. There is no fast path through this; sales-tool framing per [brief.md](../brief.md) Decision #18 means per-install quality is absolute.
+The bundle survives this gate or it doesn't ship publicly. There is no fast path through this; sales-tool framing (per our internal Decision #18) means per-install quality is absolute.
 
 ---
 

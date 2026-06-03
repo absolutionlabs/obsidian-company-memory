@@ -2,7 +2,7 @@
 
 *Draft v0.1. Sibling to [install-steps-and-skill-feasibility.md](install-steps-and-skill-feasibility.md). Purpose: scope the smallest credible v1 of the exportable setup skill, accounting for Cowork as the primary surface for non-technical users.*
 
-> **Addendum 2026-06-02 (Session 2).** Sections §5 (pseudo-code procedure) and §13 (build effort estimate) were written pre-reframe — they still reference Templater, a shipped plugin bundle, git init in the vault, and first-project scaffolding. All four were cut by the SHAPE reframe captured in [brief.md](brief.md) Key Decisions #6, #7, #8, #9. **The canonical procedure is now [SKILL.md](SKILL.md) at the project root.** Treat §5 / §13 as historical context only; [brief.md](brief.md) is the source of truth for scope and [SKILL.md](SKILL.md) for the runtime procedure. The companion sections §1, §6, §7, §8, §10, §11, §12, §14 remain useful and were not invalidated by the reframe.
+> **Addendum 2026-06-02 (Session 2).** Sections §5 (pseudo-code procedure) and §13 (build effort estimate) were written pre-reframe — they still reference Templater, a shipped plugin bundle, git init in the vault, and first-project scaffolding. All four were cut by the SHAPE reframe (Key Decisions #6, #7, #8, #9 in our internal project brief). **The canonical procedure is now [SKILL.md](SKILL.md) at the project root.** Treat §5 / §13 as historical context only; our internal brief is the source of truth for scope and [SKILL.md](SKILL.md) for the runtime procedure. The companion sections §1, §6, §7, §8, §10, §11, §12, §14 remain useful and were not invalidated by the reframe.
 
 ---
 
@@ -760,4 +760,4 @@ The 8-chunk view in §15 stands, with these additions/changes:
 
 ### Why this addendum is filed here
 
-The brief at [brief.md](brief.md) carries the canonical current state of the project (status, scope, decisions, threat map, etc.). This scope doc is the working-history of how we arrived at the current state — and per OP #4 we preserve the journey, not just the destination. Future sessions reading both docs see the path explicitly.
+The internal project brief carries the canonical current state of the project (status, scope, decisions, threat map, etc.). This scope doc is the working-history of how we arrived at the current state — and per OP #4 we preserve the journey, not just the destination. Future sessions reading both docs see the path explicitly.

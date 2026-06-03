@@ -2,7 +2,7 @@
 
 *Draft v0.1. Audience: anyone setting this up for their own company who isn't a developer. Read time: ~15 minutes.*
 
-> **Status note (2026-06-03).** This file pre-dates the SHAPE reframe captured in [brief.md](brief.md). The content here remains broadly accurate as a user-facing description of the system, but the canonical user-facing surfaces are now:
+> **Status note (2026-06-03).** This file pre-dates the SHAPE reframe (captured in our internal project brief). The content here remains broadly accurate as a user-facing description of the system, but the canonical user-facing surfaces are now:
 >
 > - [README.md](README.md) — public-facing entry point for anyone who has the bundle
 > - [templates/HOW-TO-USE-THIS.md](templates/HOW-TO-USE-THIS.md) — the Phase 2 living guide that ships into every scaffolded vault
@@ -345,7 +345,7 @@ sources: [raw/source-file.md]
 
 ## 9. What this draft does not yet cover (open items for v0.2)
 
-Most of the items previously listed here have been resolved through the SHAPE process (2026-06-02) and folded into the skill build itself. See [brief.md](brief.md) for the locked project state and [shape-1-scope.md](shape-1-scope.md) §17 for the reframe addendum. Remaining open items for this guide:
+Most of the items previously listed here have been resolved through the SHAPE process (2026-06-02) and folded into the skill build itself. Locked project state lives in our internal project brief; the public reframe addendum is at [shape-1-scope.md](shape-1-scope.md) §17. Remaining open items for this guide:
 
 - This guide describes how WE use the system today. It is the **reference document** the skill is based on — not the skill's user-facing material. The skill will ship its own user-facing guide (`HOW-TO-USE-THIS.md`) which inherits structure from this doc but is tuned for the non-technical-founder audience.
 - The "first 30 minutes" cold-start walkthrough is no longer needed here — it lives inside the skill's Phase 1 install flow and `HOW-TO-USE-THIS.md`.

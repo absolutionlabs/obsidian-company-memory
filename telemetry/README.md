@@ -2,7 +2,7 @@
 
 Direct-to-Supabase install telemetry for the [Obsidian Company Memory](../SKILL.md) skill. EU residency (West Europe / London), opt-out at runtime, anon-only-INSERT with RLS, schema-validated at the database, Postgres rate-limited.
 
-This subfolder contains the schema, the DSAR helper, and this runbook. The endpoint itself is the Supabase project's PostgREST API — no edge function, no separate server. Per [Option B decision (2026-06-03)](../brief.md) with the schema-drift mitigations documented at the top of `supabase/migrations/20260603000000_install_events.sql`.
+This subfolder contains the schema, the DSAR helper, and this runbook. The endpoint itself is the Supabase project's PostgREST API — no edge function, no separate server. The Option B (direct PostgREST + RLS) architecture decision (2026-06-03) is documented internally; schema-drift mitigations are baked into the top of `supabase/migrations/20260603000000_install_events.sql`.
 
 ---
 

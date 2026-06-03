@@ -106,7 +106,7 @@ Two columns:
 
 Below both columns:
 - License: MIT — view on GitHub
-- Threat model + decisions: brief.md on GitHub
+- Threat model + decisions: held internally; email `info@absolutionlabs.com` for specifics
 - Source: github.com/absolutionlabs/obsidian-company-memory
 
 ---

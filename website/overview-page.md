@@ -60,7 +60,7 @@ H2: **How we built it**
 >
 > The build phase produced the skill itself, a manifest mirror contract, an eleven-check pre-release lint, and an end-to-end telemetry endpoint live on Supabase EU. The confirm phase pre-mortemed the entire pipeline and put adversarial sub-agents through it before considering it ready to ship.
 >
-> The work is open. The brief, decisions log, threat map, and full session history all live in the GitHub repo alongside the code.
+> The work is open. The skill, templates, manifests, lint, telemetry infrastructure, compatibility matrix, and full disclaimer set all live in the GitHub repo. We hold the internal project brief — design rationale, threat model, decisions log — privately, and share specifics on written request.
 
 ---
 

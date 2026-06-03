@@ -88,7 +88,7 @@ your-vault/
 
 ## What the skill does NOT install
 
-These are deliberate cuts; see [brief.md](brief.md) for the full reasoning.
+These are deliberate cuts. We hold the full design rationale internally; email `info@absolutionlabs.com` if you want specifics on a particular cut.
 
 - **Obsidian itself.** You install Obsidian from `obsidian.md` separately. We tell you when.
 - **Community plugins.** Dataview, Templater, etc. are installed by you from Obsidian's own plugin browser. We don't bundle third-party binaries inside our distributable.
@@ -115,7 +115,7 @@ Full disclosure: **[absolutionlabs.com/privacy](https://absolutionlabs.com/priva
 ## Security & integrity
 
 - **Bundle signing + SHA256 checksums** will ship with every public release (Chunk 7 release process). They are not present on the v1.0.0 private-beta tag — when public ship lands, the current signing key and checksums file will be linked from the install page on [absolutionlabs.com](https://absolutionlabs.com).
-- **Threat model** documented in full in [brief.md](brief.md) § Threat & Recovery Map (six surfaces).
+- **Threat model** covers six surfaces (secrets, privacy + data, prompt injection, attack surface, backup + rollback, external platform config). Full text held internally; we share specifics on written request.
 - **No third-party binaries shipped.** Everything in the bundle is markdown / YAML / JSON / TypeScript.
 
 If you find a security issue: please email `security@absolutionlabs.com` rather than opening a public issue. We respond within one business day.
@@ -138,7 +138,6 @@ If you hit a compatibility issue we haven't documented, please send it to `info@
 - **[docs/upgrading.md](docs/upgrading.md)** — version pinning, rollback, manual refresh.
 - **[docs/privacy-policy.md](docs/privacy-policy.md)** — full text of the install-telemetry privacy policy.
 - **[DISCLAIMERS.md](DISCLAIMERS.md)** — full disclaimer, limitation of liability, statutory carve-outs (UK), indemnity (for forks), governing law. **Required reading before install.**
-- **[brief.md](brief.md)** — the Forge brief that shaped this skill. Read this if you want to understand why decisions were made the way they were.
 - **[MANIFESTS.md](MANIFESTS.md)** — the mirror contract between `plugin.json` (Cowork) and `SKILL.md` frontmatter (Claude Code).
 
 ## Support
