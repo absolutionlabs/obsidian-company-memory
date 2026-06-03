@@ -92,13 +92,13 @@ Full architecture detail in [templates/SCHEMA.md](templates/SCHEMA.md) and the p
 
 The skill writes to your local folder via your AI assistant's mounted-directory access. Nothing flows back to Absolution Labs at any point during normal use.
 
-The one exception: at install time, by default, one anonymous ping is sent to a Cloudflare Worker we operate in the EU. It contains a random UUID (not linked to your name, company, or vault contents), the skill version, your OS family, the install surface, the sync provider you confirmed, and whether the install succeeded or failed. No PII. You can opt out with one click at install time, or request deletion later by emailing `privacy@absolutionlabs.com` with the UUID shown to you during install.
+The one exception: at install time, by default, one anonymous ping is sent to a Supabase database we operate in West Europe (London). It contains nine fields — a random UUID (not linked to your name, company, or vault contents), the skill identifier and version, your OS family, the install surface, the sync provider you confirmed, the outcome (`attempted` / `success` / `failed`), an optional short failure-step identifier (only on failure), and a UTC timestamp. No PII. You can opt out with one click at install time, or request deletion later by emailing `privacy@absolutionlabs.com` with the UUID shown to you during install.
 
 Full disclosure: **[absolutionlabs.com/privacy](https://absolutionlabs.com/privacy)**.
 
 ## Security & integrity
 
-- **Bundle signing + SHA256 checksums** ship with every release. The current signing key and checksums file are linked from the install page on [absolutionlabs.com](https://absolutionlabs.com).
+- **Bundle signing + SHA256 checksums** will ship with every public release (Chunk 7 release process). They are not present on the v1.0.0 private-beta tag — when public ship lands, the current signing key and checksums file will be linked from the install page on [absolutionlabs.com](https://absolutionlabs.com).
 - **Threat model** documented in full in [brief.md](brief.md) § Threat & Recovery Map (six surfaces).
 - **No third-party binaries shipped.** Everything in the bundle is markdown / YAML / JSON / TypeScript.
 

@@ -188,7 +188,10 @@ def run_checks() -> None:
         except Exception as e:
             check("9. telemetry endpoint reachability", False, f"{type(e).__name__}: {e}")
 
-    # 10. Anon key parses as JWT, role=anon
+    # 10. Anon key parses as JWT with role=anon, iss=supabase, future exp,
+    #     AND ref matches the endpoint hostname (defends against malicious
+    #     manifest-swap where attacker forks the bundle and swaps in their
+    #     own endpoint + key pair pointing at attacker infrastructure).
     anon = (plugin.get("telemetry") or {}).get("anon_key", "")
     try:
         parts = anon.split(".")
@@ -197,13 +200,31 @@ def run_checks() -> None:
         payload_b64 = parts[1] + "=" * ((4 - len(parts[1]) % 4) % 4)
         payload = json.loads(base64.urlsafe_b64decode(payload_b64))
         role = payload.get("role")
+        iss = payload.get("iss")
+        ref = payload.get("ref", "")
+        exp = payload.get("exp", 0)
+        from datetime import datetime, timezone
+        now_ts = int(datetime.now(timezone.utc).timestamp())
+        thirty_days = 30 * 24 * 60 * 60
+
+        problems: list[str] = []
+        if role != "anon":
+            problems.append(f"role={role!r} expected 'anon'")
+        if iss != "supabase":
+            problems.append(f"iss={iss!r} expected 'supabase'")
+        if exp <= now_ts:
+            problems.append(f"exp={exp} is in the past")
+        elif exp - now_ts < thirty_days:
+            problems.append(f"exp expires in < 30 days (rotate before public ship)")
+
         check(
-            f"10. anon_key decodes to JWT with role={role!r}",
-            role == "anon",
-            f"payload: {payload}",
+            f"10. anon_key JWT validates (role=anon, iss=supabase, exp future, ref={ref!r})",
+            not problems,
+            "; ".join(problems) if problems else "",
         )
     except Exception as e:
         check("10. anon_key JWT decode", False, f"{type(e).__name__}: {e}")
+        ref = ""
 
     # 11. Network-egress endpoint matches telemetry endpoint
     egress = (
@@ -214,6 +235,18 @@ def run_checks() -> None:
         "11. permissions.network_egress.endpoints[0] == telemetry.endpoint",
         egress_first == endpoint and endpoint != "",
         f"egress={egress_first!r}  telemetry={endpoint!r}",
+    )
+
+    # 12. Endpoint hostname matches anon_key's ref claim (binds manifest to
+    #     the specific Supabase project; a malicious fork that swaps the key
+    #     but not the endpoint — or vice versa — fails this check).
+    from urllib.parse import urlparse
+    endpoint_host = urlparse(endpoint).netloc
+    expected_host = f"{ref}.supabase.co" if ref else ""
+    check(
+        f"12. endpoint hostname matches anon_key.ref ({endpoint_host!r} == {expected_host!r})",
+        bool(ref) and endpoint_host == expected_host,
+        f"endpoint host={endpoint_host!r}  ref-derived={expected_host!r}",
     )
 
 

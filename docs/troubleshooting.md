@@ -138,8 +138,8 @@ If the issue persists, you may have hit a Dropbox conflict file or a partial wri
 
 Non-blocking. The install proceeded; the success ping just didn't reach our endpoint. Common causes:
 
-- Your firewall blocks `telemetry.absolutionlabs.com`.
-- Cloudflare had a brief outage.
+- Your firewall blocks `vujwcvqiwwpncnhgxjsu.supabase.co` (the raw Supabase project URL — a custom domain `telemetry.absolutionlabs.com` is planned but not yet deployed).
+- Supabase had a brief outage.
 - You're behind a corporate proxy that strips outbound POSTs.
 
 No action needed. Your vault works. If you want us to know your install succeeded (it would help our funnel data), send a one-line email to `info@absolutionlabs.com`. Or ignore — it's genuinely opt-in for us, not just for you.
@@ -223,7 +223,7 @@ If nothing here describes what you're seeing, or the recovery steps don't work:
   - If install partially completed: contents of `_meta/scaffold-version.txt`
   - What you've already tried
 - **Response SLA: one business day.** Replied to by a human at Absolution Labs (not a bot).
-- **Security issues only: `security@absolutionlabs.com`** instead of `support@`. Same SLA. We won't ask you to wait for a CVE.
+- **Security issues only: `security@absolutionlabs.com`** instead of `info@`. Same SLA. We won't ask you to wait for a CVE.
 
 ---
 

@@ -40,7 +40,7 @@ CREATE TABLE IF NOT EXISTS public.install_events (
   surface         TEXT        NOT NULL CHECK (surface IN ('cowork', 'code')),
   sync_provider   TEXT                 CHECK (sync_provider IS NULL OR sync_provider IN ('dropbox', 'icloud', 'onedrive', 'google-drive', 'local-only')),
   outcome         TEXT        NOT NULL CHECK (outcome IN ('attempted', 'success', 'failed')),
-  failure_step    TEXT                 CHECK (failure_step IS NULL OR length(failure_step) <= 64),
+  failure_step    TEXT                 CHECK (failure_step IS NULL OR (length(failure_step) <= 64 AND failure_step ~ '^[a-z0-9_:.-]+$')),
   ts              TIMESTAMPTZ NOT NULL,
   created_at      TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
@@ -147,6 +147,46 @@ CREATE TRIGGER trg_install_events_rate_limit
   BEFORE INSERT ON public.install_events
   FOR EACH ROW
   EXECUTE FUNCTION public.enforce_install_rate_limit();
+
+
+-- Second rate-limit layer: GLOBAL insert ceiling.
+-- The per-UUID limit above is trivially bypassed by an attacker who holds the
+-- (public) anon key and rotates UUIDs per request: `crypto.randomUUID()` per
+-- POST makes recent_count always = 0. The global limit caps total insert
+-- volume at 1000/60s, forcing any abuse to surface as an obvious anomaly
+-- against the daily install signal (which would be in the 10s/day range even
+-- at strong adoption). Legitimate concurrent installs from multiple users in
+-- the same minute have plenty of headroom; an attacker can't sustain the
+-- attack without surfacing.
+CREATE OR REPLACE FUNCTION public.enforce_global_install_rate_limit()
+RETURNS TRIGGER
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = pg_catalog, public
+AS $$
+DECLARE
+  global_count INTEGER;
+BEGIN
+  SELECT COUNT(*) INTO global_count
+    FROM public.install_events
+    WHERE created_at > NOW() - INTERVAL '60 seconds';
+
+  IF global_count >= 1000 THEN
+    RAISE EXCEPTION 'global_rate_limit_exceeded'
+      USING HINT = 'Global insert rate ceiling reached. Try again later.';
+  END IF;
+
+  RETURN NEW;
+END;
+$$;
+
+REVOKE EXECUTE ON FUNCTION public.enforce_global_install_rate_limit() FROM anon;
+REVOKE EXECUTE ON FUNCTION public.enforce_global_install_rate_limit() FROM authenticated;
+
+CREATE TRIGGER trg_install_events_global_rate_limit
+  BEFORE INSERT ON public.install_events
+  FOR EACH ROW
+  EXECUTE FUNCTION public.enforce_global_install_rate_limit();
 
 
 -- ----------------------------------------------------------------------------

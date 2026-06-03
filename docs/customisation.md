@@ -36,7 +36,7 @@ Most customisations don't need procedure edits. If you're editing SKILL.md beyon
 
 ### Generally leave alone
 
-- `telemetry/` — the CF Worker for install telemetry. Forking the worker means standing up your own CF account, your own D1, your own privacy policy. If you don't want telemetry, the simpler option is to delete the call from SKILL.md Step 5 + Step 9.1.
+- `telemetry/` — the Supabase project for install telemetry (Postgres schema, RLS, rate-limit triggers, DSAR helper). Forking the telemetry means standing up your own Supabase project, applying the migration, capturing your own anon + service-role keys, and writing your own privacy policy. If you don't want telemetry, the simpler option is to delete the call from SKILL.md Step 5 + Step 9.1.
 - `docs/privacy-policy.md` — only applies if you keep our telemetry. If you fork telemetry, write your own policy.
 - `LICENSE` — required to travel with the copy unmodified. Don't delete this file.
 
@@ -133,7 +133,7 @@ Three options:
 
 **(a) Remove telemetry entirely.** Edit `SKILL.md` Step 5 to skip the surface; delete `SKILL.md` Step 9.1 (success ping). Delete the `telemetry/` folder. Remove the `telemetry` block from `plugin.json`. Update `docs/privacy-policy.md` to reflect "no telemetry sent."
 
-**(b) Point at your own endpoint.** Stand up your own CF Worker + D1 (or any HTTPS endpoint that accepts the 9-field payload). Edit `SKILL.md` Step 5 + Step 9.1 to point at your URL. Update `plugin.json.telemetry.endpoint`. Write your own privacy policy.
+**(b) Point at your own endpoint.** Stand up your own Supabase project (create a project, apply the migration at `telemetry/supabase/migrations/`, capture the anon key). Edit `SKILL.md` Step 5 + Step 9.1 to point at your URL. Update `plugin.json.telemetry.endpoint` + `plugin.json.telemetry.anon_key`. Write your own privacy policy.
 
 **(c) Keep ours.** If your variant is close enough to ours that our telemetry endpoint is fine for your use too: do nothing. Pings will go to our infrastructure and we'll see your installs in our funnel. Reach out — we may want to coordinate on what counts as a release.
 
@@ -160,7 +160,7 @@ Once you've edited the bundle:
 2. **Sign the bundle** if you're distributing publicly. The release-signing URL in `plugin.json.release_signing` should resolve to your own signing key.
 3. **Regenerate checksums** for the public bundle and host them at your `checksums_url`.
 4. **Update the install URLs** in `README.md` to point at your hosted bundle (not absolutionlabs.com).
-5. **Verify the manifest mirror contract** per [MANIFESTS.md](../MANIFESTS.md) § Pre-release manifest lint. Eight checks; runs by hand in under a minute.
+5. **Verify the manifest mirror contract** per [MANIFESTS.md](../MANIFESTS.md) § Pre-release manifest lint. Eleven checks; runs in under a second via `python scripts/lint_manifest.py`.
 6. **Test the install on a clean machine** before publishing. The "Test matrix" section of the brief lists 7 personas worth testing against; pick the ones your customer base looks like.
 
 ---

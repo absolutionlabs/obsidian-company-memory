@@ -25,6 +25,13 @@
 
 set -euo pipefail
 
+# Clear the service-role key on any exit path (including Ctrl-C, SIGTERM).
+# Without this trap, the key could remain in the parent shell's environment
+# while the curl runs, visible via /proc/<pid>/environ on Linux during the
+# brief window. Defence-in-depth per OP #18 (never persist secrets).
+SVC_KEY=""
+trap 'SVC_KEY=""; unset SVC_KEY' EXIT INT TERM
+
 PROJECT_REF="vujwcvqiwwpncnhgxjsu"
 PROJECT_URL="https://${PROJECT_REF}.supabase.co"
 OP_REF="op://API Keys/Supabase - Obsidian Telemetry - service role/credential"

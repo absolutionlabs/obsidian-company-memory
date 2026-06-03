@@ -43,7 +43,7 @@ When the skill runs, it sends one HTTPS request per install event to a Supabase 
 | `sync_provider` | `dropbox` / `icloud` / `onedrive` / `google-drive` / `local-only` | The sync provider you confirmed in the install dialog. Lets us detect installs failing on a specific provider. |
 | `outcome` | `attempted` / `success` / `failed` | Whether the install completed. Failed installs are the most valuable signal — they tell us to dispatch a fix. |
 | `failure_step` | `round_trip` (optional) | If the install failed, a short string naming which step failed. Capped at 64 characters; categorical only. |
-| `ts` | `2026-06-02T12:34:56Z` | When the ping was sent, in UTC. |
+| `ts` | `2026-06-03T12:34:56Z` | When the ping was sent, in UTC. |
 
 We do **not** collect:
 

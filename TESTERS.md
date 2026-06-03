@@ -48,7 +48,7 @@ The current install URL is on the project's GitHub repo. Rob will have sent you 
 
 ## What you should see during install
 
-The skill walks you through nine steps. Pay attention to each — they're designed to be visible, not magical.
+The skill walks you through seven user-visible steps (plus a few silent pre-flight checks). Pay attention to each — they're designed to be visible, not magical.
 
 1. **Compliance gate (3 checkboxes).** The skill won't write anything until you tick three boxes confirming the folder is yours, your cloud sync is allowed for the content, and Absolution Labs has no access. Take a moment to read each.
 2. **Refuse-to-scaffold check.** If your folder isn't empty, the skill refuses. This is intentional. If it refuses incorrectly: tell us.
@@ -100,7 +100,7 @@ Three more questions we'd love to know but don't expect everyone to address:
 ## A few practical notes
 
 - **Your vault is yours.** Anything you create stays on your disk. We don't see it. We can't see it. If you delete the folder, it's gone — and that's the only way to "uninstall" the data.
-- **The telemetry, if you don't opt out, is one HTTPS ping containing eight anonymous fields.** Full text of what gets sent is in `docs/privacy-policy.md` inside the bundle. UUID is shown to you at the end of install; email `privacy@absolutionlabs.com` with that UUID to request deletion at any time.
+- **The telemetry, if you don't opt out, is one HTTPS ping containing nine anonymous fields** (8 mandatory + an optional `failure_step` on the failure path only). Full text of what gets sent is in `docs/privacy-policy.md` inside the bundle. UUID is shown to you at the end of install; email `privacy@absolutionlabs.com` with that UUID to request deletion at any time.
 - **You can run the skill on multiple folders.** Each one is a fresh, independent vault. Useful if you want to try once with your real company name and once with a throwaway name.
 - **If you find a bug or hit an error, please send the exact message** (screenshot or paste) along with: which AI tool, which OS, which sync provider. That gives us everything we need to reproduce.
 - **You don't need to write up your feedback formally.** A 100-word email beats a polished report — we'd rather have your raw reactions in the first hour than something considered after a week.

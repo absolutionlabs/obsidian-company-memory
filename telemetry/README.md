@@ -179,7 +179,7 @@ The `dsar_log` table records WHAT was deleted (UUID) and WHEN — not the delete
 |---|---|
 | #1 Secrets | Service-role key in 1P; rotated quarterly. Anon key is public by design (security via RLS). Nothing in the data path on disk. |
 | #2 Privacy & data | EU residency (London) pinned at project creation. 24-month retention via monthly prune. DSAR via UUID. RLS prevents anon read. |
-| #3 Prompt injection | Payload never reaches an LLM; Postgres CHECK constraints reject anything outside the 8-field schema vocabulary. |
+| #3 Prompt injection | Payload never reaches an LLM; Postgres CHECK constraints reject anything outside the 9-field schema vocabulary (8 mandatory + `failure_step` optional with [a-z0-9_:.-] charclass). |
 | #4 Attack surface | RLS limits anon to INSERT only on one table; Postgres trigger rate-limits 5/60s/UUID; CHECK constraints enforce types + enums + regex. Supabase platform layers project-level rate limit + WAF. |
 | #5 Backup & rollback | Supabase Pro daily PITR snapshots. Migration files in git for schema rollback. |
 | #6 External platform config | Quarterly SUSTAIN check above. |

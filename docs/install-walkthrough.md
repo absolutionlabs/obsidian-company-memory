@@ -110,7 +110,7 @@ This name appears in your vault's templates wherever the placeholder `{{COMPANY_
 
 > Is this folder synced by Dropbox, iCloud, OneDrive, Google Drive, or local-only (no cloud sync)?
 
-Pick one. This answer:
+Pick one. Your answer is normalized to one of five tokens — `dropbox`, `icloud`, `onedrive`, `google-drive`, `local-only` — before anything is stored or transmitted. This answer:
 
 - Goes into the anonymous telemetry ping (if you don't opt out) so we can detect provider-specific failures.
 - Is recorded in `_meta/scaffold-version.txt` inside your vault as a fingerprint.
@@ -120,11 +120,20 @@ If you pick `local-only`, the skill adds a quiet reminder at the end about quart
 
 ---
 
-## Step 4 — Date format auto-detect
+## Step 4 — Resolve `os` value + auto-detect date format
+
+### 4a. `os` for telemetry
+
+The telemetry endpoint accepts your operating system family as one of `darwin` (macOS), `win32` (Windows), or `linux`. The skill resolves this differently depending on where it runs:
+
+- **In Claude Code:** runs `python -c "import sys; print(sys.platform)"` (or `uname -s` / `$env:OS` as fallback) to determine the value automatically.
+- **In Cowork:** asks you once — *"What operating system are you on — macOS, Windows, or Linux?"* — because the Cowork sandbox has no host-machine API. If you'd rather not answer, the skill skips the telemetry ping entirely (the install still proceeds).
+
+### 4b. Date format auto-detect
 
 You won't see this step on screen — the skill auto-detects your system locale and picks a sensible date format preference (DD/MM/YYYY for UK / EU / AU, MM/DD/YYYY for US, YYYY-MM-DD ISO for East Asia and fallback). It records the preference in `_meta/expectations.yml` for downstream tools.
 
-Note: regardless of preference, all the YAML frontmatter dates inside vault pages use ISO `YYYY-MM-DD` — that's a technical requirement of how the lint logic works. The preference exists for tools that want it; it doesn't affect frontmatter.
+Note: regardless of preference, all the YAML frontmatter dates inside vault pages use ISO `YYYY-MM-DD` — that's a technical requirement of how the lint logic works. The preference exists for tools that want it; it doesn't affect frontmatter. (On Cowork, locale detection isn't currently exposed; expect ISO as the default until Cowork ships that API.)
 
 ---
 
@@ -132,7 +141,7 @@ Note: regardless of preference, all the YAML frontmatter dates inside vault page
 
 The skill renders the telemetry disclosure and an opt-out checkbox:
 
-> This skill sends a single anonymous install ping to Absolution Labs LTD so we can detect installs that fail and fix them quickly. The ping contains: a randomly-generated UUID for this install (no link to your name, company, or vault contents), the skill version (currently `1.0.0`), your operating system family (e.g. "darwin", "win32", "linux"), the install surface (Cowork or Code), the sync provider you confirmed in Step 3, and whether the install succeeded or failed.
+> This skill sends a single anonymous install ping to Absolution Labs LTD so we can detect installs that fail and fix them quickly. The ping contains nine fields: a randomly-generated UUID for this install (no link to your name, company, or vault contents), the skill identifier (`obsidian-company-memory`), the skill version (currently `1.0.0`), your operating system family (`darwin`, `win32`, or `linux`), the install surface (`cowork` or `code`), the sync provider you confirmed in Step 3, the outcome (`attempted` / `success` / `failed`), an optional short failure-step string (only on failure — capped at 64 chars, lowercase identifier characters only), and a UTC timestamp.
 >
 > It contains no other data. The endpoint is hosted in the EU; data is retained for 24 months and can be deleted on request by emailing `privacy@absolutionlabs.com` with the UUID shown below.
 >
@@ -209,8 +218,9 @@ Specifically, it:
 
 1. Creates `entities/test-welcome.md` with proper YAML frontmatter and a wikilink to `[[CONTEXT]]`.
 2. Updates `index.md` to add an entry for the new page under the Entities section.
-3. Verifies the initial `log.md` entry is in place.
+3. Verifies the initial `log.md` entry is in place — the entry intentionally does NOT yet claim the round-trip passed; that line gets appended only after you confirm.
 4. Asks you to verify the result in Obsidian.
+5. Once you confirm verification, appends a separate `log.md` entry recording the round-trip result (passed, or the specific failure you reported).
 
 The verification has five clicks:
 

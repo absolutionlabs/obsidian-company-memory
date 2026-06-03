@@ -29,4 +29,4 @@ The log is read backwards in time. To answer "when did we decide X?" or "what ch
 - Ingests: SCHEMA.md, CONTEXT.md, index.md, log.md, HOW-TO-USE-THIS.md, concepts/claude-operating-principles.md, _meta/expectations.yml, _meta/templates/entity.md, _meta/templates/concept.md, _meta/templates/query.md
 - Queries: none
 - Brief updated: N/A (no project yet)
-- Notes: Vault scaffolded by the Obsidian Company Memory skill from Absolution Labs LTD. Round-trip test passed. User confirmed setup in Obsidian.
+- Notes: Vault scaffolded by the Obsidian Company Memory skill from Absolution Labs LTD. Round-trip test result will be appended as a separate entry above this one once the user has verified in Obsidian (per SKILL.md Substep 7.5).

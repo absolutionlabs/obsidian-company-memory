@@ -166,16 +166,39 @@ This name is the literal substitution for `{{COMPANY_NAME}}` everywhere in `temp
 
 Multiple-choice; one answer. The answer is captured for telemetry (no PII) and for the telemetry-display step. It does not change the scaffold itself — every sync provider produces the same vault.
 
-If "local-only", append a one-line note to the post-scaffold message reminding the user that loss of the local disk means loss of the vault, and recommend a quarterly zip backup per `HOW-TO-USE-THIS.md` § Backup hygiene.
+**Normalize the user's answer to one of the following exact tokens before storing or transmitting it** (the telemetry endpoint's schema enforces these values — a non-matching value will be rejected with HTTP 400):
+
+| User's likely answer | Normalized token |
+|---|---|
+| Dropbox / Dropbox for Business | `dropbox` |
+| iCloud / iCloud Drive | `icloud` |
+| OneDrive / OneDrive for Business | `onedrive` |
+| Google Drive / Google Drive Desktop | `google-drive` |
+| Local-only / None / No cloud sync | `local-only` |
+
+If the user's answer is ambiguous (e.g. "I'm not sure, my company uses some Microsoft thing"), ask one clarifying follow-up before assigning the token.
+
+If the normalized token is `local-only`, append a one-line note to the post-scaffold message reminding the user that loss of the local disk means loss of the vault, and recommend a quarterly zip backup per `HOW-TO-USE-THIS.md` § Backup hygiene.
 
 ---
 
-## Step 4 — Auto-detect date format
+## Step 4 — Resolve `os` value + auto-detect date format
+
+### 4a. Resolve `os` for telemetry
+
+The telemetry endpoint accepts `os` as one of `darwin`, `win32`, or `linux` only. Other values are rejected at the database. Resolve as follows:
+
+- **Claude Code:** run `python -c "import sys; print(sys.platform)"` — returns `darwin`, `win32`, or `linux` natively. If Python isn't available, fall back to `uname -s` (`Darwin` → `darwin`, `Linux` → `linux`) or `$env:OS` on PowerShell (any value containing `Windows` → `win32`).
+- **Cowork:** no host-machine API exists in the sandbox. Ask the user once: *"What operating system are you on — macOS, Windows, or Linux?"* Normalize: macOS → `darwin`, Windows → `win32`, Linux → `linux`. If the user says "something else" or refuses, skip the telemetry ping entirely (the install proceeds; you've already advertised that telemetry is opt-out anyway).
+
+Store the resolved value for use in Step 5 and Step 9.1.
+
+### 4b. Auto-detect date format
 
 Do NOT ask the user. Auto-detect from the system locale.
 
 - **Claude Code:** read `Get-Culture` on PowerShell (Windows), `defaults read -g AppleLocale` on macOS, `locale` on Linux. Fall back to ISO if detection fails.
-- **Cowork:** read the user's locale from the session context if available; fall back to ISO otherwise.
+- **Cowork:** read the user's locale from the session context if available; fall back to ISO otherwise. (Cowork does not currently expose a reliable locale API; expect this to fall through to ISO for most Cowork users until that changes.)
 
 Map:
 
@@ -194,7 +217,7 @@ This format is stored in `_meta/expectations.yml` as `date_format_preference` (i
 
 Render verbatim:
 
-> This skill sends a single anonymous install ping to Absolution Labs LTD so we can detect installs that fail and fix them quickly. The ping contains: a randomly-generated UUID for this install (no link to your name, company, or vault contents), the skill version (currently `1.0.0`), your operating system family (e.g. "darwin", "win32", "linux"), the install surface (Cowork or Code), the sync provider you confirmed in Step 3, and whether the install succeeded or failed.
+> This skill sends a single anonymous install ping to Absolution Labs LTD so we can detect installs that fail and fix them quickly. The ping contains nine fields: a randomly-generated UUID for this install (no link to your name, company, or vault contents), the skill identifier (`obsidian-company-memory`), the skill version (currently `1.0.0`), your operating system family (`darwin`, `win32`, or `linux`), the install surface (`cowork` or `code`), the sync provider you confirmed in Step 3, the outcome (`attempted` / `success` / `failed`), an optional short failure-step string (only sent if the install fails — capped at 64 chars, lowercase identifier characters only), and a UTC timestamp.
 >
 > It contains no other data. The endpoint is hosted in the EU; data is retained for 24 months and can be deleted on request by emailing `privacy@absolutionlabs.com` with the UUID shown below. Full privacy policy: [absolutionlabs.com/privacy](https://absolutionlabs.com/privacy).
 >
@@ -206,7 +229,7 @@ If not opted out, fire the install-attempted ping NOW (before scaffold begins) a
 
 Show the user their UUID (so they can request deletion later if they choose) in the final message.
 
-**Telemetry implementation note.** The endpoint is the Supabase PostgREST API of an Absolution Labs project hosted in West Europe (London) — `https://vujwcvqiwwpncnhgxjsu.supabase.co/rest/v1/install_events`. The skill ships the project's public anon key in `plugin.json.telemetry.anon_key`; Postgres-level row-level security (RLS) restricts the anon role to INSERT only — anon cannot SELECT, UPDATE, or DELETE anything. CHECK constraints on every column enforce the 8-field payload schema; a Postgres trigger rate-limits to 5 inserts per 60 seconds per UUID. The anon key is public by design (Supabase's security model rests on RLS, not key secrecy). See `telemetry/` folder and `brief.md` for the full setup.
+**Telemetry implementation note.** The endpoint is the Supabase PostgREST API of an Absolution Labs project hosted in West Europe (London) — `https://vujwcvqiwwpncnhgxjsu.supabase.co/rest/v1/install_events`. The skill ships the project's public anon key in `plugin.json.telemetry.anon_key`; Postgres-level row-level security (RLS) restricts the anon role to INSERT only — anon cannot SELECT, UPDATE, or DELETE anything. CHECK constraints on every column enforce the 9-field payload schema (8 mandatory + `failure_step` nullable); two Postgres triggers rate-limit to 5 inserts per 60 seconds per UUID AND 1000 inserts per 60 seconds globally (the global ceiling defends against UUID-rotation abuse using the public anon key). The anon key is public by design (Supabase's security model rests on RLS, not key secrecy). See `telemetry/` folder and `brief.md` for the full setup.
 
 ---
 
@@ -223,6 +246,14 @@ Substitution variables (build once before any write):
 | `{{VAULT_ABSOLUTE_PATH}}` | the resolved absolute path of the target directory |
 | `{{PROJECT_NAME}}` | NOT substituted at this stage (left as literal `{{PROJECT_NAME}}` in `CLAUDE.md.template` and `AGENTS.md.template` — `new-project-setup` substitutes per-project at first invocation) |
 | `{{PROJECT_DESCRIPTION}}` | same — left as literal |
+
+**Substitution scope exceptions** (read carefully; bugs from missing these have shipped in past sessions):
+
+- **In `templates/_meta/templates/*.md` (the per-page templates `entity.md`, `concept.md`, `query.md`):** substitute `{{COMPANY_NAME}}` but DO NOT substitute `{{TODAY}}`. These files are USER-COPY templates the user clones in Obsidian months from now to create new pages — baking the scaffold date into them defeats the lint's stale-page detection. The `{{TODAY}}` placeholder is left in place for the user's Obsidian Templates plugin (or the AI at page-creation time) to fill in.
+- **In `CLAUDE.md.template` and `AGENTS.md.template` at the vault root:** do NOT substitute anything; preserve `{{PROJECT_NAME}}`, `{{PROJECT_DESCRIPTION}}`, `{{COMPANY_NAME}}`, `{{VAULT_ABSOLUTE_PATH}}`, `{{TODAY}}` all as literal. The `new-project-setup` skill substitutes these at first project invocation, with the project-creation date — NOT the vault-scaffold date.
+- **In `_meta/scaffold-version.txt` (Substep 6.7):** the file is built fresh from the runtime values, not from a template. `{{TODAY}}` in the example block below means "the resolved value at scaffold time," not "leave the literal text."
+
+The substitution table above is otherwise applied universally; the three exceptions above are the only carve-outs.
 
 **Substep 6.1 — Create folder structure.**
 
@@ -272,7 +303,7 @@ For each, read the template, substitute `{{COMPANY_NAME}}` and `{{TODAY}}`, writ
 **Substep 6.5 — Write `_meta` files.**
 
 - `_meta/expectations.yml` → from template; append a `date_format_preference: <detected>` line for downstream tools that want it.
-- `_meta/templates/entity.md`, `concept.md`, `query.md` → from `templates/_meta/templates/`, substitute `{{TODAY}}`.
+- `_meta/templates/entity.md`, `concept.md`, `query.md` → from `templates/_meta/templates/`. Substitute `{{COMPANY_NAME}}` but DO NOT substitute `{{TODAY}}` (these are user-copy templates per the substitution-scope exception above; leaving `{{TODAY}}` as a placeholder is correct).
 
 **Substep 6.6 — Write the project-stub templates (do NOT instantiate).**
 
@@ -285,14 +316,14 @@ These files are NOT in `index.md` (they are not wiki pages); they sit at the roo
 
 **Substep 6.7 — Write a one-line scaffold-version marker.**
 
-Write `_meta/scaffold-version.txt` containing:
+Write `_meta/scaffold-version.txt` containing (this file is built fresh from runtime values, NOT from a template — the placeholders below show what to substitute):
 
 ```
 skill: obsidian-company-memory
 version: 1.0.0
-scaffolded: {{TODAY}}
-date_format_preference: <detected>
-sync_provider: <from Step 3 Q2>
+scaffolded: <resolved {{TODAY}} value>
+date_format_preference: <detected per Step 4b>
+sync_provider: <normalized token from Step 3 Q2>
 telemetry_uuid: <UUID or "opted-out">
 ```
 
@@ -356,11 +387,9 @@ Append under the `## Entities` section:
 - [[entities/test-welcome]] — welcome page created at vault setup; safe to delete after first real page
 ```
 
-**Substep 7.3 — Append `log.md`.**
+**Substep 7.3 — Verify the scaffold log entry.**
 
-The starter `log.md` already contains the initial scaffold entry (per `templates/log.md`). Verify it landed correctly post-substitution; if `{{TODAY}}` is still literal anywhere, fix it.
-
-No new log entry is needed for the round-trip — the initial entry already mentions the welcome page implicitly via "round-trip test passed".
+The starter `log.md` already contains the initial scaffold entry (per `templates/log.md`). Verify it landed correctly post-substitution; if `{{TODAY}}` is still literal anywhere, fix it. The starter entry intentionally does NOT claim the round-trip test passed — that claim is only added in Substep 7.5 after the user verifies.
 
 **Substep 7.4 — Tell the user to verify.**
 
@@ -376,7 +405,21 @@ Render:
 >
 > Reply "verified" once you have seen all five, or tell me which step did not work.
 
-Wait for the user to confirm. If they report a problem, surface it; do not proceed to Step 9 with an unverified scaffold.
+Wait for the user to confirm. If they report a problem, surface it; do not proceed to Step 8 with an unverified scaffold.
+
+**Substep 7.5 — Append round-trip result to `log.md`.**
+
+Once the user has confirmed verification, append a second entry to `log.md` (above the initial scaffold entry per the read-backwards-in-time convention):
+
+```
+## [<resolved TODAY>] vault setup — round-trip test
+- Ingests: entities/test-welcome.md
+- Queries: none
+- Brief updated: N/A
+- Notes: Round-trip test passed. User confirmed in Obsidian.
+```
+
+If the user reported a failure in 7.4 instead, append a different entry naming the specific failure observed — do NOT claim success in `log.md` when the round-trip did not pass.
 
 ---
 
@@ -412,17 +455,29 @@ Body:
   "uuid": "<UUID from Step 5>",
   "skill": "obsidian-company-memory",
   "version": "1.0.0",
-  "os": "<darwin|win32|linux>",
+  "os": "<value resolved in Step 4a — one of darwin / win32 / linux>",
   "surface": "<cowork|code>",
-  "sync_provider": "<from Step 3 Q2>",
+  "sync_provider": "<normalized token from Step 3 Q2 — one of dropbox / icloud / onedrive / google-drive / local-only>",
   "outcome": "success",
-  "ts": "<ISO timestamp UTC>"
+  "ts": "<ISO timestamp UTC, e.g. 2026-06-03T12:34:56Z>"
 }
 ```
 
+For the **install-failed** path only, ALSO include `failure_step` as an additional field:
+
+```json
+{
+  ...all the above...,
+  "outcome": "failed",
+  "failure_step": "<short step identifier — lowercase, digits, _ : . - only, max 64 chars; e.g. round_trip or mid_scaffold>"
+}
+```
+
+The `failure_step` field is the only field that differs between outcomes (omitted on `attempted` and `success`, required on `failed`). The `outcome` field itself takes one of `attempted` / `success` / `failed`. Every other field is identical across the three pings.
+
 Expected response: `HTTP 201` (Created) with empty body.
 
-If the call fails (network error, HTTP 400 from a schema-validation rejection, HTTP 429 from rate-limit), swallow silently — telemetry failure does not block the install. Log the failure to internal session state so the operator can see it on close. The same payload shape applies to the install-attempted ping (Step 5) and the install-failed ping (failure path); only the `outcome` field differs (`attempted` / `success` / `failed`).
+If the call fails (network error, HTTP 400 from a schema-validation rejection, HTTP 429 from rate-limit, or HTTP 400 with body containing `rate_limit_exceeded` / `global_rate_limit_exceeded` from the Postgres triggers), swallow silently — telemetry failure does not block the install. Log the failure to internal session state so the operator can see it on close.
 
 **Substep 9.2 — Render the final message.**
 
@@ -558,7 +613,7 @@ For agents / harnesses that introspect this file beyond the YAML frontmatter:
 - **Reversible:** yes, by deleting the vault directory (cloud sync provides version history)
 - **Time-to-run:** ~5 minutes of skill time + ~20 minutes of user-side reading and Obsidian setup
 - **Hard gates:** worktree refusal (OP #19), compliance gate (3 boxes), refuse-to-scaffold on non-empty directory, skill-bundle integrity check
-- **Telemetry:** default-on, opt-out, anonymous UUID + 5 fields, EU-residency, 24-month retention, DSAR via UUID
+- **Telemetry:** default-on, opt-out, 9 anonymous fields (8 mandatory + `failure_step` on failure only), EU-residency, 24-month retention, DSAR via UUID
 
 ---
 
