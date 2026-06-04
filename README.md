@@ -132,13 +132,13 @@ Full architecture detail in [templates/SCHEMA.md](templates/SCHEMA.md) and the p
 
 The skill writes to your local folder via your AI assistant's mounted-directory access. **Nothing flows back to Absolution Labs at any point** — no install ping, no health check, no usage data, no error reports. The skill never phones home, at install time or afterwards.
 
-Earlier releases (v1.0.0 / v1.1.0) shipped an opt-out 9-field anonymous install ping to an EU-hosted Supabase project. That surface was removed entirely in v1.2.0 — the value to us was structurally near-zero (Cowork sandbox couldn't fire the POST, so half our data was missing by design) and the compliance overhead disproportionate. The infrastructure is being sunset; orphan rows contain no PII.
+Full privacy posture and limitation-of-liability terms are in [DISCLAIMERS.md](DISCLAIMERS.md).
 
 ## Security & integrity
 
-- **Bundle signing + SHA256 checksums** will ship with every public release (Chunk 7 release process). They are not present on the v1.0.0 private-beta tag — when public ship lands, the current signing key and checksums file will be linked from the install page on [absolutionlabs.com](https://absolutionlabs.com).
+- **No third-party binaries shipped.** Everything in the bundle is markdown / YAML / JSON. You can read every file the skill will write to your machine before installing.
 - **Threat model** covers six surfaces (secrets, privacy + data, prompt injection, attack surface, backup + rollback, external platform config). Full text held internally; we share specifics on written request.
-- **No third-party binaries shipped.** Everything in the bundle is markdown / YAML / JSON / TypeScript.
+- **Bundle signing + SHA256 checksums** are not part of this release. We're tracking them as a future addition; the install flow today relies on the zip being downloaded from this repo's GitHub Release.
 
 If you find a security issue: please email `security@absolutionlabs.com` rather than opening a public issue. We respond within one business day.
 
@@ -159,7 +159,6 @@ If you hit a compatibility issue we haven't documented, please send it to `info@
 - **[docs/standard-vs-ours.md](docs/standard-vs-ours.md)** — diff between common Obsidian + AI patterns and what this bundle ships. Read this if you're deciding whether to install.
 - **[docs/upgrading.md](docs/upgrading.md)** — version pinning, rollback, manual refresh.
 - **[DISCLAIMERS.md](DISCLAIMERS.md)** — full disclaimer, limitation of liability, statutory carve-outs (UK), indemnity (for forks), governing law. **Required reading before install.**
-- **[MANIFESTS.md](MANIFESTS.md)** — the mirror contract between `plugin.json` (Cowork) and `SKILL.md` frontmatter (Claude Code).
 
 ## Support
 
