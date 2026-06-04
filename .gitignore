@@ -15,6 +15,28 @@ telemetry/
 # and attached to GitHub Releases — they don't belong in git history.
 release/cowork-zips/
 
+# Internal artefacts hidden from the public repo file tree (still in the
+# working tree on the operator's machine; git history retains earlier
+# committed versions). The public file tree is the user's first-touch
+# surface; only user-facing files belong there.
+MANIFESTS.md
+TESTERS.md
+plugin.json
+companion-skills/open-obsidian-project/plugin.json
+companion-skills/close-obsidian-project/plugin.json
+current-setup-user-guide.md
+install-steps-and-skill-feasibility.md
+shape-1-scope.md
+docs/manual-install-guide-scope.md
+release/test-matrix.md
+release/private-beta-gate.md
+release/post-launch-backlog.md
+release/v1.2.0-notes.md
+release/v1.2.1-notes.md
+release/beta-feedback-runs/
+website/
+scripts/lint_manifest.py
+
 # Build / OS noise
 node_modules/
 .DS_Store
