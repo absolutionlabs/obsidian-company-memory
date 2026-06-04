@@ -1,13 +1,5 @@
 # Obsidian Company Memory
 
-A way to give your AI assistant a proper memory of your company — built by [Absolution Labs](https://absolutionlabs.com), who use this exact pattern to run [Asterley Bros](https://asterleybros.com), our small-batch drinks operation.
-
-Free. Open source. Yours after install. About 25 minutes.
-
-> *We made it free because we'd rather more companies have access to a working AI memory system than gate it behind a sales conversation. If you install it, see it work, and want help with the next thing — you know where to find us.*
-
----
-
 ## What it is, in plain English
 
 If you've ever asked your AI for help with your company and watched it produce the same wrong assumption it produced last week — this is the fix.
